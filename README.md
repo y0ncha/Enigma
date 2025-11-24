@@ -1,6 +1,6 @@
 # Enigma Machine – End-to-End Java Project
 
-This repository contains a full implementation of the Enigma encryption machine, developed as part of the *End-to-End Software Development – Enigma 2025* course.  
+This repository contains a full implementation of the Enigma encryption machine, developed as part of the *End-to-End Software Development* course.  
 The project evolves across three stages, starting from a console application and ending with a complete Spring Boot server.
 
 ---
