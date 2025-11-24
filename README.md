@@ -41,12 +41,14 @@ The project evolves across three stages, starting from a console application and
 ---
 
 ## 📁 Repository Layout
-/machine        # Rotor, reflector, stepping logic
-/engine         # Machine manager and operations
-/loader         # XML loading and validation
-/console        # Console UI (Exercise 1)
-/app-server     # Spring Boot server (Exercise 3)
-/aggregator-enigma  # Maven parent POM
+```
+aggregator-enigma/        # Maven parent project (POM aggregator)
+machine/                  # Core Enigma logic: rotors, reflectors, stepping
+engine/                   # System engine: code setup, history, processing
+loader/                   # XML parsing, validation, and machine construction
+console/                  # Console UI application (Exercise 1)
+app-server/               # Spring Boot server exposing REST API (Exercise 3)
+```
 
 ---
 
