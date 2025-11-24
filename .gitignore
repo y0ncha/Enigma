@@ -1,0 +1,57 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+*.iws
+*.ipr
+out/
+.vscode/
+*.classpath
+*.project
+.settings/
+
+# Logs
+*.log
+*.tmp
+*.temp
+hs_err_pid*
+logs/
+*.log.*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build / distribution
+enigma-machine-server-ex3.jar
+ex-machine-enigma2.jar
+build/
+.gradle/
+
+# Local config and secrets
+.env
+.env.*
+local.properties
+secrets.properties
+*.keystore
+*.jks
+
+# Test artifacts & editor swap files
+test-machines/
+*.xml
+*.bak
+*.swp
+*.swo
