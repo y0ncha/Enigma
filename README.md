@@ -40,14 +40,26 @@ The project evolves across three stages, starting from a console application and
 
 ---
 
-## 📁 Repository Layout
+## 📁 Project Layout
+
+### Overall Structure
 ```
-aggregator-enigma/        # Maven parent project (POM aggregator)
-machine/                  # Core Enigma logic: rotors, reflectors, stepping
-engine/                   # System engine: code setup, history, processing
-loader/                   # XML parsing, validation, and machine construction
-console/                  # Console UI application (Exercise 1)
-app-server/               # Spring Boot server exposing REST API (Exercise 3)
+enigma/
+├─ pom.xml                  # parent (packaging: pom)
+├─ machine/                 # core Enigma logic
+├─ engine/                  # orchestration, validation, history
+├─ loader/                  # XML loading + validations
+├─ console/                 # CLI app (Exercise 1 & 2)
+├─ server/                  # Spring Boot REST API (Exercise 3)
+└─ shared/                  # (optional) DTOs / common models
+```
+### Module Dependencies
+```
+machine   ←   engine   ←   console
+   ↑          ↑  ↑
+   └──── loader  └── server
+         ↑
+       shared (optional, DTOs)
 ```
 
 ---
