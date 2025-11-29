@@ -11,48 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 public class LoadXml implements Loader {
-//    @Override
-//    public String loadAlphabet(String filePath) throws EnigmaLoadingException {
-//        BTEEnigma root = loadRootFromFile(filePath);
-//        return extractAndValidateAlphabet(root);
-//    }
-//
-//    private BTEEnigma loadRootFromFile(String filePath) throws EnigmaLoadingException {
-//        Path path = Paths.get(filePath);
-//        if (!Files.exists(path)) {
-//            throw new EnigmaLoadingException("File does not exist: " + filePath);
-//        }
-//        if (!filePath.toLowerCase().endsWith(".xml")) {
-//            throw new EnigmaLoadingException("File is not an XML (must end with .xml)");
-//        }
-//
-//        try {
-//            JAXBContext context = JAXBContext.newInstance(BTEEnigma.class);
-//            Unmarshaller unmarshaller = context.createUnmarshaller();
-//            return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
-//        } catch (JAXBException e) {
-//            throw new EnigmaLoadingException("Failed to parse XML with JAXB", e);
-//        }
-//    }
-//
-//    private String extractAndValidateAlphabet(BTEEnigma root) throws EnigmaLoadingException {
-//        String rawAbc = root.getABC();
-//        if (rawAbc == null) {
-//            throw new EnigmaLoadingException("XML does not contain <ABC> section");
-//        }
-//
-//        String cleanAbc = rawAbc.replaceAll("\\s+", "");
-//        if (cleanAbc.isEmpty()) {
-//            throw new EnigmaLoadingException("<ABC> section is empty after trimming");
-//        }
-//
-//        if (cleanAbc.length() % 2 != 0) {
-//            throw new EnigmaLoadingException(
-//                    "Alphabet length must be even, but got " + cleanAbc.length());
-//        }
-//
-//        return cleanAbc;
-//    }
 @Override
 public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingException {
     BTEEnigma root = loadRootFromFile(filePath);
