@@ -1,9 +1,9 @@
-package enigma.machine.component.Machine;
+package enigma.machine.component.machine;
 
-import enigma.machine.component.Code.Code;
-import enigma.machine.component.Rotor.Direction;
-import enigma.machine.component.Keyboard.Keyboard;
-import enigma.machine.component.Rotor.Rotor;
+import enigma.machine.component.code.Code;
+import enigma.machine.component.rotor.Direction;
+import enigma.machine.component.keyboard.Keyboard;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 

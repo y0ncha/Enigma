@@ -1,6 +1,6 @@
-package enigma.machine.component.Machine;
+package enigma.machine.component.machine;
 
-import enigma.machine.component.Code.Code;
+import enigma.machine.component.code.Code;
 
 public interface Machine {
     void setCode(Code code);

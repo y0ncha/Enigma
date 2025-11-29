@@ -1,7 +1,7 @@
-package enigma.machine.component.Code;
+package enigma.machine.component.code;
 
-import enigma.machine.component.Reflector.Reflector;
-import enigma.machine.component.Rotor.Rotor;
+import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 

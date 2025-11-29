@@ -1,4 +1,4 @@
-package enigma.machine.component.Keyboard;
+package enigma.machine.component.keyboard;
 
 public interface Keyboard {
     int process(int input);

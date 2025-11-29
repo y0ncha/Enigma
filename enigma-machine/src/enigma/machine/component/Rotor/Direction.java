@@ -1,4 +1,4 @@
-package enigma.machine.component.Rotor;
+package enigma.machine.component.rotor;
 
 public enum Direction {
     FORWARD, BACKWARD

@@ -1,4 +1,4 @@
-package enigma.machine.component.Rotor;
+package enigma.machine.component.rotor;
 
 public interface Rotor {
     int process(int input, Direction direction);
