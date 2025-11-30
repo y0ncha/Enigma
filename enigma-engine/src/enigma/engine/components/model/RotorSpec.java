@@ -4,7 +4,14 @@ import java.util.Objects;
 
 /**
  * Represents the specification of a rotor in the Enigma machine.
- * Immutable data carrier implemented as a record. Arrays are defensively copied.
+ *
+ * <p>Immutable data carrier implemented as a record. Arrays are defensively copied
+ * to preserve immutability semantics for callers.</p>
+ *
+ * <p>Note: Explicit getter methods are provided to return defensive copies of arrays
+ * and to maintain compatibility with existing code that expects getX() methods.</p>
+ *
+ * @since 1.0
  */
 public record RotorSpec(
         int id,
@@ -12,6 +19,14 @@ public record RotorSpec(
         int[] forwardMapping,
         int[] backwardMapping
 ) {
+    /**
+     * Canonical constructor with validation and defensive copy.
+     *
+     * @param id rotor identifier
+     * @param notchIndex notch position index (0-based)
+     * @param forwardMapping forward mapping array (right→left)
+     * @param backwardMapping backward mapping array (left→right)
+     */
     public RotorSpec {
         Objects.requireNonNull(forwardMapping);
         Objects.requireNonNull(backwardMapping);
@@ -20,19 +35,38 @@ public record RotorSpec(
         backwardMapping = backwardMapping.clone();
     }
 
-    // Keep compatibility with existing code that expects getX() methods
+    /**
+     * Return the rotor identifier.
+     *
+     * @return rotor id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Return the notch index that triggers the next rotor step.
+     *
+     * @return notch index (0-based)
+     */
     public int getNotchIndex() {
         return notchIndex;
     }
 
+    /**
+     * Return a defensive copy of the forward mapping array.
+     *
+     * @return copy of forward mapping (right→left)
+     */
     public int[] getForwardMapping() {
         return forwardMapping.clone();
     }
 
+    /**
+     * Return a defensive copy of the backward mapping array.
+     *
+     * @return copy of backward mapping (left→right)
+     */
     public int[] getBackwardMapping() {
         return backwardMapping.clone();
     }

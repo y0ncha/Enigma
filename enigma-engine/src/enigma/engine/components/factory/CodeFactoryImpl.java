@@ -57,6 +57,9 @@ public class CodeFactoryImpl implements CodeFactory {
 
     private static final int DEFAULT_ROTOR_COUNT = 3; // number of rotors to assemble
 
+    /**
+     * Create a new CodeFactoryImpl instance.
+     */
     public CodeFactoryImpl() {
     }
 

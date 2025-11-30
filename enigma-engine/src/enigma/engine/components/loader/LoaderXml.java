@@ -34,6 +34,9 @@ import java.util.*;
  */
 public class LoaderXml implements Loader {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MachineSpec loadMachine(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
@@ -47,6 +50,13 @@ public class LoaderXml implements Loader {
         return new MachineSpec(alphabet, rotors, reflectors);
     }
 
+    /**
+     * Load and parse the XML file into a JAXB root object.
+     *
+     * @param filePath path to the XML file
+     * @return parsed JAXB root object
+     * @throws EnigmaLoadingException when file does not exist, is not XML, or parsing fails
+     */
     private BTEEnigma loadRoot(String filePath) throws EnigmaLoadingException {
         Path path = Paths.get(filePath);
 
@@ -67,6 +77,13 @@ public class LoaderXml implements Loader {
         }
     }
 
+    /**
+     * Extract and validate the alphabet from the XML root.
+     *
+     * @param root JAXB root object
+     * @return validated Alphabet instance
+     * @throws EnigmaLoadingException when alphabet is missing, empty, odd-length, or has duplicates
+     */
     private Alphabet extractAlphabet(BTEEnigma root) throws EnigmaLoadingException {
         String rawAbc = root.getABC();
         if (rawAbc == null) {
@@ -93,6 +110,14 @@ public class LoaderXml implements Loader {
         return new Alphabet(cleanAbc);
     }
 
+    /**
+     * Extract and validate rotors from the XML root.
+     *
+     * @param root JAXB root object
+     * @param alphabet machine alphabet for validation
+     * @return map of rotor id to RotorSpec
+     * @throws EnigmaLoadingException when rotors are missing, invalid, or have duplicate ids
+     */
     private Map<Integer, RotorSpec> extractRotors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<Integer, RotorSpec> result = new HashMap<>();
@@ -190,6 +215,14 @@ public class LoaderXml implements Loader {
         return result;
     }
 
+    /**
+     * Extract and validate reflectors from the XML root.
+     *
+     * @param root JAXB root object
+     * @param alphabet machine alphabet for validation
+     * @return map of reflector id to ReflectorSpec
+     * @throws EnigmaLoadingException when reflectors are missing, invalid, or have duplicate ids
+     */
     private Map<String, ReflectorSpec> extractReflectors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<String, ReflectorSpec> result = new HashMap<>();
