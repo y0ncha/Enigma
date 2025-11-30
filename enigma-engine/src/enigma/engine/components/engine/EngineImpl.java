@@ -44,65 +44,34 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Load machine specification from an XML file, validate it, create a
-     * runtime {@link Machine} and apply a sampled, validated {@link Code}.
+     * {@inheritDoc}
      *
-     * <p>The method performs the following high-level steps:
-     * <ol>
-     *   <li>Load the specification using the configured {@link Loader}.</li>
-     *   <li>Validate the specification at the engine boundary.</li>
-     *   <li>Sample a random, valid {@link CodeConfig} (rotors, positions, reflector).</li>
-     *   <li>Validate the generated configuration and delegate to the factory to
-     *       construct the {@link Code} instance.</li>
-     * </ol>
-     *
-     * @param path file-system path to the machine XML
-     * @throws RuntimeException wrapping {@link EnigmaLoadingException} when loading fails
-     * @throws IllegalArgumentException when the spec or generated config is invalid
+     * <p>High-level orchestration: load spec, validate, create machine,
+     * generate random code config, validate config, build code and assign it.</p>
      */
     @Override
     public void loadXml(String path) {
         try {
+            // 1. Load spec
             MachineSpec spec = loader.loadMachine(path);
 
-            // validate the spec at engine boundary (now engine owns validation)
+            // 2. Validate spec
             validateMachineSpec(spec);
 
-            // create machine with keyboard configured for this alphabet
-            Machine m = new MachineImpl(new KeyboardImpl(spec.alphabet()));
+            // 3. Create machine (no validation here)
+            Machine m = createMachine(spec);
 
-            // generate random CodeConfig here (engine responsibility)
-            SecureRandom rnd = new SecureRandom();
+            // 4. Generate random code configuration
+            CodeConfig cfg = generateRandomCodeConfig(spec);
 
-            // ensure enough rotors
-            int available = (spec.rotorsById() == null) ? 0 : spec.rotorsById().size();
-            if (available < 3) {
-                throw new IllegalArgumentException("Not enough rotors in spec to build machine");
-            }
-
-            // sample 3 rotor ids randomly (left->right order)
-            List<Integer> pool = new ArrayList<>(spec.rotorsById().keySet());
-            Collections.shuffle(pool, rnd);
-            List<Integer> chosenRotors = new ArrayList<>(pool.subList(0, 3));
-
-            // sample starting positions left->right
-            List<Integer> positions = new ArrayList<>();
-            int alphaSize = spec.alphabet().size();
-            for (int i = 0; i < 3; i++) positions.add(rnd.nextInt(alphaSize));
-
-            // pick random reflector
-            List<String> reflectors = new ArrayList<>(spec.reflectorsById().keySet());
-            String reflectorId = reflectors.get(rnd.nextInt(reflectors.size()));
-
-            CodeConfig cfg = new CodeConfig(chosenRotors, positions, reflectorId);
-
-            // validate the generated config using engine validation
+            // 5. Validate generated configuration
             validateCodeConfig(spec, cfg);
 
-            // build code via factory (factory assumes inputs are valid)
+            // 6. Create Code via factory and assign
             Code code = codeFactory.create(spec, cfg);
             m.setCode(code);
 
+            // 7. Store machine
             this.machine = m;
         }
         catch (EnigmaLoadingException e) {
@@ -110,45 +79,22 @@ public class EngineImpl implements Engine {
         }
     }
 
-    /**
-     * Accept arbitrary machine-related input. Implementation is currently a
-     * no-op and reserved for future interactive or scripted flows.
-     *
-     * @param input free-form input used to update engine state
-     */
     @Override
     public void machineData(String input) {
         // no-op for now
     }
 
-    /**
-     * Switch to manual configuration mode. Implementations should collect
-     * manual rotor/reflector/position values and apply them to the machine.
-     * This implementation leaves the behavior to the caller.
-     */
     @Override
     public void codeManual() {
         Code code = null; // construct code from user input
         machine.setCode(code);
     }
 
-    /**
-     * Assign a randomly generated code to the current machine. Prefer the
-     * `loadXml` flow for deterministic sampling + validation; this method
-     * currently delegates to factory helpers or may be implemented later.
-     */
     public void codeRandom() {
         // generate random code - not implemented; prefer loadXml path for now
         machine.setCode(null);
     }
 
-    /**
-     * Process text through the configured machine/code and return the result.
-     *
-     * @param input input text to process
-     * @return processed output
-     * @throws IllegalStateException if the machine is not initialized
-     */
     @Override
     public String process(String input) {
         if (machine == null) throw new IllegalStateException("Machine is not initialized");
@@ -160,15 +106,76 @@ public class EngineImpl implements Engine {
         return output.toString();
     }
 
-    /**
-     * Emit runtime statistics. The current implementation is a placeholder.
-     */
     @Override
     public void statistics() {
 
     }
 
-    // --- Engine-level validation helpers (moved from ValidationService) ---
+    // --- Flow helpers: machine creation and random code generation ---------
+
+    /**
+     * Create a runtime {@link Machine} for the provided specification.
+     * No validation is performed here (caller must validate spec beforehand).
+     *
+     * @param spec validated machine spec
+     * @return new Machine instance
+     */
+    private Machine createMachine(MachineSpec spec) {
+        return new MachineImpl(new KeyboardImpl(spec.alphabet()));
+    }
+
+    /**
+     * Generate a random {@link CodeConfig} from the machine specification.
+     * This method performs only lightweight precondition checks (via
+     * {@link #validateRandomCodePreconditions(MachineSpec, int)}) and returns
+     * a sampled configuration; full validation is done by validateCodeConfig.
+     *
+     * @param spec machine specification
+     * @return sampled CodeConfig (rotorIds left->right, positions left->right, reflectorId)
+     */
+    private CodeConfig generateRandomCodeConfig(MachineSpec spec) {
+        final int REQUIRED_ROTORS = 3;
+        validateRandomCodePreconditions(spec, REQUIRED_ROTORS);
+
+        SecureRandom rnd = new SecureRandom();
+
+        // Sample rotor ids: shuffle the available ids and take the first N
+        List<Integer> pool = new ArrayList<>(spec.rotorsById().keySet());
+        Collections.shuffle(pool, rnd);
+        List<Integer> chosenRotors = new ArrayList<>(pool.subList(0, REQUIRED_ROTORS)); // left->right order
+
+        // Sample starting positions (left->right)
+        List<Integer> positions = new ArrayList<>(REQUIRED_ROTORS);
+        int alphaSize = spec.alphabet().size();
+        for (int i = 0; i < REQUIRED_ROTORS; i++) {
+            positions.add(rnd.nextInt(alphaSize));
+        }
+
+        // Pick a random reflector id
+        List<String> reflectors = new ArrayList<>(spec.reflectorsById().keySet());
+        String reflectorId = reflectors.get(rnd.nextInt(reflectors.size()));
+
+        return new CodeConfig(chosenRotors, positions, reflectorId);
+    }
+
+    /**
+     * Validate preconditions required for sampling a random code configuration.
+     * Throws {@link IllegalArgumentException} when prerequisites are not met.
+     *
+     * @param spec machine specification
+     * @param requiredRotors number of rotors required for sampling
+     */
+    private void validateRandomCodePreconditions(MachineSpec spec, int requiredRotors) {
+        if (spec.rotorsById() == null) throw new IllegalArgumentException("MachineSpec rotors map must not be null");
+        int available = spec.rotorsById().size();
+        if (available < requiredRotors) {
+            throw new IllegalArgumentException("Not enough rotors in spec to build machine: required " + requiredRotors + ", but got " + available);
+        }
+        if (spec.reflectorsById() == null || spec.reflectorsById().isEmpty())
+            throw new IllegalArgumentException("MachineSpec must define at least one reflector to sample randomly");
+    }
+
+    // --- Engine-level validation helpers ------------------------------------------------
 
     /**
      * Validate the loaded {@link MachineSpec} for internal consistency.

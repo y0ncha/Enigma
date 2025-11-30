@@ -265,13 +265,21 @@ public class LoaderXml implements Loader {
     // --- Alphabet validation helper -------------------------------------------------
 
     /**
-     * Validate and clean the raw alphabet string from XML.
-     * Rules (fail with {@link EnigmaLoadingException} on violation):
-     * - missing <ABC> section
-     * - trim whitespace (all internal whitespace removed)
-     * - empty after trimming
-     * - length must be even
-     * - no duplicate characters
+     * Validate and clean the raw alphabet string from the XML {@code <ABC>} element.
+     *
+     * <p>This method expects the raw alphabet value as read from the XML {@code <ABC>} element.
+     * It removes all whitespace using {@code rawAbc.replaceAll("\\s+", "")} and then
+     * enforces the following constraints on the cleaned alphabet:</p>
+     *
+     * <ul>
+     *   <li>the raw value must not be {@code null} (the XML must contain an {@code <ABC>} element)</li>
+     *   <li>the cleaned value must not be empty after whitespace removal</li>
+     *   <li>the cleaned value must have an even length</li>
+     *   <li>the cleaned value must not contain duplicate characters</li>
+     * </ul>
+     *
+     * <p>On success the cleaned alphabet string (all whitespace removed) is returned.
+     * On failure an {@link EnigmaLoadingException} is thrown describing the problem.</p>
      *
      * @param rawAbc raw ABC value from XML
      * @return cleaned alphabet string
