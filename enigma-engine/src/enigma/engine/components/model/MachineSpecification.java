@@ -5,7 +5,7 @@ public class MachineSpecification {
     private final Alphabet alphabet;
     private final Map<Integer, RotorSpecification> rotorsById;
     private final Map<String, ReflectorSpecification> reflectorsById;
-    private final int rotorsCountInUse; // לשימוש בתרגיל 2+
+    private final int rotorsCountInUse; // Used in exercise 2+
 
     public MachineSpecification(Alphabet alphabet,
                                 Map<Integer, RotorSpecification> rotorsById,
