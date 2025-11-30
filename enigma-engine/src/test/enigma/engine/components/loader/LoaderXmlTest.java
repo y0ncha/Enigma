@@ -8,11 +8,24 @@ import enigma.engine.components.model.MachineSpec;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Manual test harness for {@link LoaderXml}.
+ *
+ * <p>Runs the loader against several XML files and prints results to stdout.
+ * This is not a unit test but a manual verification tool.</p>
+ *
+ * @since 1.0
+ */
 public class LoaderXmlTest {
 
     // Relative to the project root — actual files are under enigma-engine/src/resources/xml/
     private static final String XML_BASE_DIR = "enigma-engine/src/resources/xml";
 
+    /**
+     * Entry point for the test harness.
+     *
+     * @param args command line arguments (unused)
+     */
     public static void main(String[] args) {
         Loader loader = new LoaderXml();
 
