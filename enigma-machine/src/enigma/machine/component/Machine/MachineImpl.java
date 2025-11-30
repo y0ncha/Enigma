@@ -1,113 +1,65 @@
-package enigma.machine.component.machine;
+package enigma.machine.component.Machine;
 
-import enigma.machine.component.code.Code;
-import enigma.machine.component.keyboard.Keyboard;
-import enigma.machine.component.reflector.Reflector;
-import enigma.machine.component.rotor.Direction;
-import enigma.machine.component.rotor.Rotor;
+import enigma.machine.component.Code.Code;
+import enigma.machine.component.Rotor.Direction;
+import enigma.machine.component.Keyboard.Keyboard;
+import enigma.machine.component.Rotor.Rotor;
 
 import java.util.List;
 
-/**
- * Default {@link Machine} implementation that coordinates rotor stepping,
- * forward/backward transformations and reflector processing.
- *
- * @since 1.0
- */
-public class MachineImpl implements Machine {
-
-    /*--------------- Fields ---------------*/
+public class MachineImpl implements Machine{
     private Code code;
     private final Keyboard keyboard;
 
-
-    /*--------------- Ctor ---------------*/
-    /**
-     * Construct a machine with a provided {@link Keyboard}.
-     *
-     * @param keyboard keyboard adapter used for char/index conversions
-     * @since 1.0
-     */
     public MachineImpl(Keyboard keyboard) {
-
         this.keyboard = keyboard;
-        this.code = null;
     }
 
-    /*--------------- Methods ---------------*/
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setCode(Code code) {
         this.code = code;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public char process(char input) {
-
-        if (code == null) {
-            throw new IllegalStateException("Machine is not configured with a code");
-        }
-
-        int intermediate = keyboard.process(input);
+        int intermediate =  keyboard.process(input);
         List<Rotor> rotors = code.getRotors();
 
+        // advance
         advance(rotors);
+
+        // forward
         intermediate = forwardTransform(rotors, intermediate);
+
+        // reflect
         intermediate = code.getReflector().process(intermediate);
+
+        // backward
         intermediate = backwardTransform(rotors, intermediate);
 
         return keyboard.lightKey(intermediate);
     }
 
-    /*--------------- Helpers ---------------*/
-    /**
-     * Advance rotors starting from the rightmost rotor.
-     *
-     * @param rotors list of rotors in right→left order
-     * @since 1.0
-     */
-    private void advance(List<Rotor> rotors) {
-        int rotorIndex = 0;
-        boolean shouldAdvance;
-
-        do {
-            shouldAdvance = rotors.get(rotorIndex).advance();
-            rotorIndex++;
-        } while (shouldAdvance && rotorIndex < rotors.size());
-    }
-
-    /**
-     * Apply forward transformation through rotors (right→left).
-     *
-     * @param rotors rotors list
-     * @param value input index
-     * @return transformed index after forward pass
-     * @since 1.0
-     */
-    private static int forwardTransform(List<Rotor> rotors, int value) {
-        for (int i = 0; i < rotors.size(); i++) {
-            value = rotors.get(i).process(value, Direction.FORWARD);
-        }
-        return value;
-    }
-
-    /**
-     * Apply backward transformation through rotors (left→right).
-     *
-     * @param rotors rotors list
-     * @param value input index
-     * @return transformed index after backward pass
-     * @since 1.0
-     */
-    private static int backwardTransform(List<Rotor> rotors, int value) {
+    private static int backwardTransform(List<Rotor> rotors, int intermediate) {
         for (int i = rotors.size() - 1; i >= 0; i--) {
-            value = rotors.get(i).process(value, Direction.BACKWARD);
+            intermediate = rotors.get(i).process(intermediate, Direction.BACKWARD);
         }
-        return value;
+        return intermediate;
+    }
+
+    private static int forwardTransform(List<Rotor> rotors, int intermediate) {
+        for (int i = 0; i < rotors.size(); i++) {
+            intermediate = rotors.get(i).process(intermediate, Direction.FORWARD);
+        }
+        return intermediate;
+    }
+
+    private void advance(List<Rotor> rotors) {
+        int rotorIndx = 0;
+        boolean shouldAdvance = false;
+        do {
+            shouldAdvance = rotors.get(rotorIndx).advance();
+            rotorIndx++;
+        } while (shouldAdvance && rotorIndx < rotors.size());
     }
 }
