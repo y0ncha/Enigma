@@ -5,7 +5,7 @@
 //
 
 
-package enigma.engine.components.xml.generated;
+package enigma.engine.xml.generated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +25,8 @@ import jakarta.xml.bind.annotation.XmlType;
  * <complexType>
  *   <complexContent>
  *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       <sequence maxOccurs="unbounded">
- *         <element ref="{}BTE-Rotor"/>
+ *       <sequence maxOccurs="5">
+ *         <element ref="{}BTE-Reflector"/>
  *       </sequence>
  *     </restriction>
  *   </complexContent>
@@ -37,44 +37,44 @@ import jakarta.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "bteRotor"
+    "bteReflector"
 })
-@XmlRootElement(name = "BTE-Rotors")
-public class BTERotors {
+@XmlRootElement(name = "BTE-Reflectors")
+public class BTEReflectors {
 
-    @XmlElement(name = "BTE-Rotor", required = true)
-    protected List<BTERotor> bteRotor;
+    @XmlElement(name = "BTE-Reflector", required = true)
+    protected List<BTEReflector> bteReflector;
 
     /**
-     * Gets the value of the bteRotor property.
+     * Gets the value of the bteReflector property.
      * 
      * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the bteRotor property.</p>
+     * This is why there is not a <CODE>set</CODE> method for the bteReflector property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * </p>
      * <pre>
-     * getBTERotor().add(newItem);
+     * getBTEReflector().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link BTERotor }
+     * {@link BTEReflector }
      * </p>
      * 
      * 
      * @return
-     *     The value of the bteRotor property.
+     *     The value of the bteReflector property.
      */
-    public List<BTERotor> getBTERotor() {
-        if (bteRotor == null) {
-            bteRotor = new ArrayList<>();
+    public List<BTEReflector> getBTEReflector() {
+        if (bteReflector == null) {
+            bteReflector = new ArrayList<>();
         }
-        return this.bteRotor;
+        return this.bteReflector;
     }
 
 }

@@ -5,7 +5,7 @@
 //
 
 
-package enigma.engine.components.xml.generated;
+package enigma.engine.xml.generated;
 
 import jakarta.xml.bind.annotation.XmlRegistry;
 

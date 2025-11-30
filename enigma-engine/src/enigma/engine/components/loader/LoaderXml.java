@@ -1,11 +1,13 @@
 package enigma.engine.components.loader;
 
-import enigma.engine.components.model.*;
 import enigma.machine.component.alphabet.Alphabet;
-import enigma.engine.components.xml.generated.*;
+import enigma.engine.xml.generated.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import enigma.engine.components.model.MachineSpec;
+import enigma.engine.components.model.ReflectorSpec;
+import enigma.engine.components.model.RotorSpec;
 
 import java.io.File;
 import java.nio.file.Files;

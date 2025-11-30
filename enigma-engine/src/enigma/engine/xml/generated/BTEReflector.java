@@ -5,7 +5,7 @@
 //
 
 
-package enigma.engine.components.xml.generated;
+package enigma.engine.xml.generated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,19 @@ import jakarta.xml.bind.annotation.XmlType;
  *   <complexContent>
  *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       <sequence maxOccurs="unbounded">
- *         <element ref="{}BTE-Positioning"/>
+ *         <element ref="{}BTE-Reflect"/>
  *       </sequence>
- *       <attribute name="notch" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       <attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       <attribute name="id" use="required">
+ *         <simpleType>
+ *           <restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *             <enumeration value="I"/>
+ *             <enumeration value="II"/>
+ *             <enumeration value="III"/>
+ *             <enumeration value="IV"/>
+ *             <enumeration value="V"/>
+ *           </restriction>
+ *         </simpleType>
+ *       </attribute>
  *     </restriction>
  *   </complexContent>
  * </complexType>
@@ -40,79 +49,69 @@ import jakarta.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "btePositioning"
+    "bteReflect"
 })
-@XmlRootElement(name = "BTE-Rotor")
-public class BTERotor {
+@XmlRootElement(name = "BTE-Reflector")
+public class BTEReflector {
 
-    @XmlElement(name = "BTE-Positioning", required = true)
-    protected List<BTEPositioning> btePositioning;
-    @XmlAttribute(name = "notch", required = true)
-    protected int notch;
+    @XmlElement(name = "BTE-Reflect", required = true)
+    protected List<BTEReflect> bteReflect;
     @XmlAttribute(name = "id", required = true)
-    protected int id;
+    protected String id;
 
     /**
-     * Gets the value of the btePositioning property.
+     * Gets the value of the bteReflect property.
      * 
      * <p>This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the btePositioning property.</p>
+     * This is why there is not a <CODE>set</CODE> method for the bteReflect property.</p>
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * </p>
      * <pre>
-     * getBTEPositioning().add(newItem);
+     * getBTEReflect().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link BTEPositioning }
+     * {@link BTEReflect }
      * </p>
      * 
      * 
      * @return
-     *     The value of the btePositioning property.
+     *     The value of the bteReflect property.
      */
-    public List<BTEPositioning> getBTEPositioning() {
-        if (btePositioning == null) {
-            btePositioning = new ArrayList<>();
+    public List<BTEReflect> getBTEReflect() {
+        if (bteReflect == null) {
+            bteReflect = new ArrayList<>();
         }
-        return this.btePositioning;
-    }
-
-    /**
-     * Gets the value of the notch property.
-     * 
-     */
-    public int getNotch() {
-        return notch;
-    }
-
-    /**
-     * Sets the value of the notch property.
-     * 
-     */
-    public void setNotch(int value) {
-        this.notch = value;
+        return this.bteReflect;
     }
 
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(int value) {
+    public void setId(String value) {
         this.id = value;
     }
 
