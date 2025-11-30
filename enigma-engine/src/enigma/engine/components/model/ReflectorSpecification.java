@@ -2,7 +2,7 @@ package enigma.engine.components.model;
 
 public class ReflectorSpecification {
     private final String id; // "I", "II", ...
-    private final int[] mapping; // mapping[i] = j ; סימטרי
+    private final int[] mapping; // mapping[i] = j ; symmetric
 
     public ReflectorSpecification(String id, int[] mapping) {
         this.id = id;
