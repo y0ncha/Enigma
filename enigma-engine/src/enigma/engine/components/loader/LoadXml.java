@@ -169,7 +169,7 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
         return result;
     }
 
-    /* ---------- שלב 4: רפלקטורים ---------- */
+    /* ---------- Step 4: Reflectors ---------- */
 
     private Map<String, ReflectorSpecification> buildReflectors(BTEEnigma root,
                                                                 Alphabet alphabet)
