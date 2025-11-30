@@ -8,6 +8,12 @@ import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 
+/**
+ * Default {@link Machine} implementation that coordinates rotor stepping,
+ * forward/backward transformations and reflector processing.
+ *
+ * @since 1.0
+ */
 public class MachineImpl implements Machine {
 
     /*--------------- Fields ---------------*/
@@ -16,6 +22,12 @@ public class MachineImpl implements Machine {
 
 
     /*--------------- Ctor ---------------*/
+    /**
+     * Construct a machine with a provided {@link Keyboard}.
+     *
+     * @param keyboard keyboard adapter used for char/index conversions
+     * @since 1.0
+     */
     public MachineImpl(Keyboard keyboard) {
 
         this.keyboard = keyboard;
@@ -23,11 +35,17 @@ public class MachineImpl implements Machine {
     }
 
     /*--------------- Methods ---------------*/
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setCode(Code code) {
         this.code = code;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public char process(char input) {
 
@@ -47,6 +65,12 @@ public class MachineImpl implements Machine {
     }
 
     /*--------------- Helpers ---------------*/
+    /**
+     * Advance rotors starting from the rightmost rotor.
+     *
+     * @param rotors list of rotors in right→left order
+     * @since 1.0
+     */
     private void advance(List<Rotor> rotors) {
         int rotorIndex = 0;
         boolean shouldAdvance;
@@ -57,6 +81,14 @@ public class MachineImpl implements Machine {
         } while (shouldAdvance && rotorIndex < rotors.size());
     }
 
+    /**
+     * Apply forward transformation through rotors (right→left).
+     *
+     * @param rotors rotors list
+     * @param value input index
+     * @return transformed index after forward pass
+     * @since 1.0
+     */
     private static int forwardTransform(List<Rotor> rotors, int value) {
         for (int i = 0; i < rotors.size(); i++) {
             value = rotors.get(i).process(value, Direction.FORWARD);
@@ -64,6 +96,14 @@ public class MachineImpl implements Machine {
         return value;
     }
 
+    /**
+     * Apply backward transformation through rotors (left→right).
+     *
+     * @param rotors rotors list
+     * @param value input index
+     * @return transformed index after backward pass
+     * @since 1.0
+     */
     private static int backwardTransform(List<Rotor> rotors, int value) {
         for (int i = rotors.size() - 1; i >= 0; i--) {
             value = rotors.get(i).process(value, Direction.BACKWARD);

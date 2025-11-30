@@ -2,17 +2,31 @@ package enigma.machine.component.reflector;
 
 import enigma.machine.component.alphabet.Alphabet;
 
+/**
+ * Simple runtime reflector using a symmetric mapping array.
+ *
+ * @since 1.0
+ */
 public class ReflectorImpl implements Reflector {
 
     private final Alphabet alphabet;
     private final int[] mapping;   // symmetric mapping array
 
-    // todo - change after understanding hows th code is being generated from the xml and user input, maybe builder or factory design pattern
+    /**
+     * Create reflector with the provided alphabet and mapping.
+     *
+     * @param alphabet alphabet used by the machine
+     * @param mapping symmetric mapping array (mapping[i] = j and mapping[j] = i)
+     * @since 1.0
+     */
     public ReflectorImpl(Alphabet alphabet, int[] mapping) {
         this.alphabet = alphabet;
         this.mapping = mapping;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int process(int index) {
         return mapping[index];

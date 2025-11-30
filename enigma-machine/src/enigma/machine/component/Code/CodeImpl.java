@@ -5,6 +5,12 @@ import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 
+/**
+ * Immutable implementation of {@link Code} that stores active components
+ * and configuration metadata.
+ *
+ * @since 1.0
+ */
 public class CodeImpl implements Code {
 
     // active components
@@ -16,7 +22,16 @@ public class CodeImpl implements Code {
     private final List<Integer> positions;   // numeric positions (0..|ABC|-1)
     private final String reflectorId;        // "I", "II", ...
 
-    // todo - change after understanding hows th code is being generated from the xml and user input, maybe builder or factory design pattern
+    /**
+     * Create a new immutable code instance.
+     *
+     * @param rotors active rotors in right→left order
+     * @param reflector active reflector
+     * @param rotorIds rotor numeric ids in right→left order
+     * @param positions rotor start positions (0-based)
+     * @param reflectorId reflector identifier
+     * @since 1.0
+     */
     public CodeImpl(List<Rotor> rotors,
                     Reflector reflector,
                     List<Integer> rotorIds,

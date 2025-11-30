@@ -3,7 +3,11 @@ package enigma.machine.component.rotor;
 import enigma.machine.component.alphabet.Alphabet;
 
 /**
- * Runtime rotor created from a RotorDefinition and a starting position.
+ * Runtime rotor created from rotor mappings and a starting position.
+ *
+ * Handles index shifting according to the rotor window position.
+ *
+ * @since 1.0
  */
 public class RotorImpl implements Rotor {
 
@@ -14,7 +18,16 @@ public class RotorImpl implements Rotor {
 
     private int position;                   // current window index (0..alphabetSize-1)
 
-    // todo - change after understanding hows th code is being generated from the xml and user input, maybe builder or factory design pattern
+    /**
+     * Create a runtime rotor.
+     *
+     * @param alphabet alphabet for bounds and conversions
+     * @param forwardMapping forward mapping array (right→left)
+     * @param backwardMapping backward mapping array (left→right)
+     * @param notch notch index that triggers the next rotor step
+     * @param startPosition initial rotor position (0..alphabetSize-1)
+     * @since 1.0
+     */
     public RotorImpl(Alphabet alphabet,
                      int[] forwardMapping,
                      int[] backwardMapping,
@@ -28,12 +41,18 @@ public class RotorImpl implements Rotor {
         this.position = startPosition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean advance() {
         position = (position + 1) % alphabet.size();
         return position == notch;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int process(int index, Direction direction) {
         // apply rotation offset
@@ -47,16 +66,25 @@ public class RotorImpl implements Rotor {
         return (mapped - position + alphabet.size()) % alphabet.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getPosition() {
         return position;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setPosition(int position) {
         this.position = position % alphabet.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNotch() {
         return notch;
