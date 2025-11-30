@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 public class LoadXml implements Loader {
-@Override
+    @Override
 public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingException {
     BTEEnigma root = loadRootFromFile(filePath);
 
