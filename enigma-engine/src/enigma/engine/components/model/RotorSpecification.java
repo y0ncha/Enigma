@@ -25,10 +25,10 @@ public class RotorSpecification {
     }
 
     public int[] getForwardMapping() {
-        return forwardMapping;
+        return forwardMapping.clone();
     }
 
     public int[] getBackwardMapping() {
-        return backwardMapping;
+        return backwardMapping.clone();
     }
 }
