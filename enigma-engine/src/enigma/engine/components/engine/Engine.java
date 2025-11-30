@@ -26,7 +26,8 @@ public interface Engine {
 
     /**
      * Configures the machine code manually.
-     * Requires rotor IDs, initial positions, reflector ID, and optional plug pairs.
+     * Parameters for rotor IDs, initial positions, reflector ID, and optional plug pairs
+     * are to be provided when the method signature is fully implemented.
      */
     void codeManual(/*Args*/);
 

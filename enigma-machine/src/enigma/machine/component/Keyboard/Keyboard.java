@@ -8,9 +8,9 @@ package enigma.machine.component.keyboard;
 public interface Keyboard {
 
     /**
-     * Processes an input character by converting it to its numeric index.
+     * Processes an input by mapping it through the keyboard.
      *
-     * @param input the numeric representation of the input character
+     * @param input the numeric index of the input character
      * @return the processed numeric index
      */
     int process(int input);
