@@ -133,13 +133,6 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
                 }
 
                 // 4. Extra safety range check (should already be OK if indexOf != -1)
-                if (right < 0 || right >= alphabetSize ||
-                        left  < 0 || left  >= alphabetSize) {
-                    throw new EnigmaLoadingException(
-                            "Rotor " + id +
-                                    " has mapping out of alphabet range: " +
-                                    rightChar + " -> " + leftChar);
-                }
 
                 // 5. Ensure permutation: each index on the right and left
                 //    appears exactly once (no duplicates)
