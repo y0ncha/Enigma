@@ -24,19 +24,11 @@ import java.util.*;
  * and content of the XML sections (such as <ABC>, rotors, and reflectors).
  * <p>
  * Any errors encountered during loading or parsing are reported via {@link EnigmaLoadingException}.
- * <p>
- * Implementation details:
- * <ul>
- *   <li>Uses {@link BTEEnigma} as the root JAXB-mapped class.</li>
- *   <li>Validates the alphabet section for even length and non-empty content.</li>
- *   <li>Builds collections of rotors and reflectors from the XML structure.</li>
- * </ul>
  */
 public class LoaderXml implements Loader {
 
-    /**
-     * {@inheritDoc}
-     */
+    private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
+
     @Override
     public MachineSpec loadMachine(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
@@ -50,13 +42,6 @@ public class LoaderXml implements Loader {
         return new MachineSpec(alphabet, rotors, reflectors);
     }
 
-    /**
-     * Load and parse the XML file into a JAXB root object.
-     *
-     * @param filePath path to the XML file
-     * @return parsed JAXB root object
-     * @throws EnigmaLoadingException when file does not exist, is not XML, or parsing fails
-     */
     private BTEEnigma loadRoot(String filePath) throws EnigmaLoadingException {
         Path path = Paths.get(filePath);
 
@@ -77,69 +62,27 @@ public class LoaderXml implements Loader {
         }
     }
 
-    /**
-     * Extract and validate the alphabet from the XML root.
-     *
-     * @param root JAXB root object
-     * @return validated Alphabet instance
-     * @throws EnigmaLoadingException when alphabet is missing, empty, odd-length, or has duplicates
-     */
     private Alphabet extractAlphabet(BTEEnigma root) throws EnigmaLoadingException {
         String rawAbc = root.getABC();
-        if (rawAbc == null) {
-            throw new EnigmaLoadingException("XML does not contain <ABC> section");
-        }
-
-        String cleanAbc = rawAbc.replaceAll("\\s+", "");
-        if (cleanAbc.isEmpty()) {
-            throw new EnigmaLoadingException("<ABC> section is empty after trimming");
-        }
-
-        if (cleanAbc.length() % 2 != 0) {
-            throw new EnigmaLoadingException(
-                    "Alphabet length must be even, but got " + cleanAbc.length());
-        }
-
-        // Check for duplicate characters
-        Set<Character> charSet = new HashSet<>();
-        for (char c : cleanAbc.toCharArray()) {
-            if (!charSet.add(c)) {
-                throw new EnigmaLoadingException("Alphabet contains duplicate character: '" + c + "'");
-            }
-        }
+        String cleanAbc = validateAlphabet(rawAbc);
         return new Alphabet(cleanAbc);
     }
 
-    /**
-     * Extract and validate rotors from the XML root.
-     *
-     * @param root JAXB root object
-     * @param alphabet machine alphabet for validation
-     * @return map of rotor id to RotorSpec
-     * @throws EnigmaLoadingException when rotors are missing, invalid, or have duplicate ids
-     */
     private Map<Integer, RotorSpec> extractRotors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<Integer, RotorSpec> result = new HashMap<>();
 
         BTERotors bteRotors = root.getBTERotors();
-        if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
-            throw new EnigmaLoadingException("No <BTE-Rotors> section or empty rotors list");
-        }
+        validateRotorsHeader(bteRotors);
 
         int alphabetSize = alphabet.size();
 
         for (BTERotor rotorXml : bteRotors.getBTERotor()) {
             int id = rotorXml.getId();
-            if (result.containsKey(id)) {
-                throw new EnigmaLoadingException("Duplicate rotor id: " + id);
-            }
+            validateRotorIdUnique(id, result);
 
             int notch = rotorXml.getNotch();
-            if (notch < 1 || notch > alphabetSize) {
-                throw new EnigmaLoadingException("Rotor " + id +
-                        " has illegal notch " + notch + " (must be 1.." + alphabetSize + ")");
-            }
+            validateNotch(id, notch, alphabetSize);
             int notchIndex = notch - 1;
 
             int[] forward = new int[alphabetSize];
@@ -180,7 +123,6 @@ public class LoaderXml implements Loader {
                                     " left=" + leftChar);
                 }
 
-
                 // 5. Ensure permutation: each index on the right and left
                 //    appears exactly once (no duplicates)
                 if (!seenRight.add(right)) {
@@ -212,25 +154,78 @@ public class LoaderXml implements Loader {
             result.put(id, new RotorSpec(id, notchIndex, forward, backward));
         }
 
+        // After collecting all rotor ids, ensure they form a contiguous 1..N sequence
+        validateRotorIdSequence(result.keySet());
+
         return result;
     }
 
-    /**
-     * Extract and validate reflectors from the XML root.
-     *
-     * @param root JAXB root object
-     * @param alphabet machine alphabet for validation
-     * @return map of reflector id to ReflectorSpec
-     * @throws EnigmaLoadingException when reflectors are missing, invalid, or have duplicate ids
-     */
+    // Alphabet validation helper
+    private String validateAlphabet(String rawAbc) throws EnigmaLoadingException {
+        if (rawAbc == null) {
+            throw new EnigmaLoadingException("XML does not contain <ABC> section");
+        }
+
+        String cleanAbc = rawAbc.replaceAll("\\s+", "");
+        if (cleanAbc.isEmpty()) {
+            throw new EnigmaLoadingException("<ABC> section is empty after trimming");
+        }
+
+        if (cleanAbc.length() % 2 != 0) {
+            throw new EnigmaLoadingException("Alphabet length must be even, but got " + cleanAbc.length());
+        }
+
+        // Check for duplicate characters
+        Set<Character> charSet = new HashSet<>();
+        for (char c : cleanAbc.toCharArray()) {
+            if (!charSet.add(c)) {
+                throw new EnigmaLoadingException("Alphabet contains duplicate character: '" + c + "'");
+            }
+        }
+        return cleanAbc;
+    }
+
+    // Rotor validation helpers
+    private void validateRotorsHeader(BTERotors bteRotors) throws EnigmaLoadingException {
+        if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
+            throw new EnigmaLoadingException("No <BTE-Rotors> section or empty rotors list");
+        }
+        if (bteRotors.getBTERotor().size() < 3) {
+            throw new EnigmaLoadingException("Machine must define at least 3 rotors, but got " + bteRotors.getBTERotor().size());
+        }
+    }
+
+    private void validateRotorIdUnique(int id, Map<Integer, RotorSpec> existing) throws EnigmaLoadingException {
+        if (existing.containsKey(id)) {
+            throw new EnigmaLoadingException("Duplicate rotor id: " + id);
+        }
+    }
+
+    private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
+        if (notch < 1 || notch > alphabetSize) {
+            throw new EnigmaLoadingException("Rotor " + rotorId +
+                    " has illegal notch " + notch + " (must be 1.." + alphabetSize + ")");
+        }
+    }
+
+    private void validateRotorIdSequence(Set<Integer> ids) throws EnigmaLoadingException {
+        if (ids == null || ids.isEmpty()) return;
+
+        int min = Collections.min(ids);
+        int max = Collections.max(ids);
+        int expectedCount = max - min + 1;
+
+        if (min != 1 || expectedCount != ids.size()) {
+            throw new EnigmaLoadingException("Rotor ids must form a contiguous sequence 1..N without gaps, but got: " + ids);
+        }
+    }
+
     private Map<String, ReflectorSpec> extractReflectors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<String, ReflectorSpec> result = new HashMap<>();
 
         BTEReflectors bteReflectors = root.getBTEReflectors();
-        if (bteReflectors == null || bteReflectors.getBTEReflector().isEmpty()) {
-            throw new EnigmaLoadingException("No <BTE-Reflectors> section or empty reflectors list");
-        }
+        validateReflectorsHeader(bteReflectors);
 
         int alphabetSize = alphabet.size();
 
@@ -239,6 +234,8 @@ public class LoaderXml implements Loader {
             if (result.containsKey(id)) {
                 throw new EnigmaLoadingException("Duplicate reflector id: " + id);
             }
+
+            validateReflectorIdFormat(id);
 
             int[] mapping = new int[alphabetSize];
             Arrays.fill(mapping, -1);
@@ -281,6 +278,35 @@ public class LoaderXml implements Loader {
             result.put(id, new ReflectorSpec(id, mapping));
         }
 
+        // After building reflectors, ensure ids form a contiguous Roman run starting from I
+        validateReflectorIdRun(result.keySet());
+
         return result;
+    }
+
+    // Reflector validation helpers
+    private void validateReflectorsHeader(BTEReflectors bteReflectors) throws EnigmaLoadingException {
+        if (bteReflectors == null || bteReflectors.getBTEReflector().isEmpty()) {
+            throw new EnigmaLoadingException("No <BTE-Reflectors> section or empty reflectors list");
+        }
+    }
+
+    private void validateReflectorIdFormat(String id) throws EnigmaLoadingException {
+        if (!ROMAN_ORDER.contains(id)) {
+            throw new EnigmaLoadingException("Illegal reflector id '" + id + "' (must be Roman numeral I, II, III, IV or V)");
+        }
+    }
+
+    private void validateReflectorIdRun(Set<String> ids) throws EnigmaLoadingException {
+        if (ids == null || ids.isEmpty()) return;
+
+        // Build the required prefix of ROMAN_ORDER with size n
+        int n = ids.size();
+        for (int i = 0; i < n; i++) {
+            String required = ROMAN_ORDER.get(i);
+            if (!ids.contains(required)) {
+                throw new EnigmaLoadingException("Reflector ids must form a contiguous Roman run starting from I (e.g. I,II,III). Got: " + ids);
+            }
+        }
     }
 }
