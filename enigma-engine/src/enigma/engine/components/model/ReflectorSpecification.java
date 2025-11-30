@@ -14,6 +14,6 @@ public class ReflectorSpecification {
     }
 
     public int[] getMapping() {
-        return mapping;
+        return mapping.clone();
     }
 }
