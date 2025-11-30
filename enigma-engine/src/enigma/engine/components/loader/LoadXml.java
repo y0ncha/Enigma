@@ -1,5 +1,6 @@
 package enigma.engine.components.loader;
 import enigma.engine.components.model.*;
+import enigma.machine.component.alphabet.Alphabet;
 import enigma.engine.components.xml.generated.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;

@@ -11,8 +11,38 @@ package enigma.machine.component.alphabet;
 public class Alphabet {
     private final String letters;
 
+    /**
+     * Create an Alphabet instance. The provided string must be non-null,
+     * non-empty and contain unique characters.
+     *
+     * @param letters sequence of characters composing the alphabet
+     * @throws IllegalArgumentException when letters is null, empty or contains duplicates
+     * @since 1.0
+     */
     public Alphabet(String letters) {
+        if (letters == null) {
+            throw new IllegalArgumentException("Alphabet letters cannot be null.");
+        }
+        if (letters.isEmpty()) {
+            throw new IllegalArgumentException("Alphabet letters cannot be empty.");
+        }
+        java.util.Set<Character> seen = new java.util.HashSet<>();
+        for (char c : letters.toCharArray()) {
+            if (!seen.add(c)) {
+                throw new IllegalArgumentException("Alphabet letters must be unique. Duplicate character: " + c);
+            }
+        }
         this.letters = letters;
+    }
+
+    /**
+     * Return the underlying letters string.
+     *
+     * @return the letters string
+     * @since 1.0
+     */
+    public String getLetters() {
+        return letters;
     }
 
     /**
