@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * Represents a machine code configuration: rotors, reflector and metadata.
- *
  * Implementations are expected to provide ordered rotor instances (right→left)
  * together with their configuration metadata.
  *
@@ -52,3 +51,4 @@ public interface Code {
      */
     String getReflectorId();
 }
+

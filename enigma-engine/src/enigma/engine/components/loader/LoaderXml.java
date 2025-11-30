@@ -36,21 +36,18 @@ public class LoaderXml implements Loader {
 
     @Override
     public MachineSpec loadMachine(String filePath) throws EnigmaLoadingException {
-        BTEEnigma root = loadRootFromFile(filePath);
+        BTEEnigma root = loadRoot(filePath);
 
-        Alphabet alphabet = buildAlphabet(root);
+        Alphabet alphabet = extractAlphabet(root);
 
-        Map<Integer, RotorSpec> rotors = buildRotors(root, alphabet);
+        Map<Integer, RotorSpec> rotors = extractRotors(root, alphabet);
 
-        Map<String, ReflectorSpec> reflectors = buildReflectors(root, alphabet);
+        Map<String, ReflectorSpec> reflectors = extractReflectors(root, alphabet);
 
-        int rotorsCountInUse = 0;
-
-        return new MachineSpec(alphabet, rotors, reflectors, rotorsCountInUse);
+        return new MachineSpec(alphabet, rotors, reflectors);
     }
 
-
-    private BTEEnigma loadRootFromFile(String filePath) throws EnigmaLoadingException {
+    private BTEEnigma loadRoot(String filePath) throws EnigmaLoadingException {
         Path path = Paths.get(filePath);
 
         if (!Files.exists(path)) {
@@ -70,8 +67,7 @@ public class LoaderXml implements Loader {
         }
     }
 
-
-    private Alphabet buildAlphabet(BTEEnigma root) throws EnigmaLoadingException {
+    private Alphabet extractAlphabet(BTEEnigma root) throws EnigmaLoadingException {
         String rawAbc = root.getABC();
         if (rawAbc == null) {
             throw new EnigmaLoadingException("XML does not contain <ABC> section");
@@ -97,10 +93,7 @@ public class LoaderXml implements Loader {
         return new Alphabet(cleanAbc);
     }
 
-
-    private Map<Integer, RotorSpec> buildRotors(BTEEnigma root,
-                                                Alphabet alphabet)
-        throws EnigmaLoadingException {
+    private Map<Integer, RotorSpec> extractRotors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<Integer, RotorSpec> result = new HashMap<>();
 
@@ -197,10 +190,7 @@ public class LoaderXml implements Loader {
         return result;
     }
 
-
-    private Map<String, ReflectorSpec> buildReflectors(BTEEnigma root,
-                                                       Alphabet alphabet)
-            throws EnigmaLoadingException {
+    private Map<String, ReflectorSpec> extractReflectors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
         Map<String, ReflectorSpec> result = new HashMap<>();
 

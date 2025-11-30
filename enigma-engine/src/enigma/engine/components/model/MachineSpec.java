@@ -6,45 +6,39 @@ import enigma.machine.component.alphabet.Alphabet;
 
 /**
  * Represents the specification of an Enigma machine, including its alphabet,
- * available rotors and reflectors, and the number of rotors used in operation.
- * This class serves as a model for configuring and describing the machine's
+ * available rotors and reflectors.
+ * This record serves as a model for configuring and describing the machine's
  * components and constraints.
+ * Note: maps are stored as provided (no defensive deep copy) to preserve existing behaviour.
  *
  * @since 1.0
  */
-public class MachineSpec {
-    private final Alphabet alphabet;
-    private final Map<Integer, RotorSpec> rotorsById;
-    private final Map<String, ReflectorSpec> reflectorsById;
-    private final int rotorsCountInUse; // Used in exercise 2+
+public record MachineSpec(
+        Alphabet alphabet,
+        Map<Integer, RotorSpec> rotorsById,
+        Map<String, ReflectorSpec> reflectorsById
+) {
 
-    public MachineSpec(Alphabet alphabet,
-                       Map<Integer, RotorSpec> rotorsById,
-                       Map<String, ReflectorSpec> reflectorsById,
-                       int rotorsCountInUse) {
-        this.alphabet = alphabet;
-        this.rotorsById = rotorsById;
-        this.reflectorsById = reflectorsById;
-        this.rotorsCountInUse = rotorsCountInUse;
+    /**
+     * Convenience lookup for a reflector specification by its identifier.
+     *
+     * @param id reflector id (e.g. "I", "II")
+     * @return ReflectorSpec or null if not found
+     */
+    public ReflectorSpec getReflectorById(String id) {
+        return (reflectorsById == null) ? null : reflectorsById.get(id);
     }
 
-    public Alphabet getAlphabet() {
-        return alphabet;
+    /**
+     * Convenience lookup for a rotor specification by its numeric id.
+     *
+     * @param id rotor id
+     * @return RotorSpec or null if not found
+     */
+    public RotorSpec getRotorById(int id) {
+        return (rotorsById == null) ? null : rotorsById.get(id);
     }
 
-    public Map<Integer, RotorSpec> getRotorsById() {
-        return rotorsById;
-    }
-
-    public Map<String, ReflectorSpec> getReflectorsById() {
-        return reflectorsById;
-    }
-
-    public int getRotorsCountInUse() {
-        return rotorsCountInUse;
-    }
-
-    // todo delete
     @Override
     public String toString() {
         String letters = (alphabet == null) ? "<none>" : alphabet.getLetters();
@@ -69,10 +63,8 @@ public class MachineSpec {
         sb.append("MachineSpec:\n");
         sb.append("  Alphabet: ").append(letters).append("\n");
         sb.append("  Alphabet size: ").append(alphaSize).append("\n");
-        sb.append("  Rotors in use: ").append(rotorsCountInUse).append("\n");
         sb.append("  Available rotors: ").append(rotorsStr).append("\n");
         sb.append("  Available reflectors: ").append(reflectorsStr).append("\n");
         return sb.toString();
     }
-
 }

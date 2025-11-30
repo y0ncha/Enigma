@@ -8,4 +8,6 @@ public interface Loader {
      * On failure throws EnigmaLoadingException with a clear message.
      */
     MachineSpec loadMachine(String filePath) throws EnigmaLoadingException;
+
+
 }

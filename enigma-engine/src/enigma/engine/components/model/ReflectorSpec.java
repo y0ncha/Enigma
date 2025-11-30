@@ -1,19 +1,19 @@
 package enigma.engine.components.model;
 
+import java.util.Objects;
+
 /**
  * Specification for an Enigma machine reflector.
- * <p>
- * A reflector is a fixed component that maps each input position to another position,
- * ensuring the mapping is symmetric (i.e., if A maps to B, then B maps to A).
- * This class holds the reflector's identifier (e.g., "I", "II") and its wiring mapping.
+ * Immutable record with defensive copying for arrays.
  */
-public class ReflectorSpec {
-    private final String id; // "I", "II", ...
-    private final int[] mapping; // mapping[i] = j ; symmetric
-
-    public ReflectorSpec(String id, int[] mapping) {
-        this.id = id;
-        this.mapping = mapping;
+public record ReflectorSpec(
+        String id,
+        int[] mapping
+) {
+    public ReflectorSpec {
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(mapping);
+        mapping = mapping.clone();
     }
 
     public String getId() {
