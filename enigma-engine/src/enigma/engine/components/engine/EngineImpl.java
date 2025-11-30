@@ -1,8 +1,8 @@
 package enigma.engine.components.engine;
 
 import enigma.engine.components.loader.Loader;
-import enigma.machine.component.Code.Code;
-import enigma.machine.component.Machine.Machine;
+import enigma.machine.component.code.Code;
+import enigma.machine.component.machine.Machine;
 
 public class EngineImpl implements Engine {
 
