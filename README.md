@@ -42,24 +42,11 @@ The project evolves across three stages, starting from a console application and
 
 ## 📁 Project Layout
 
-### Overall Structure
 ```
 enigma/
-├─ pom.xml                  # parent (packaging: pom)
-├─ machine/                 # core Enigma logic
-├─ engine/                  # orchestration, validation, history
-├─ loader/                  # XML loading + validations
-├─ console/                 # CLI app (Exercise 1 & 2)
-├─ server/                  # Spring Boot REST API (Exercise 3)
-└─ shared/                  # (optional) DTOs / common models
-```
-### Module Dependencies
-```
-machine   ←   engine   ←   console
-   ↑          ↑  ↑
-   └──── loader  └── server
-         ↑
-       shared (optional, DTOs)
+├─ enigma-machine/    # core Enigma logic
+├─ enigma-engine/     # orchestration, validation, history
+└─ enigma-console/    # CLI app
 ```
 
 ---
