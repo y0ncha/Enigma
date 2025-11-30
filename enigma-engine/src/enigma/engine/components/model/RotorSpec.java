@@ -8,6 +8,9 @@ import java.util.Objects;
  * <p>Immutable data carrier implemented as a record. Arrays are defensively copied
  * to preserve immutability semantics for callers.</p>
  *
+ * <p>Note: Explicit getter methods are provided to return defensive copies of arrays
+ * and to maintain compatibility with existing code that expects getX() methods.</p>
+ *
  * @since 1.0
  */
 public record RotorSpec(
