@@ -10,16 +10,16 @@ import enigma.machine.component.alphabet.Alphabet;
  *
  * @since 1.0
  */
-public class MachineSpecification {
+public class MachineSpec {
     private final Alphabet alphabet;
-    private final Map<Integer, RotorSpecification> rotorsById;
-    private final Map<String, ReflectorSpecification> reflectorsById;
+    private final Map<Integer, RotorSpec> rotorsById;
+    private final Map<String, ReflectorSpec> reflectorsById;
     private final int rotorsCountInUse; // Used in exercise 2+
 
-    public MachineSpecification(Alphabet alphabet,
-                                Map<Integer, RotorSpecification> rotorsById,
-                                Map<String, ReflectorSpecification> reflectorsById,
-                                int rotorsCountInUse) {
+    public MachineSpec(Alphabet alphabet,
+                       Map<Integer, RotorSpec> rotorsById,
+                       Map<String, ReflectorSpec> reflectorsById,
+                       int rotorsCountInUse) {
         this.alphabet = alphabet;
         this.rotorsById = rotorsById;
         this.reflectorsById = reflectorsById;
@@ -30,11 +30,11 @@ public class MachineSpecification {
         return alphabet;
     }
 
-    public Map<Integer, RotorSpecification> getRotorsById() {
+    public Map<Integer, RotorSpec> getRotorsById() {
         return rotorsById;
     }
 
-    public Map<String, ReflectorSpecification> getReflectorsById() {
+    public Map<String, ReflectorSpec> getReflectorsById() {
         return reflectorsById;
     }
 
@@ -42,3 +42,4 @@ public class MachineSpecification {
         return rotorsCountInUse;
     }
 }
+

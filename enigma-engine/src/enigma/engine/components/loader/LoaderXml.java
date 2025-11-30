@@ -1,4 +1,5 @@
 package enigma.engine.components.loader;
+
 import enigma.engine.components.model.*;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.engine.components.xml.generated.*;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
 /**
  * Loads and parses Enigma machine specifications from XML files.
  * <p>
@@ -28,21 +30,22 @@ import java.util.*;
  *   <li>Builds collections of rotors and reflectors from the XML structure.</li>
  * </ul>
  */
-public class LoadXml implements Loader {
+public class LoaderXml implements Loader {
+
     @Override
-    public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingException {
-    BTEEnigma root = loadRootFromFile(filePath);
+    public MachineSpec loadMachine(String filePath) throws EnigmaLoadingException {
+        BTEEnigma root = loadRootFromFile(filePath);
 
-    Alphabet alphabet = buildAlphabet(root);
+        Alphabet alphabet = buildAlphabet(root);
 
-    Map<Integer, RotorSpecification> rotors = buildRotors(root, alphabet);
+        Map<Integer, RotorSpec> rotors = buildRotors(root, alphabet);
 
-    Map<String, ReflectorSpecification> reflectors = buildReflectors(root, alphabet);
+        Map<String, ReflectorSpec> reflectors = buildReflectors(root, alphabet);
 
-    int rotorsCountInUse = 0;
+        int rotorsCountInUse = 0;
 
-    return new MachineSpecification(alphabet, rotors, reflectors, rotorsCountInUse);
-}
+        return new MachineSpec(alphabet, rotors, reflectors, rotorsCountInUse);
+    }
 
 
     private BTEEnigma loadRootFromFile(String filePath) throws EnigmaLoadingException {
@@ -93,11 +96,11 @@ public class LoadXml implements Loader {
     }
 
 
-    private Map<Integer, RotorSpecification> buildRotors(BTEEnigma root,
-                                                         Alphabet alphabet)
+    private Map<Integer, RotorSpec> buildRotors(BTEEnigma root,
+                                                Alphabet alphabet)
         throws EnigmaLoadingException {
 
-        Map<Integer, RotorSpecification> result = new HashMap<>();
+        Map<Integer, RotorSpec> result = new HashMap<>();
 
         BTERotors bteRotors = root.getBTERotors();
         if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
@@ -186,18 +189,18 @@ public class LoadXml implements Loader {
                         " does not define a full permutation of the alphabet");
             }
 
-            result.put(id, new RotorSpecification(id, notchIndex, forward, backward));
+            result.put(id, new RotorSpec(id, notchIndex, forward, backward));
         }
 
         return result;
     }
 
 
-    private Map<String, ReflectorSpecification> buildReflectors(BTEEnigma root,
-                                                                Alphabet alphabet)
+    private Map<String, ReflectorSpec> buildReflectors(BTEEnigma root,
+                                                       Alphabet alphabet)
             throws EnigmaLoadingException {
 
-        Map<String, ReflectorSpecification> result = new HashMap<>();
+        Map<String, ReflectorSpec> result = new HashMap<>();
 
         BTEReflectors bteReflectors = root.getBTEReflectors();
         if (bteReflectors == null || bteReflectors.getBTEReflector().isEmpty()) {
@@ -250,7 +253,7 @@ public class LoadXml implements Loader {
                 }
             }
 
-            result.put(id, new ReflectorSpecification(id, mapping));
+            result.put(id, new ReflectorSpec(id, mapping));
         }
 
         return result;

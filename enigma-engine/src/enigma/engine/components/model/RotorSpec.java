@@ -7,16 +7,16 @@ package enigma.engine.components.model;
  * the static configuration of a rotor, which can then be instantiated and
  * used in the Enigma engine for encryption and decryption operations.
  */
-public class RotorSpecification {
+public class RotorSpec {
     private final int id;
     private final int notchIndex;        // 0..N-1
     private final int[] forwardMapping;  // from right index -> left index
     private final int[] backwardMapping; // from left index -> right index
 
-    public RotorSpecification(int id,
-                              int notchIndex,
-                              int[] forwardMapping,
-                              int[] backwardMapping) {
+    public RotorSpec(int id,
+                     int notchIndex,
+                     int[] forwardMapping,
+                     int[] backwardMapping) {
         this.id = id;
         this.notchIndex = notchIndex;
         this.forwardMapping = forwardMapping;
