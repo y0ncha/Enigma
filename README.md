@@ -40,17 +40,6 @@ The project evolves across three stages, starting from a console application and
 
 ---
 
-## 📁 Project Layout
-
-```
-enigma/
-├─ enigma-machine/    # core Enigma logic
-├─ enigma-engine/     # orchestration, validation, history
-└─ enigma-console/    # CLI app
-```
-
----
-
 ## 📝 Running the Project
 Each exercise includes its own runnable JAR and `run.bat` script as required by the course.
 For the full system (Exercise 3):
