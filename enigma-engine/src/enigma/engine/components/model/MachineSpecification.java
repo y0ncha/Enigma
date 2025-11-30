@@ -1,6 +1,12 @@
 package enigma.engine.components.model;
 import java.util.Map;
 
+/**
+ * Represents the specification of an Enigma machine, including its alphabet,
+ * available rotors and reflectors, and the number of rotors used in operation.
+ * This class serves as a model for configuring and describing the machine's
+ * components and constraints.
+ */
 public class MachineSpecification {
     private final Alphabet alphabet;
     private final Map<Integer, RotorSpecification> rotorsById;

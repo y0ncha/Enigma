@@ -10,9 +10,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+/**
+ * Loads and parses Enigma machine specifications from XML files.
+ * <p>
+ * This class implements the {@link Loader} interface and uses JAXB to unmarshal XML files
+ * into Java objects representing the Enigma machine configuration. It performs validation
+ * on the input XML, including checks for file existence, file extension, and the structure
+ * and content of the XML sections (such as <ABC>, rotors, and reflectors).
+ * <p>
+ * Any errors encountered during loading or parsing are reported via {@link EnigmaLoadingException}.
+ * <p>
+ * Implementation details:
+ * <ul>
+ *   <li>Uses {@link BTEEnigma} as the root JAXB-mapped class.</li>
+ *   <li>Validates the alphabet section for even length and non-empty content.</li>
+ *   <li>Builds collections of rotors and reflectors from the XML structure.</li>
+ * </ul>
+ */
 public class LoadXml implements Loader {
     @Override
-public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingException {
+    public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingException {
     BTEEnigma root = loadRootFromFile(filePath);
 
     Alphabet alphabet = buildAlphabet(root);
@@ -35,7 +52,7 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
         }
 
         if (!filePath.toLowerCase().endsWith(".xml")) {
-            throw new EnigmaLoadingException("File is not an XML (must end with .xml)");
+            throw new EnigmaLoadingException("File is not an XML (must have a .xml extension, case-insensitive)");
         }
 
         try {
@@ -64,6 +81,13 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
                     "Alphabet length must be even, but got " + cleanAbc.length());
         }
 
+        // Check for duplicate characters
+        Set<Character> charSet = new HashSet<>();
+        for (char c : cleanAbc.toCharArray()) {
+            if (!charSet.add(c)) {
+                throw new EnigmaLoadingException("Alphabet contains duplicate character: '" + c + "'");
+            }
+        }
         return new Alphabet(cleanAbc);
     }
 
@@ -132,15 +156,20 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
                                     " left=" + leftChar);
                 }
 
-                // 4. Extra safety range check (should already be OK if indexOf != -1)
 
                 // 5. Ensure permutation: each index on the right and left
                 //    appears exactly once (no duplicates)
-                if (!seenRight.add(right) || !seenLeft.add(left)) {
+                if (!seenRight.add(right)) {
                     throw new EnigmaLoadingException(
                             "Rotor " + id +
-                                    " has duplicate mapping for index " +
-                                    (right + 1) + " or " + (left + 1));
+                                    " has duplicate mapping for right index " +
+                                    (right + 1) + " (letter: " + rightChar + ")");
+                }
+                if (!seenLeft.add(left)) {
+                    throw new EnigmaLoadingException(
+                            "Rotor " + id +
+                                    " has duplicate mapping for left index " +
+                                    (left + 1) + " (letter: " + leftChar + ")");
                 }
 
                 // 6. Fill forward and backward mapping arrays
@@ -162,7 +191,6 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
         return result;
     }
 
-    /* ---------- Step 4: Reflectors ---------- */
 
     private Map<String, ReflectorSpecification> buildReflectors(BTEEnigma root,
                                                                 Alphabet alphabet)
@@ -201,9 +229,13 @@ public MachineSpecification loadMachine(String filePath) throws EnigmaLoadingExc
                             " maps letter to itself at position " + (in + 1));
                 }
 
-                if (mapping[in] != -1 || mapping[out] != -1) {
+                if (mapping[in] != -1) {
                     throw new EnigmaLoadingException("Reflector " + id +
-                            " reuses index " + (in + 1) + " or " + (out + 1));
+                            " reuses index " + (in + 1));
+                }
+                if (mapping[out] != -1) {
+                    throw new EnigmaLoadingException("Reflector " + id +
+                            " reuses index " + (out + 1));
                 }
 
                 mapping[in] = out;
