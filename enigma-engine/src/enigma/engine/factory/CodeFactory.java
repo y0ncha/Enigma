@@ -1,6 +1,6 @@
 package enigma.engine.factory;
 
-import enigma.shared.dto.CodeConfig;
+import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
 import enigma.machine.code.Code;
 

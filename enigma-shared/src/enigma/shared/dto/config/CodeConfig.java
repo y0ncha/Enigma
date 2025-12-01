@@ -1,4 +1,4 @@
-package enigma.shared.dto;
+package enigma.shared.dto.config;
 
 import java.util.List;
 

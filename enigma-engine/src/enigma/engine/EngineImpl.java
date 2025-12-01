@@ -8,7 +8,7 @@ import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
 import enigma.machine.code.Code;
 import enigma.machine.Machine;
-import enigma.shared.dto.CodeConfig;
+import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
 
 import java.security.SecureRandom;
@@ -38,6 +38,8 @@ import java.util.*;
 public class EngineImpl implements Engine {
 
     private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
+    private final boolean DEBUG = false;
+
     private final Machine machine;
     private final Loader loader;
     private final CodeFactory codeFactory;

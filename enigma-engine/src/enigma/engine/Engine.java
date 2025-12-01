@@ -1,6 +1,6 @@
 package enigma.engine;
 
-import enigma.shared.dto.CodeConfig;
+import enigma.shared.dto.config.CodeConfig;
 
 /**
  * Engine API for coordinating machine loading, configuration and processing.

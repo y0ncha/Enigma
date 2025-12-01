@@ -13,6 +13,7 @@ uniform, useful docs without over-explaining implementation details.
   describing what the code literally does.
 - Put detailed design rationale in the README or a short design doc; keep
   Javadoc focused on API contract (inputs/outputs/preconditions).
+- Use "// --- Flow helpers: machine creation and random code generation ---------" as sections separators.
 
 ## JavaDoc guidelines
 
