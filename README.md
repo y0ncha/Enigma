@@ -89,7 +89,7 @@ Choose one of the approaches below depending on how you prefer to work (IDE, dir
 1) Run from an IDE (recommended for development)
 - Import the project as a multi-module project (or open modules separately).
 - Ensure `lib/` JARs are added to each module's classpath (JAXB jars are required for XML loader).
-- Run the `Main` class in `enigma-console` (likely `enigma.console.components.Main` or `Console` entry point).
+- Run the `Main` class in `enigma-console` (likely `enigma.console.Main` or `Console` entry point).
 
 2) Run with javac/java (manual classpath)
 - Compile modules and include `lib/*.jar` on the classpath. Example (run from project root):
@@ -99,7 +99,7 @@ Choose one of the approaches below depending on how you prefer to work (IDE, dir
 javac -d out -cp "lib/*" $(find enigma-machine enigma-engine enigma-console -name "*.java")
 
 # run the console main (replace MainClass with the real FQN)
-java -cp "out:lib/*" enigma.console.components.Main
+java -cp "out:lib/*" enigma.console.Main
 ```
 
 3) Run with Maven (if you add module pom.xml files)
