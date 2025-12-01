@@ -5,7 +5,8 @@ import java.util.Objects;
 /**
  * Specification for an Enigma machine reflector.
  *
- * <p>Immutable record with defensive copying for arrays to preserve immutability.</p>
+ * <p>Immutable record with defensive copying for arrays to preserve immutability.
+ * Use record accessor {@code id()} for the reflector identifier.</p>
  *
  * @since 1.0
  */
@@ -23,15 +24,6 @@ public record ReflectorSpec(
         Objects.requireNonNull(id);
         Objects.requireNonNull(mapping);
         mapping = mapping.clone();
-    }
-
-    /**
-     * Return the reflector identifier.
-     *
-     * @return reflector id string
-     */
-    public String getId() {
-        return id;
     }
 
     /**

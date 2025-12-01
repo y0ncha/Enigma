@@ -8,8 +8,8 @@ import java.util.Objects;
  * <p>Immutable data carrier implemented as a record. Arrays are defensively copied
  * to preserve immutability semantics for callers.</p>
  *
- * <p>Note: Explicit getter methods are provided to return defensive copies of arrays
- * and to maintain compatibility with existing code that expects getX() methods.</p>
+ * <p>Note: Explicit getter methods are provided for array fields to return defensive copies.
+ * Use record accessors {@code id()} and {@code notchIndex()} for primitive fields.</p>
  *
  * @since 1.0
  */
@@ -33,24 +33,6 @@ public record RotorSpec(
         // Defensive copy to preserve immutability semantics for callers
         forwardMapping = forwardMapping.clone();
         backwardMapping = backwardMapping.clone();
-    }
-
-    /**
-     * Return the rotor identifier.
-     *
-     * @return rotor id
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Return the notch index that triggers the next rotor step.
-     *
-     * @return notch index (0-based)
-     */
-    public int getNotchIndex() {
-        return notchIndex;
     }
 
     /**

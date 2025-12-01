@@ -190,7 +190,7 @@ public class EngineImpl implements Engine {
                 throw new IllegalArgumentException("Rotor " + id + " mappings must not be null");
             if (f.length != alphaSize || b.length != alphaSize)
                 throw new IllegalArgumentException("Rotor " + id + " mapping length must equal alphabet size (" + alphaSize + ")");
-            if (rs.getNotchIndex() < 0 || rs.getNotchIndex() >= alphaSize)
+            if (rs.notchIndex() < 0 || rs.notchIndex() >= alphaSize)
                 throw new IllegalArgumentException("Rotor " + id + " notchIndex out of range");
         }
 
