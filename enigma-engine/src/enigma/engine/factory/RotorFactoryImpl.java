@@ -1,6 +1,6 @@
 package enigma.engine.factory;
 
-import enigma.engine.model.RotorSpec;
+import enigma.shared.spec.RotorSpec;
 import enigma.machine.alphabet.Alphabet;
 import enigma.machine.rotor.Rotor;
 import enigma.machine.rotor.RotorImpl;

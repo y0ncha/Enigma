@@ -1,11 +1,11 @@
 package enigma.engine.factory;
 
-import enigma.engine.dto.CodeConfig;
-import enigma.engine.model.MachineSpec;
-import enigma.engine.model.RotorSpec;
-import enigma.engine.model.ReflectorSpec;
+import enigma.shared.dto.CodeConfig;
+import enigma.shared.spec.MachineSpec;
+import enigma.shared.spec.ReflectorSpec;
+import enigma.shared.spec.RotorSpec;
 
-import enigma.engine.engine.EngineImpl;
+import enigma.engine.EngineImpl;
 import enigma.machine.alphabet.Alphabet;
 import enigma.machine.code.Code;
 import enigma.machine.code.CodeImpl;
