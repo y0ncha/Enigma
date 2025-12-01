@@ -1,5 +1,6 @@
 package enigma.machine.code;
 
+import enigma.machine.alphabet.Alphabet;
 import enigma.machine.reflector.Reflector;
 import enigma.machine.rotor.Rotor;
 
@@ -50,5 +51,7 @@ public interface Code {
      * @return reflector id string
      */
     String getReflectorId();
+
+    Alphabet getAlphabet();
 }
 

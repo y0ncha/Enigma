@@ -105,6 +105,7 @@ public class CodeFactoryImpl implements CodeFactory {
         List<Integer> rotorIdsForCode = new ArrayList<>(rotorIds);
 
         return new CodeImpl(
+                alphabet,
                 rotors,
                 reflector,
                 rotorIdsForCode,

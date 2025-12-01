@@ -2,6 +2,7 @@ package enigma.machine;
 
 import enigma.machine.code.Code;
 import enigma.machine.keyboard.Keyboard;
+import enigma.machine.keyboard.KeyboardImpl;
 import enigma.machine.rotor.Direction;
 import enigma.machine.rotor.Rotor;
 
@@ -24,7 +25,7 @@ public class MachineImpl implements Machine {
 
     // --- Fields --------------------------------------------------
     private Code code;
-    private final Keyboard keyboard;
+    private Keyboard keyboard;
 
 
     // --- Ctor ----------------------------------------------------
@@ -47,6 +48,7 @@ public class MachineImpl implements Machine {
     @Override
     public void setCode(Code code) {
         this.code = code;
+        this.keyboard = new KeyboardImpl(code.getAlphabet());
     }
 
     /**
@@ -60,14 +62,7 @@ public class MachineImpl implements Machine {
      */
     @Override
     public char process(char input) {
-
-        if (code == null) {
-            throw new IllegalStateException("Machine is not configured with a code");
-        }
-
-        if (keyboard == null) {
-            throw new IllegalStateException("Machine is not configured with a keyboard");
-        }
+        ensureConfigured();
 
         int intermediate = keyboard.process(input);
         List<Rotor> rotors = code.getRotors();
@@ -80,14 +75,13 @@ public class MachineImpl implements Machine {
         return keyboard.lightKey(intermediate);
     }
 
-    /**
-     * Checks if the machine is configured with a valid code.
-     *
-     * @return {@code true} if the machine has a non-null code, {@code false} otherwise.
-     * @since 1.0
-     */
-    public boolean isConfigured() {
-        return code != null;
+    public void ensureConfigured() {
+        if (code == null) {
+            throw new IllegalStateException("Machine is not configured with a code");
+        }
+        if (keyboard == null) {
+            throw new IllegalStateException("Machine is not configured with a keyboard");
+        }
     }
 
     // --- Helpers -------------------------------------------------
@@ -115,7 +109,9 @@ public class MachineImpl implements Machine {
      * @return transformed index after forward pass
      * @since 1.0
      */
-    private static int forwardTransform(List<Rotor> rotors, int value) {
+    private int forwardTransform(List<Rotor> rotors, int value) {
+        ensureConfigured();
+
         for (Rotor rotor : rotors) {
             value = rotor.process(value, FORWARD);
         }
@@ -130,7 +126,9 @@ public class MachineImpl implements Machine {
      * @return transformed index after backward pass
      * @since 1.0
      */
-    private static int backwardTransform(List<Rotor> rotors, int value) {
+    private int backwardTransform(List<Rotor> rotors, int value) {
+        ensureConfigured();
+
         for (int i = rotors.size() - 1; i >= 0; i--) {
             value = rotors.get(i).process(value, Direction.BACKWARD);
         }
@@ -144,13 +142,7 @@ public class MachineImpl implements Machine {
      */
     @Override
     public SignalTrace processDebug(char input) {
-
-        if (code == null) {
-            throw new IllegalStateException("Machine is not configured with a code");
-        }
-        if (keyboard == null) {
-            throw new IllegalStateException("Machine is not configured with a keyboard");
-        }
+        ensureConfigured();
 
         List<Rotor> rotors = code.getRotors();
 
@@ -227,10 +219,7 @@ public class MachineImpl implements Machine {
     }
 
     private List<RotorTrace> forwardTransformDebug(List<Rotor> rotors, int value) {
-
-        if (keyboard == null) {
-            throw new IllegalStateException("Machine is not configured with a keyboard");
-        }
+        ensureConfigured();
 
         List<RotorTrace> steps = new ArrayList<>();
 
@@ -263,10 +252,7 @@ public class MachineImpl implements Machine {
      * @return immutable list of RotorTrace (rightmost first)
      */
     private List<RotorTrace> backwardTransformDebug(List<Rotor> rotors, int value) {
-
-        if (keyboard == null) {
-            throw new IllegalStateException("Machine is not configured with a keyboard");
-        }
+        ensureConfigured();
 
         List<RotorTrace> steps = new ArrayList<>();
 
