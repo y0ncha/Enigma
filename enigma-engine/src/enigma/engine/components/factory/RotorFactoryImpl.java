@@ -38,7 +38,7 @@ public class RotorFactoryImpl implements RotorFactory {
 
         int[] forward = spec.getForwardMapping();
         int[] backward = spec.getBackwardMapping();
-        int notch = spec.getNotchIndex();
+        int notch = spec.notchIndex();
 
         // RotorImpl constructor expects alphabet, forward/backward maps, notch and start position
         return new RotorImpl(alphabet, forward, backward, notch, startPosition);
