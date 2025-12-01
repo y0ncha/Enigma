@@ -40,7 +40,7 @@ import java.util.*;
 public class EngineImpl implements Engine {
 
     private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
-    private final boolean DEBUG = false;
+    private final boolean DEBUG = false; // For future console control
 
     private final Machine machine;
     private final Loader loader;
