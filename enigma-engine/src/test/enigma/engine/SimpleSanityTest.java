@@ -42,20 +42,37 @@ public class SimpleSanityTest {
                 "FFFDDDCCCEEEAFEDCB"
         };
 
+        int passed = 0;
+        int failed = 0;
+
         for (int i = 0; i < inputs.length; i++) {
-            // If you have a reset-to-original-code API, call it here, e.g.:
-            // engine.reset();  // or engine.resetToOriginalCode();
 
             String input = inputs[i];
             DebugTrace debug = engine.processDebug(input);
+
+            boolean ok = debug.output().equals(expectedOutputs[i]);
+            if (ok) passed++; else failed++;
 
             System.out.println("========== Sanity Case #" + (i + 1) + " ==========");
             System.out.println("Input   : " + input);
             System.out.println("Expected: " + expectedOutputs[i]);
             System.out.println("Actual  : " + debug.output());
+            System.out.println("Result  : " + (ok ? "PASSED ✔" : "FAILED ✘"));
             System.out.println();
-            // Pretty printing handled by DebugTrace → SignalTrace.toString()
-            System.out.println(debug);
+//            System.out.println(debug);
         }
+
+        // ---- Summary section ----
+        System.out.println("\n=========== SUMMARY ===========");
+        System.out.println("Total tests : " + inputs.length);
+        System.out.println("Passed      : " + passed);
+        System.out.println("Failed      : " + failed);
+
+        if (failed == 0) {
+            System.out.println("Status      : ALL GOOD ✔✔✔");
+        } else {
+            System.out.println("Status      : CHECK FAILED CASES ✘");
+        }
+        System.out.println("================================");
     }
 }
