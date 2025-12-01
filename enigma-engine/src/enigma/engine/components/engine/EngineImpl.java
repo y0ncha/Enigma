@@ -136,26 +136,9 @@ public class EngineImpl implements Engine {
     private CodeConfig generateRandomCodeConfig(MachineSpec spec) {
         final int REQUIRED_ROTORS = 3;
         validateRandomCodePreconditions(spec, REQUIRED_ROTORS);
-
-        SecureRandom rnd = new SecureRandom();
-
-        // Sample rotor ids: shuffle the available ids and take the first N
-        List<Integer> pool = new ArrayList<>(spec.rotorsById().keySet());
-        Collections.shuffle(pool, rnd);
-        List<Integer> chosenRotors = new ArrayList<>(pool.subList(0, REQUIRED_ROTORS)); // left->right order
-
-        // Sample starting positions (left->right)
-        List<Integer> positions = new ArrayList<>(REQUIRED_ROTORS);
-        int alphaSize = spec.alphabet().size();
-        for (int i = 0; i < REQUIRED_ROTORS; i++) {
-            positions.add(rnd.nextInt(alphaSize));
-        }
-
-        // Pick a random reflector id
-        List<String> reflectors = new ArrayList<>(spec.reflectorsById().keySet());
-        String reflectorId = reflectors.get(rnd.nextInt(reflectors.size()));
-
-        return new CodeConfig(chosenRotors, positions, reflectorId);
+        // Delegate to CodeFactoryImpl.createRandom to avoid duplication
+        CodeFactory factory = new CodeFactoryImpl();
+        return factory.createRandom(spec);
     }
 
     /**
