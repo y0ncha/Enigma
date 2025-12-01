@@ -1,6 +1,6 @@
 package enigma.engine.factory;
 
-import enigma.engine.model.ReflectorSpec;
+import enigma.shared.spec.ReflectorSpec;
 import enigma.machine.alphabet.Alphabet;
 import enigma.machine.reflector.Reflector;
 import enigma.machine.reflector.ReflectorImpl;
