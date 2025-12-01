@@ -26,20 +26,12 @@ public record ReflectorSpec(
     }
 
     /**
-     * Return the reflector identifier.
-     *
-     * @return reflector id string
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
      * Return a defensive copy of the mapping array.
      *
      * @return copy of the mapping array
      */
-    public int[] getMapping() {
+    @Override
+    public int[] mapping() {
         return mapping.clone();
     }
 }
