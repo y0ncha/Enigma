@@ -2,12 +2,8 @@ package test.enigma.engine;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
+import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
-import enigma.shared.dto.tracer.SignalTrace;
-import enigma.shared.dto.tracer.RotorTrace;
-import enigma.shared.dto.tracer.ReflectorTrace;
-
-import java.util.List;
 
 public class SimpleSanityTest {
 
@@ -21,56 +17,45 @@ public class SimpleSanityTest {
         System.out.println("Loading XML: " + XML_PATH);
         engine.loadMachime(XML_PATH);
 
-        String input = "HELLO";
-        System.out.println("Processing in DEBUG mode: " + input);
-
-        DebugTrace debug = engine.processDebug(input);
-
-        System.out.println("Output: " + debug.output());
-        System.out.println("============================================");
-
-        List<SignalTrace> signals = debug.signalTraces();
-
-        for (int i = 0; i < signals.size(); i++) {
-            SignalTrace s = signals.get(i);
-
-            System.out.println("----- Character #" + (i + 1) + " -----");
-            System.out.println("Input  : " + s.inputChar());
-            System.out.println("Output : " + s.outputChar());
-            System.out.println("Window : before=" + s.windowBefore() +
-                    " after=" + s.windowAfter());
-            System.out.println("Stepped: " + s.advancedIndices());
-            System.out.println();
-
-            System.out.println("Forward path (right → left):");
-            printRotorPath(s.forwardSteps());
-
-            System.out.println("Reflector:");
-            printReflectorStep(s.reflectorStep());
-
-            System.out.println("Backward path (left → right):");
-            printRotorPath(s.backwardSteps());
-
-            System.out.println();
-        }
-    }
-
-    private static void printRotorPath(List<RotorTrace> steps) {
-        for (RotorTrace r : steps) {
-            System.out.printf(
-                    "  rotor %d: %c(%d) -> %c(%d)%n",
-                    r.rotorIndex(),
-                    r.entryChar(), r.entryIndex(),
-                    r.exitChar(), r.exitIndex()
-            );
-        }
-    }
-
-    private static void printReflectorStep(ReflectorTrace ref) {
-        System.out.printf(
-                "  %c(%d) -> %c(%d)%n",
-                ref.entryChar(), ref.entryIndex(),
-                ref.exitChar(), ref.exitIndex()
+        // Code: <3,2,1><CCC><I>
+        CodeConfig config = new CodeConfig(
+                java.util.List.of(3, 2, 1),   // rotors left→right
+                java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
+                "I"                           // reflector
         );
+        engine.codeManual(config);
+
+        // Sanity-small inputs & expected outputs from the appendix table
+        String[] inputs = {
+                "AABBCCDDEEFF",
+                "FEDCBADDEF",
+                "FEDCBAABCDEF",
+                "AFBFCFDFEFFF",
+                "AAAEEEBBBDDDCCCFFF"
+        };
+
+        String[] expectedOutputs = {
+                "FFCCBBEEDDAA",
+                "ADEBCFEEDA",
+                "ADEBCFFCBEDA",
+                "FACABAEADAAA",
+                "FFFDDDCCCEEEAFEDCB"
+        };
+
+        for (int i = 0; i < inputs.length; i++) {
+            // If you have a reset-to-original-code API, call it here, e.g.:
+            // engine.reset();  // or engine.resetToOriginalCode();
+
+            String input = inputs[i];
+            DebugTrace debug = engine.processDebug(input);
+
+            System.out.println("========== Sanity Case #" + (i + 1) + " ==========");
+            System.out.println("Input   : " + input);
+            System.out.println("Expected: " + expectedOutputs[i]);
+            System.out.println("Actual  : " + debug.output());
+            System.out.println();
+            // Pretty printing handled by DebugTrace → SignalTrace.toString()
+            System.out.println(debug);
+        }
     }
 }
