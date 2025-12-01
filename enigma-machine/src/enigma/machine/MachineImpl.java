@@ -1,5 +1,6 @@
 package enigma.machine;
 
+import enigma.machine.alphabet.Alphabet;
 import enigma.machine.code.Code;
 import enigma.machine.keyboard.Keyboard;
 import enigma.machine.rotor.Direction;
@@ -23,13 +24,11 @@ public class MachineImpl implements Machine {
     /*--------------- Ctor ---------------*/
     /**
      * Construct a machine with a provided {@link Keyboard}.
-     *
-     * @param keyboard keyboard adapter used for char/index conversions
      * @since 1.0
      */
-    public MachineImpl(Keyboard keyboard) {
+    public MachineImpl() {
 
-        this.keyboard = keyboard;
+        this.keyboard = null;
         this.code = null;
     }
 

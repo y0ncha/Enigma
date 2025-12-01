@@ -1,5 +1,7 @@
 package enigma.engine;
 
+import enigma.shared.dto.CodeConfig;
+
 /**
  * Engine API for coordinating machine loading, configuration and processing.
  *
@@ -21,7 +23,7 @@ public interface Engine {
      *
      * @param path file-system path to machine XML
      */
-    void loadXml(String path);
+    void loadMachime(String path);
 
     /**
      * Supply or update machine data (for example wiring/config inputs) from
@@ -36,7 +38,7 @@ public interface Engine {
      * Implementations should prompt for or accept manual rotor/reflector/position
      * settings and apply them to the machine.
      */
-    void codeManual(/*Args*/);
+    void codeManual(CodeConfig config);
 
     /**
      * Generate or assign a random code configuration and apply it to the machine.

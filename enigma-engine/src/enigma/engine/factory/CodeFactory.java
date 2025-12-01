@@ -21,15 +21,6 @@ import enigma.machine.code.Code;
 public interface CodeFactory {
 
     /**
-     * Create a new {@link Code} using random selection of components from the spec.
-     * The method may sample rotors, reflector and starting positions.
-     *
-     * @param spec machine specification (must be valid)
-     * @return created {@link Code}
-     */
-    Code createRandom(MachineSpec spec);
-
-    /**
      * Create a {@link Code} from an explicit configuration.
      *
      * @param spec machine specification (must be valid)

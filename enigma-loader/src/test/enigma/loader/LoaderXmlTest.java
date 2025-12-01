@@ -27,7 +27,7 @@ public class LoaderXmlTest {
      * @param args command line arguments (unused)
      */
     public static void main(String[] args) {
-        Loader loader = new LoaderXml();
+        Loader loader = new LoaderXml(3);
 
         String[] files = {
                 "ex1-sanity-small.xml",
@@ -46,7 +46,7 @@ public class LoaderXmlTest {
             try {
                 // Pass an absolute filesystem path string to the loader
                 String absolutePath = path.toAbsolutePath().toString();
-                MachineSpec spec = loader.loadMachine(absolutePath);
+                MachineSpec spec = loader.loadSpecs(absolutePath);
                 System.out.println("Load succeeded.");
                 System.out.println(spec);
 
