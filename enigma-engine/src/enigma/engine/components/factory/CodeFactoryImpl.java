@@ -43,8 +43,8 @@ import java.util.*;
  *       {@link enigma.engine.components.engine.EngineImpl}). {@link #createRandom(MachineSpec)}
  *       expects the engine to perform validation on the generated configuration
  *       before constructing the {@link Code}.</li>
- *   <li>On invalid input the factory throws {@link IllegalArgumentException}
- *       with a clear message describing the problem.</li>
+ *   <li>No explicit validation is performed in this class; callers must ensure
+ *       preconditions are met before invoking factory methods.</li>
  * </ul>
  *
  * Thread-safety: instances of this class are stateless and thread-safe; the
@@ -88,8 +88,6 @@ public class CodeFactoryImpl implements CodeFactory {
      * @param spec validated machine specification (alphabet, rotor/reflector specs)
      * @param config validated code configuration (left→right ordering)
      * @return a newly created immutable {@link Code} instance
-     * @throws IllegalArgumentException if preconditions are violated (nulls,
-     *                                  missing components, or inconsistent lengths)
      */
     @Override
     public Code create(MachineSpec spec, CodeConfig config) {
@@ -142,7 +140,6 @@ public class CodeFactoryImpl implements CodeFactory {
      * @param spec machine specification; must contain at least {@code DEFAULT_ROTOR_COUNT}
      *             rotors and at least one reflector
      * @return created {@link Code}
-     * @throws IllegalArgumentException when the spec is incomplete or sampling fails
      */
     @Override
     public Code createRandom(MachineSpec spec) {
