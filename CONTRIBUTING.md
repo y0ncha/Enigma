@@ -1,21 +1,21 @@
-CONTRIBUTING — documentation & code comment style
+# CONTRIBUTING — documentation & code comment style
 
-Goal
------
+## Goal
+
 Keep public documentation and inline comments minimal, consistent and actionable.
 This file codifies the short style we use in this repository so contributors write
 uniform, useful docs without over-explaining implementation details.
 
-High-level rules
-----------------
+## High-level rules
+
 - Be concise. One-line summaries for types; short paragraphs for behavior.
 - Prefer short inline comments (//) for *why* or non-obvious decisions — not for
   describing what the code literally does.
 - Put detailed design rationale in the README or a short design doc; keep
   Javadoc focused on API contract (inputs/outputs/preconditions).
 
-JavaDoc guidelines
-------------------
+## JavaDoc guidelines
+
 - Class summary: 1–2 short sentences describing responsibility.
 - Method summary: 1 short sentence describing effect.
 - Use these tags where applicable: @param, @return, @throws. Keep descriptions short.
@@ -26,16 +26,16 @@ JavaDoc guidelines
   (e.g. CodeConfig vs runtime Code). Put that note in class-level JavaDoc for
   the factory/engine that relies on it.
 
-Inline comment guidelines
--------------------------
+## Inline comment guidelines
+
 - Use // comments for small clarifications:
   - Explain the reason ("why") not the mechanics ("what").
   - Keep to one line when possible; two short lines max.
 - Use block comments (/* ... */) only for short file headers or license blocks.
 - Do NOT leave commented-out code; remove it or add a short note in git history.
 
-Examples (good)
----------------
+## Examples (good)
+
 // reverse because runtime expects right->left ordering
 Collections.reverse(list);
 
@@ -45,26 +45,26 @@ Collections.reverse(list);
  */
 public Code create(MachineSpec spec, CodeConfig config) { ... }
 
-Examples (avoid)
-----------------
+## Examples (avoid)
+
 // this loops over the items and adds them to the result
 for (...) { ... }
 /* old implementation kept for debugging */
 
-Formatting and tone
--------------------
+## Formatting and tone
+
 - Use plain, neutral English.
 - Keep sentences short and imperative when giving instructions.
 - Keep line length reasonable (wrap at ~100 columns).
 
-Validation and where it lives
------------------------------
+## Validation and where it lives
+
 - Validation of XML/Specs/configs belongs to the Engine layer (EngineImpl).
   Factories should assume inputs are valid and only construct runtime objects.
   Document this responsibility in both Engine and factory JavaDoc.
 
-Pull requests & review checklist
--------------------------------
+## Pull requests & review checklist
+
 - Include 1–2 sentence summary of the change and why.
 - Add/modify JavaDoc only where behavior or API changed.
 - Run the project's checks (IDE/build) and ensure no new compile errors.
