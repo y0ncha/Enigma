@@ -52,6 +52,7 @@ secrets.properties
 # Test artifacts & editor swap files
 test-machines/
 *.xml
+*.xsd
 *.bak
 *.swp
 *.swo
