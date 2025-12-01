@@ -11,13 +11,13 @@ package enigma.machine.component.keyboard;
 public interface Keyboard {
 
     /**
-     * Converts an input character to its position in the alphabet.
+     * Converts an input position to its corresponding keyboard position.
      * <p>
      * This simulates pressing a key on the Enigma keyboard,
-     * translating the character to a 0-based position for rotor processing.
+     * translating the position for rotor processing.
      * </p>
      *
-     * @param input the character pressed on the keyboard
+     * @param input the input position (may represent a character index)
      * @return the 0-based position of the character in the alphabet
      */
     int process(int input);

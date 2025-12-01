@@ -40,6 +40,9 @@ public interface Engine {
      * Allows manual selection of rotors, initial positions, reflector,
      * and plug pairs. The rotor order is specified from right to left.
      * </p>
+     * <p>
+     * Note: Parameters will be added in future implementation.
+     * </p>
      */
     void codeManual(/*Args*/);
 
