@@ -27,7 +27,6 @@ public class MachineImpl implements Machine {
      * @since 1.0
      */
     public MachineImpl() {
-
         this.keyboard = null;
         this.code = null;
     }
@@ -60,6 +59,16 @@ public class MachineImpl implements Machine {
         intermediate = backwardTransform(rotors, intermediate);
 
         return keyboard.lightKey(intermediate);
+    }
+
+    /**
+     * Checks if the machine is configured with a valid code.
+     *
+     * @return {@code true} if the machine has a non-null code, {@code false} otherwise.
+     * @since 1.0
+     */
+    public boolean isConfigured() {
+        return code != null;
     }
 
     /*--------------- Helpers ---------------*/

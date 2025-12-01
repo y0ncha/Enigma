@@ -17,13 +17,21 @@ import java.util.*;
 /**
  * Default {@link Engine} implementation.
  *
- * <p>This class is responsible for loading a machine specification from XML,
- * validating the specification and configurations, creating a {@link Machine}
- * and wiring a runtime {@link Code} using {@link CodeFactory}.</p>
+ * <p>This class coordinates the high-level engine flow: it obtains a
+ * {@link MachineSpec} from the configured {@link Loader}, generates or
+ * validates {@link CodeConfig} instances, and delegates construction of
+ * a runtime {@link Code} to a {@link CodeFactory} implementation. The
+ * Engine assumes the {@link Loader} performs full validation of the
+ * {@link MachineSpec} contents; the Engine validates runtime configuration
+ * (code selection and positions) before creating a code instance.</p>
  *
- * <p>Validation is performed at the engine boundary (see private helpers)
- * and factories are expected to construct runtime objects from validated
- * inputs.</p>
+ * <p>Responsibilities (concise):</p>
+ * <ul>
+ *   <li>Load machine specification (XML) via {@link Loader}.</li>
+ *   <li>Produce validated {@link CodeConfig} (manual or random).</li>
+ *   <li>Build a runtime {@link Code} using {@link CodeFactory} and assign it to
+ *       the internal {@link Machine} instance.</li>
+ * </ul>
  *
  * @since 1.0
  */
@@ -38,7 +46,12 @@ public class EngineImpl implements Engine {
     private CodeConfig origConfig;
 
     /**
-     * Construct an Engine that uses the default XML loader and code factory.
+     * Construct an Engine that uses the default XML {@link Loader} and
+     * the default {@link CodeFactory} implementation.
+     *
+     * <p>The engine creates a {@link Machine} instance and keeps it as an
+     * internal field; the {@link Machine} is configured later when a
+     * {@link Code} is created (manual or random).</p>
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
@@ -47,10 +60,14 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * {@inheritDoc}
+     * Load a machine specification from the given path.
      *
-     * <p>High-level orchestration: load spec, validate, create machine,
-     * generate random code config, validate config, build code and assign it.</p>
+     * <p>This method delegates actual XML parsing/validation to the configured
+     * {@link Loader}. On success the loaded {@link MachineSpec} is stored in
+     * the engine for subsequent code creation calls.</p>
+     *
+     * @param path filesystem path or resource identifier accepted by the loader
+     * @throws RuntimeException when loading fails (wraps {@link EnigmaLoadingException})
      */
     @Override
     public void loadMachime(String path) {
@@ -62,11 +79,31 @@ public class EngineImpl implements Engine {
         }
     }
 
+    /**
+     * Placeholder for feeding machine-level data into the engine.
+     *
+     * <p>Currently a no-op; kept for API completeness.</p>
+     *
+     * @param input arbitrary input string for future use
+     */
     @Override
     public void machineData(String input) {
         // no-op for now
     }
 
+    /**
+     * Configure the machine using an explicit {@link CodeConfig} provided by
+     * the caller.
+     *
+     * <p>The engine validates the configuration against the loaded
+     * {@link MachineSpec} (uniqueness, existence of ids, and valid positions)
+     * and uses {@link CodeFactory#create(MachineSpec, CodeConfig)} to obtain
+     * a runtime {@link Code} instance. The created code is assigned to the
+     * internal {@link Machine}.</p>
+     *
+     * @param config runtime code configuration (rotor ids, positions, reflector id)
+     * @throws IllegalArgumentException when the configuration is invalid
+     */
     @Override
     public void codeManual(CodeConfig config) {
         validateCodeConfig(spec, config);
@@ -75,11 +112,33 @@ public class EngineImpl implements Engine {
         machine.setCode(code);
     }
 
+    /**
+     * Create a random, valid {@link CodeConfig} and configure the machine
+     * with the resulting code.
+     *
+     * <p>This method samples rotor ids, starting positions and a reflector
+     * id using a local {@link SecureRandom} instance, validates the sampled
+     * configuration and delegates to {@link #codeManual(CodeConfig)} so the
+     * same creation path is used for manual and random flows.</p>
+     *
+     * @throws IllegalStateException when the machine spec is not loaded
+     */
     public void codeRandom() {
-        CodeConfig config = generateRandomCodeConfig(spec);
+        CodeConfig config = randomCodeConfig(spec);
         codeManual(config);
     }
 
+    /**
+     * Process an input string through the configured {@link Machine}.
+     *
+     * <p>The engine forwards characters one-by-one to {@link Machine#process}
+     * and concatenates the results. {@link Machine} itself enforces that a
+     * {@link Code} has been set and will throw if the machine is not ready.</p>
+     *
+     * @param input input string to process
+     * @return processed output string
+     * @throws IllegalStateException if the internal machine rejects processing
+     */
     @Override
     public String process(String input) {
         StringBuilder output = new StringBuilder();
@@ -89,6 +148,11 @@ public class EngineImpl implements Engine {
         return output.toString();
     }
 
+    /**
+     * Produce runtime statistics for the engine.
+     *
+     * <p>Currently a placeholder; implementation may be added later.</p>
+     */
     @Override
     public void statistics() {
         // no-op for now
@@ -97,14 +161,22 @@ public class EngineImpl implements Engine {
     // --- Flow helpers: machine creation and random code generation ---------
 
     /**
-     * Generate a random {@link CodeConfig} from the machine specification.
-     * This method performs only lightweight precondition checks (via
-     * a sampled configuration; full validation is done by validateCodeConfig.
+     * Generate a random {@link CodeConfig} from the loaded {@link MachineSpec}.
      *
-     * @param spec machine specification
-     * @return sampled CodeConfig (rotorIds left->right, positions left->right, reflectorId)
+     * <p>Sampling rules:
+     * <ul>
+     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor ids (left→right)</li>
+     *   <li>Pick one reflector id at random</li>
+     *   <li>Generate random starting positions (0 .. alphabet.size()-1) for each rotor</li>
+     * </ul>
+     * The returned {@link CodeConfig} uses left→right ordering for rotors and
+     * positions (caller/engine conventions).</p>
+     *
+     * @param spec machine specification (must be non-null)
+     * @return randomly sampled {@link CodeConfig}
+     * @throws IllegalStateException when {@code spec} is null
      */
-    private CodeConfig generateRandomCodeConfig(MachineSpec spec) {
+    private CodeConfig randomCodeConfig(MachineSpec spec) {
         if (spec == null) {
             throw new IllegalStateException(
                     "Machine is not loaded. Load an XML file before generating a random code.");
@@ -135,12 +207,28 @@ public class EngineImpl implements Engine {
     // --- Engine-level validation helpers ------------------------------------------------
 
     /**
-     * Validate a {@link CodeConfig} against a {@link MachineSpec}.
+     * Minimal guard ensuring a non-null {@link MachineSpec} is present before
+     * the engine uses it.
      *
-     * <p>Checks include: non-null fields, exact rotor count (3), uniqueness,
-     * existence in the spec and positions range.</p>
+     * <p>The loader is responsible for full spec validation (alphabet length,
+     * mappings, notch sanity, etc.). The engine keeps a minimal presence check
+     * to protect runtime flows.</p>
      *
-     * @param spec   machine specification
+     * @param spec machine specification instance
+     * @throws IllegalArgumentException if {@code spec} is null
+     */
+    private void validateMachineSpec(MachineSpec spec) {
+        if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
+    }
+
+    /**
+     * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
+     *
+     * <p>Checks performed here are limited to configuration-level constraints:
+     * number of rotors/positions, uniqueness of rotor ids, existence of ids in
+     * the spec, and valid numeric ranges for positions.</p>
+     *
+     * @param spec   machine specification (assumed valid by the loader)
      * @param config code configuration to validate
      * @throws IllegalArgumentException when validation fails
      */
