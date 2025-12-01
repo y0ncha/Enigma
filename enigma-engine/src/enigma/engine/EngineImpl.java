@@ -9,6 +9,8 @@ import enigma.machine.MachineImpl;
 import enigma.machine.code.Code;
 import enigma.machine.Machine;
 import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.spec.MachineSpec;
 
 import java.security.SecureRandom;
@@ -61,16 +63,6 @@ public class EngineImpl implements Engine {
         this.codeFactory = new CodeFactoryImpl();
     }
 
-    /**
-     * Load a machine specification from the given path.
-     *
-     * <p>This method delegates actual XML parsing/validation to the configured
-     * {@link Loader}. On success the loaded {@link MachineSpec} is stored in
-     * the engine for subsequent code creation calls.</p>
-     *
-     * @param path filesystem path or resource identifier accepted by the loader
-     * @throws RuntimeException when loading fails (wraps {@link EnigmaLoadingException})
-     */
     @Override
     public void loadMachime(String path) {
         try {
@@ -81,31 +73,11 @@ public class EngineImpl implements Engine {
         }
     }
 
-    /**
-     * Placeholder for feeding machine-level data into the engine.
-     *
-     * <p>Currently a no-op; kept for API completeness.</p>
-     *
-     * @param input arbitrary input string for future use
-     */
     @Override
     public void machineData(String input) {
         // no-op for now
     }
 
-    /**
-     * Configure the machine using an explicit {@link CodeConfig} provided by
-     * the caller.
-     *
-     * <p>The engine validates the configuration against the loaded
-     * {@link MachineSpec} (uniqueness, existence of ids, and valid positions)
-     * and uses {@link CodeFactory#create(MachineSpec, CodeConfig)} to obtain
-     * a runtime {@link Code} instance. The created code is assigned to the
-     * internal {@link Machine}.</p>
-     *
-     * @param config runtime code configuration (rotor ids, positions, reflector id)
-     * @throws IllegalArgumentException when the configuration is invalid
-     */
     @Override
     public void codeManual(CodeConfig config) {
         validateCodeConfig(spec, config);
@@ -130,24 +102,41 @@ public class EngineImpl implements Engine {
         codeManual(config);
     }
 
-    /**
-     * Process an input string through the configured {@link Machine}.
-     *
-     * <p>The engine forwards characters one-by-one to {@link Machine#process}
-     * and concatenates the results. {@link Machine} itself enforces that a
-     * {@link Code} has been set and will throw if the machine is not ready.</p>
-     *
-     * @param input input string to process
-     * @return processed output string
-     * @throws IllegalStateException if the internal machine rejects processing
-     */
+
     @Override
     public String process(String input) {
+        if (!machine.isConfigured()) {
+            throw new IllegalStateException("Machine is not configured");
+        }
+        if (input == null) { // TODO: validate input is in alphabet
+            throw new IllegalArgumentException("Input must not be null");
+        }
         StringBuilder output = new StringBuilder();
+
         for(char c : input.toCharArray()) {
             output.append(machine.process(c));
         }
         return output.toString();
+    }
+
+    @Override
+    public DebugTrace processDebug(String input) {
+        if (!machine.isConfigured()) {
+            throw new IllegalStateException("Machine is not configured");
+        }
+        if (input == null) { // TODO: validate input is in alphabet
+            throw new IllegalArgumentException("Input must not be null");
+        }
+
+        List<SignalTrace> traces = new ArrayList<>();
+        StringBuilder output = new StringBuilder();
+
+        for (char c : input.toCharArray()) {
+            SignalTrace trace = machine.processDebug(c);
+            traces.add(trace);
+            output.append(trace.outputChar());
+        }
+        return new DebugTrace(output.toString(), List.copyOf(traces));
     }
 
     /**
@@ -207,21 +196,6 @@ public class EngineImpl implements Engine {
     }
 
     // --- Engine-level validation helpers ------------------------------------------------
-
-    /**
-     * Minimal guard ensuring a non-null {@link MachineSpec} is present before
-     * the engine uses it.
-     *
-     * <p>The loader is responsible for full spec validation (alphabet length,
-     * mappings, notch sanity, etc.). The engine keeps a minimal presence check
-     * to protect runtime flows.</p>
-     *
-     * @param spec machine specification instance
-     * @throws IllegalArgumentException if {@code spec} is null
-     */
-    private void validateMachineSpec(MachineSpec spec) {
-        if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
-    }
 
     /**
      * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.

@@ -1,6 +1,7 @@
 package enigma.engine;
 
 import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.dto.tracer.DebugTrace;
 
 /**
  * Engine API for coordinating machine loading, configuration and processing.
@@ -55,6 +56,15 @@ public interface Engine {
      * @return processed/transformed output text
      */
     String process(String input);
+
+    /**
+     * Process the provided input string through the currently configured
+     * machine/code with detailed debugging information.
+     *
+     * @param input the input text to process
+     * @return detailed debug trace of the processing steps
+     */
+    DebugTrace processDebug(String input);
 
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).

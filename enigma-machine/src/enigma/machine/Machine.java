@@ -44,4 +44,6 @@ public interface Machine {
      * @since 1.0
      */
     SignalTrace processDebug(char input);
+
+    boolean isConfigured();
 }

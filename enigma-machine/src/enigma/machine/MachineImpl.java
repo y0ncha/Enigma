@@ -75,13 +75,18 @@ public class MachineImpl implements Machine {
         return keyboard.lightKey(intermediate);
     }
 
-    public void ensureConfigured() {
+    private void ensureConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured with a code");
         }
         if (keyboard == null) {
             throw new IllegalStateException("Machine is not configured with a keyboard");
         }
+    }
+
+    @Override
+    public boolean isConfigured() {
+        return code != null && keyboard != null;
     }
 
     // --- Helpers -------------------------------------------------
