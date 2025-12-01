@@ -30,6 +30,7 @@ import java.util.*;
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
+    private static final int MINIMUM_ROTOR_COUNT = 3;
 
     /**
      * {@inheritDoc}
@@ -321,8 +322,8 @@ public class LoaderXml implements Loader {
         if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
             throw new EnigmaLoadingException("No <BTE-Rotors> section or empty rotors list");
         }
-        if (bteRotors.getBTERotor().size() < 3) {
-            throw new EnigmaLoadingException("Machine must define at least 3 rotors, but got " + bteRotors.getBTERotor().size());
+        if (bteRotors.getBTERotor().size() < MINIMUM_ROTOR_COUNT) {
+            throw new EnigmaLoadingException("Machine must define at least " + MINIMUM_ROTOR_COUNT + " rotors, but got " + bteRotors.getBTERotor().size());
         }
     }
 
