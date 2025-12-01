@@ -252,8 +252,8 @@ public class EngineImpl implements Engine {
         int alphaSize = spec.alphabet().size();
         for (int i = 0; i < positions.size(); i++) {
             Integer p = positions.get(i);
-            if (p == null) throw new IllegalArgumentException("Position at index " + i + " is null");
-            if (p < 0 || p >= alphaSize) throw new IllegalArgumentException("Invalid position index at " + i + ": " + p);
+            if (p == null || p < 0 || p >= alphaSize)
+                throw new IllegalArgumentException("Invalid position at index " + i + ": " + p);
         }
     }
 }
