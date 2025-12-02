@@ -1,6 +1,6 @@
 package enigma.shared.spec;
+
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.Comparator;
 import enigma.machine.alphabet.Alphabet;
 
@@ -23,7 +23,7 @@ public record MachineSpec(
      * Convenience lookup for a reflector specification by its identifier.
      *
      * @param id reflector id (e.g. "I", "II")
-     * @return ReflectorSpec or null if not found
+     * @return ReflectorSpec instance for the given id, or null if not found
      */
     public ReflectorSpec getReflectorById(String id) {
         return (reflectorsById == null) ? null : reflectorsById.get(id);
@@ -33,38 +33,46 @@ public record MachineSpec(
      * Convenience lookup for a rotor specification by its numeric id.
      *
      * @param id rotor id
-     * @return RotorSpec or null if not found
+     * @return RotorSpec instance for the given id, or null if not found
      */
     public RotorSpec getRotorById(int id) {
         return (rotorsById == null) ? null : rotorsById.get(id);
     }
 
+    /**
+     * @inheritDoc
+     * @return
+     */
     @Override
     public String toString() {
-        String letters = (alphabet == null) ? "<none>" : alphabet.getLetters();
+        String letters = (alphabet == null) ? null : alphabet.getLetters();
         int alphaSize = (alphabet == null) ? 0 : alphabet.size();
-
-        String rotorsStr = "<none>";
-        if (rotorsById != null && !rotorsById.isEmpty()) {
-            rotorsStr = rotorsById.keySet().stream()
-                    .sorted()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", ", "[", "]"));
-        }
-
-        String reflectorsStr = "<none>";
-        if (reflectorsById != null && !reflectorsById.isEmpty()) {
-            reflectorsStr = reflectorsById.keySet().stream()
-                    .sorted(Comparator.naturalOrder())
-                    .collect(Collectors.joining(", ", "[", "]"));
-        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("MachineSpec:\n");
-        sb.append("  Alphabet: ").append(letters).append("\n");
+        sb.append("  Alphabet: ").append(letters == null ? "<none>" : letters).append("\n");
         sb.append("  Alphabet size: ").append(alphaSize).append("\n");
-        sb.append("  Available rotors: ").append(rotorsStr).append("\n");
-        sb.append("  Available reflectors: ").append(reflectorsStr).append("\n");
+
+        // Print rotors using RotorSpec.toString()
+        if (rotorsById == null || rotorsById.isEmpty()) {
+            sb.append("  Rotors: <none>\n");
+        } else {
+            sb.append("  Rotors (count=").append(rotorsById.size()).append("):\n");
+            rotorsById.values().stream()
+                    .sorted(Comparator.comparing(RotorSpec::id))
+                    .forEach(r -> sb.append("    ").append(r).append("\n"));
+        }
+
+        // Print reflectors using ReflectorSpec.toString()
+        if (reflectorsById == null || reflectorsById.isEmpty()) {
+            sb.append("  Reflectors: <none>\n");
+        } else {
+            sb.append("  Reflectors (count=").append(reflectorsById.size()).append("):\n");
+            reflectorsById.values().stream()
+                    .sorted(Comparator.comparing(ReflectorSpec::id))
+                    .forEach(rf -> sb.append("    ").append(rf).append("\n"));
+        }
+
         return sb.toString();
     }
 }

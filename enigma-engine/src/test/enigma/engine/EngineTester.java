@@ -5,6 +5,8 @@ import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
 
+import java.nio.file.Paths;
+
 /**
  * Manual sanity test for the Enigma engine.
  *
@@ -16,8 +18,10 @@ import enigma.shared.dto.tracer.DebugTrace;
  */
 public class EngineTester {
 
-    private static final String XML_PATH =
-            "/Users/yonatan/Library/CloudStorage/OneDrive-TheAcademicCollegeofTel-AvivJaffa-MTA/GoodNotes/שנה ג/סמסטר א/Java E2E/Enigma/enigma-loader/src/test/resources/xml/ex1-sanity-small.xml";
+    // Use the same test resources directory as the loader tests
+    private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
+
+    private static final String XML_PATH = Paths.get(XML_BASE_DIR, "ex1-sanity-small.xml").toString();
 
     /**
      * Entry point for the sanity test.
@@ -26,7 +30,8 @@ public class EngineTester {
 
         Engine engine = new EngineImpl();
 
-        System.out.println("Loading XML: " + XML_PATH);
+        System.out.println("Loading XML: " + XML_PATH + "\n");
+
         engine.loadMachime(XML_PATH);
 
         // Code: <3,2,1><CCC><I>
@@ -35,6 +40,7 @@ public class EngineTester {
                 java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
                 "I"                           // reflector
         );
+        System.out.println("Code configuration: " + config + "\n");
         engine.codeManual(config);
 
         // Sanity-small inputs & expected outputs from the appendix table

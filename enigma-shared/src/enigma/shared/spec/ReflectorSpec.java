@@ -1,6 +1,8 @@
 package enigma.shared.spec;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Specification for an Enigma machine reflector.
@@ -27,12 +29,24 @@ public record ReflectorSpec(
     }
 
     /**
-     * Return a defensive copy of the mapping array.
-     *
-     * @return copy of the mapping array
+     * @inheritDoc
      */
     @Override
     public int[] mapping() {
         return mapping.clone();
+    }
+
+    private String mappingToString() {
+        return IntStream.range(0, mapping.length)
+                .mapToObj(i -> (char)('A' + i) + "->" + (char)('A' + mapping[i]))
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String toString() {
+        return String.format("Reflector ID: %s, Mapping: [%s]", id, mappingToString());
     }
 }

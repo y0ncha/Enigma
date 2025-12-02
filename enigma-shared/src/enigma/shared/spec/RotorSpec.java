@@ -1,6 +1,8 @@
 package enigma.shared.spec;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Represents the specification of a rotor in the Enigma machine.
@@ -51,5 +53,20 @@ public record RotorSpec(
      */
     public int[] getBackwardMapping() {
         return backwardMapping.clone();
+    }
+
+    private String mappingToString(int[] mapping) {
+        return IntStream.range(0, mapping.length)
+                .mapToObj(i -> (char)('A' + i) + "->" + (char)('A' + mapping[i]))
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String toString() {
+        return String.format("Rotor ID: %d, Notch: %d, Forward: [%s], Backward: [%s]",
+                id, notchIndex + 1, mappingToString(forwardMapping), mappingToString(backwardMapping));
     }
 }
