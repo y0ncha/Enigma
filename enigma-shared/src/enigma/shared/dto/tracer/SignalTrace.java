@@ -2,7 +2,23 @@ package enigma.shared.dto.tracer;
 
 import java.util.List;
 
-
+/**
+ * Trace of a single character's path through the Enigma machine.
+ *
+ * <p>Records the input/output characters, rotor window states before and after
+ * processing, which rotors advanced, and detailed forward/backward rotor traces
+ * including the reflector step.</p>
+ *
+ * @param inputChar original input character
+ * @param outputChar final output character
+ * @param windowBefore rotor window before stepping (left→right)
+ * @param windowAfter rotor window after processing (left→right)
+ * @param advancedIndices rotors that advanced (0 = rightmost)
+ * @param forwardSteps rotor traces for forward pass (right→left)
+ * @param reflectorStep reflector transformation trace
+ * @param backwardSteps rotor traces for backward pass (left→right)
+ * @since 1.0
+ */
 public record SignalTrace(
         char inputChar,                  // original input char
         char outputChar,                 // final output char
