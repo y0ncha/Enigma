@@ -124,7 +124,7 @@ public class EngineImpl implements Engine {
         if (!machine.isConfigured()) {
             throw new IllegalStateException("Machine is not configured");
         }
-        if (input == null) { // TODO: validate input is in alphabet
+        if (input == null) {
             throw new IllegalArgumentException("Input must not be null");
         }
 

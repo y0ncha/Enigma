@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class EngineTester {
+public class EngineMultiTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";

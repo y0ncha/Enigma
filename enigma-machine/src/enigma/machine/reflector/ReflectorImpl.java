@@ -9,18 +9,15 @@ import enigma.machine.alphabet.Alphabet;
  */
 public class ReflectorImpl implements Reflector {
 
-    private final Alphabet alphabet;
     private final int[] mapping;   // symmetric mapping array
 
     /**
      * Create reflector with the provided alphabet and mapping.
      *
-     * @param alphabet alphabet used by the machine
      * @param mapping symmetric mapping array (mapping[i] = j and mapping[j] = i)
      * @since 1.0
      */
-    public ReflectorImpl(Alphabet alphabet, int[] mapping) {
-        this.alphabet = alphabet;
+    public ReflectorImpl(int[] mapping) {
         this.mapping = mapping;
     }
 

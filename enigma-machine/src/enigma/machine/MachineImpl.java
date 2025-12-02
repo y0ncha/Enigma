@@ -134,37 +134,35 @@ public class MachineImpl implements Machine {
 
         List<Integer> advanced = new ArrayList<>();
 
-        int rotorIndex = 0;
+        int index = rotors.size() - 1; // start at RIGHTMOST
         boolean shouldAdvance;
 
         do {
-            Rotor rotor = rotors.get(rotorIndex);
+            Rotor rotor = rotors.get(index);
             shouldAdvance = rotor.advance();
-            advanced.add(rotorIndex);      // this rotor advanced
-            rotorIndex++;
-        } while (shouldAdvance && rotorIndex < rotors.size());
+            advanced.add(index);        // record natural index (left→right convention)
+            index--;                    // move leftward
+        } while (shouldAdvance && index >= 0);
 
         return List.copyOf(advanced);
     }
 
     private List<RotorTrace> forwardTransform(List<Rotor> rotors, int value) {
-        ensureConfigured();
 
         List<RotorTrace> steps = new ArrayList<>();
 
-        for (int i = 0; i < rotors.size(); i++) {
+        // iterate from RIGHTMOST (last index) → LEFTMOST (0)
+        for (int i = rotors.size() - 1; i >= 0; i--) {
             Rotor rotor = rotors.get(i);
             int entryIndex = value;
             int exitIndex = rotor.process(entryIndex, Direction.FORWARD);
-            char entryChar = keyboard.lightKey(entryIndex);
-            char exitChar = keyboard.lightKey(exitIndex);
 
             steps.add(new RotorTrace(
                     i,
                     entryIndex,
                     exitIndex,
-                    entryChar,
-                    exitChar
+                    keyboard.lightKey(entryIndex),
+                    keyboard.lightKey(exitIndex)
             ));
 
             value = exitIndex;
@@ -181,23 +179,21 @@ public class MachineImpl implements Machine {
      * @return immutable list of RotorTrace (rightmost first)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
-        ensureConfigured();
 
         List<RotorTrace> steps = new ArrayList<>();
 
-        for (int i = rotors.size() - 1; i >= 0; i--) {
+        // iterate from LEFTMOST (0) → RIGHTMOST (last index)
+        for (int i = 0; i < rotors.size(); i++) {
             Rotor rotor = rotors.get(i);
             int entryIndex = value;
             int exitIndex = rotor.process(entryIndex, Direction.BACKWARD);
-            char entryChar = keyboard.lightKey(entryIndex);
-            char exitChar = keyboard.lightKey(exitIndex);
 
             steps.add(new RotorTrace(
                     i,
                     entryIndex,
                     exitIndex,
-                    entryChar,
-                    exitChar
+                    keyboard.lightKey(entryIndex),
+                    keyboard.lightKey(exitIndex)
             ));
 
             value = exitIndex;

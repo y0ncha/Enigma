@@ -5,6 +5,8 @@ import enigma.machine.alphabet.Alphabet;
 import enigma.machine.rotor.Rotor;
 import enigma.machine.rotor.RotorImpl;
 
+import java.util.Objects;
+
 /**
  * Default {@link RotorFactory} implementation producing {@link RotorImpl} instances.
  *
@@ -19,10 +21,18 @@ public class RotorFactoryImpl implements RotorFactory {
     private final Alphabet alphabet;
 
     /**
-     * Create a rotor factory bound to the given alphabet.
+     * Default {@link RotorFactory} implementation.
      *
-     * @param alphabet alphabet used for rotor construction
-     * @throws IllegalArgumentException if alphabet is null
+     * <p><b>Mapping conventions (inherited from {@link RotorSpec}):</b></p>
+     * <ul>
+     *   <li>{@code forwardMapping}: index = right-side position, value = left-side position
+     *       (right→left, used on the forward path toward the reflector).</li>
+     *   <li>{@code backwardMapping}: index = left-side position, value = right-side position
+     *       (left→right, used on the return path from the reflector).</li>
+     * </ul>
+     *
+     * <p>This factory does <b>not</b> modify or invert the mappings; it simply adapts
+     * the immutable {@link RotorSpec} data into a runtime {@link RotorImpl}.</p>
      */
     public RotorFactoryImpl(Alphabet alphabet) {
         if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
@@ -34,13 +44,30 @@ public class RotorFactoryImpl implements RotorFactory {
      */
     @Override
     public Rotor create(RotorSpec spec, int startPosition) {
-        if (spec == null) throw new IllegalArgumentException("spec must not be null");
+        Objects.requireNonNull(spec, "spec must not be null");
 
-        int[] forward = spec.getForwardMapping();
-        int[] backward = spec.getBackwardMapping();
-        int notch = spec.notchIndex();
+        if (startPosition < 0 || startPosition >= alphabet.size()) {
+            throw new IllegalArgumentException(
+                    "startPosition out of range: " + startPosition +
+                            " (alphabet size=" + alphabet.size() + ")"
+            );
+        }
 
-        // RotorImpl constructor expects alphabet, forward/backward maps, notch and start position
-        return new RotorImpl(alphabet, forward, backward, notch, startPosition);
+        // Preserve directional semantics from RotorSpec:
+        // forward:  right -> left
+        // backward: left  -> right
+        int[] forward = spec.getForwardMapping();   // defensive copy from spec
+        int[] backward = spec.getBackwardMapping(); // defensive copy from spec
+
+        int notchIndex = spec.notchIndex(); // 0-based notch index
+
+        return new RotorImpl(
+                alphabet,
+                forward,        // right→left
+                backward,       // left→right
+                notchIndex,
+                startPosition
+        );
     }
 }
+
