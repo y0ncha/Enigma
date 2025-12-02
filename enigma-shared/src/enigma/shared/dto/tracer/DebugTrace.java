@@ -2,6 +2,16 @@ package enigma.shared.dto.tracer;
 
 import java.util.List;
 
+/**
+ * Container for full debug output from processing a string through the machine.
+ *
+ * <p>Contains the final output string and a per-character trace of the signal
+ * path through rotors and reflector.</p>
+ *
+ * @param output final processed output string
+ * @param signalTraces per-character signal traces
+ * @since 1.0
+ */
 public record DebugTrace(
         String output,                  // final processed string
         List<SignalTrace> signalTraces  // one trace per input character

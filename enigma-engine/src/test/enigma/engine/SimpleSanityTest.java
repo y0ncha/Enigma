@@ -5,11 +5,25 @@ import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
 
+/**
+ * Manual sanity test for the Enigma engine.
+ *
+ * <p>Runs a series of input/output tests against a small sanity XML file
+ * and prints results to stdout. This is not a unit test but a manual
+ * verification tool.</p>
+ *
+ * @since 1.0
+ */
 public class SimpleSanityTest {
 
     private static final String XML_PATH =
             "/Users/yonatan/Library/CloudStorage/OneDrive-TheAcademicCollegeofTel-AvivJaffa-MTA/GoodNotes/שנה ג/סמסטר א/Java E2E/Enigma/enigma-loader/src/test/resources/xml/ex1-sanity-small.xml";
 
+    /**
+     * Entry point for the sanity test.
+     *
+     * @param args command line arguments (unused)
+     */
     public static void main(String[] args) {
 
         Engine engine = new EngineImpl();
