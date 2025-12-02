@@ -132,7 +132,7 @@ public class EngineImpl implements Engine {
         StringBuilder output = new StringBuilder();
 
         for (char c : input.toCharArray()) {
-            SignalTrace trace = machine.processDebug(c);
+            SignalTrace trace = machine.process(c);
             traces.add(trace);
             output.append(trace.outputChar());
         }

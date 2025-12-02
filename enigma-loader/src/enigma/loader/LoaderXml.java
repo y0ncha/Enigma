@@ -261,7 +261,7 @@ public class LoaderXml implements Loader {
             result.put(id, new ReflectorSpec(id, mapping));
         }
 
-        // After building reflectors, ensure ids form a contiguous Roman run starting from I
+        // After building reflectors, ensure ids form a contiguous Roman main starting from I
         validateReflectorIdRun(result.keySet());
 
         return result;
@@ -404,10 +404,10 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Validate that the set of reflector ids forms a contiguous run of Roman numerals starting from I.
+     * Validate that the set of reflector ids forms a contiguous main of Roman numerals starting from I.
      *
      * @param ids set of reflector ids to validate
-     * @throws EnigmaLoadingException if the run is not contiguous or does not start from I
+     * @throws EnigmaLoadingException if the main is not contiguous or does not start from I
      */
     private void validateReflectorIdRun(Set<String> ids) throws EnigmaLoadingException {
         if (ids == null || ids.isEmpty()) return;
@@ -417,7 +417,7 @@ public class LoaderXml implements Loader {
         for (int i = 0; i < n; i++) {
             String required = ROMAN_ORDER.get(i);
             if (!ids.contains(required)) {
-                throw new EnigmaLoadingException("Reflector ids must form a contiguous Roman run starting from I (e.g. I,II,III). Got: " + ids);
+                throw new EnigmaLoadingException("Reflector ids must form a contiguous Roman main starting from I (e.g. I,II,III). Got: " + ids);
             }
         }
     }

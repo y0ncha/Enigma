@@ -16,15 +16,13 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class LoaderXmlTest {
+public class LoaderTester {
 
     // Relative to the project root — actual files are under enigma-engine/src/resources/xml/
     private static final String XML_BASE_DIR = "enigma-engine/src/resources/xml";
 
     /**
      * Entry point for the test harness.
-     *
-     * @param args command line arguments (unused)
      */
     public static void main(String[] args) {
         Loader loader = new LoaderXml(3);

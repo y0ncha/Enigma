@@ -14,15 +14,13 @@ import enigma.shared.dto.tracer.DebugTrace;
  *
  * @since 1.0
  */
-public class SimpleSanityTest {
+public class EngineTester {
 
     private static final String XML_PATH =
             "/Users/yonatan/Library/CloudStorage/OneDrive-TheAcademicCollegeofTel-AvivJaffa-MTA/GoodNotes/שנה ג/סמסטר א/Java E2E/Enigma/enigma-loader/src/test/resources/xml/ex1-sanity-small.xml";
 
     /**
      * Entry point for the sanity test.
-     *
-     * @param args command line arguments (unused)
      */
     public static void main(String[] args) {
 
