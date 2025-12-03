@@ -31,16 +31,9 @@ public interface Rotor {
     int getPosition();
 
     /**
-     * Set the current rotor position.
-     *
-     * @param position new position (0..alphabetSize-1)
-     */
-    void setPosition(int position);
-
-    /**
      * Get the notch position which triggers stepping of the next rotor.
      *
      * @return notch position (0..alphabetSize-1)
      */
-    int getNotch();
+    int getNotchInd();
 }

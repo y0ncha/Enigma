@@ -215,12 +215,13 @@ public class MachineImpl implements Machine {
 
         StringBuilder sb = new StringBuilder();
 
-        // user-facing left→right view: iterate physical rotors from leftmost to rightmost
-        for (int i = rotors.size() - 1; i >= 0; i--) {
-            int pos = rotors.get(i).getPosition();       // numeric window index
-            char c = keyboard.lightKey(pos);             // convert index -> alphabet char
+        // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
+        for (Rotor rotor : rotors) {
+            int pos = rotor.getPosition();   // numeric window index (0-based)
+            char c = keyboard.lightKey(pos);         // convert index -> alphabet char
             sb.append(c);
         }
+
         return sb.toString();
     }
 }

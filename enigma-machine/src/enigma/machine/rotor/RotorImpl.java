@@ -13,7 +13,7 @@ public class RotorImpl implements Rotor {
     private final Alphabet alphabet;
     private final int[] forwardMapping;     // from right → left
     private final int[] backwardMapping;    // from left → right
-    private final int notch;                // position that triggers stepping
+    private final int notchInd;                // position that triggers stepping
 
     private int position;                   // current window index (0..alphabetSize-1)
 
@@ -36,7 +36,7 @@ public class RotorImpl implements Rotor {
         this.alphabet = alphabet;
         this.forwardMapping = forwardMapping;
         this.backwardMapping = backwardMapping;
-        this.notch = notch;
+        this.notchInd = notch;
         this.position = startPosition;
     }
 
@@ -46,7 +46,7 @@ public class RotorImpl implements Rotor {
     @Override
     public boolean advance() {
         position = (position + 1) % alphabet.size();
-        return position == notch;
+        return position == notchInd;
     }
 
     /**
@@ -77,15 +77,7 @@ public class RotorImpl implements Rotor {
      * {@inheritDoc}
      */
     @Override
-    public void setPosition(int position) {
-        this.position = position % alphabet.size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNotch() {
-        return notch;
+    public int getNotchInd() {
+        return notchInd;
     }
 }

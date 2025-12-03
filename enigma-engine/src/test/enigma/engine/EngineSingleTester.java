@@ -24,8 +24,8 @@ public class EngineSingleTester {
     private static final String XML_PATH     = Paths.get(XML_BASE_DIR, "ex1-sanity-small.xml").toString();
 
     // ---- Configure the single test case here ----
-    private static final String INPUT          = "AABBCCDDEEFF";
-    private static final String EXPECTED       = "FFCCBBEEDDAA";
+    private static final String INPUT          = "FEDCBADDEF";
+    private static final String EXPECTED       = "ADEBCFEEDA";
 
     // Code: <3,2,1><CCC><I>
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
