@@ -127,8 +127,8 @@ public class MachineImpl implements Machine {
     /**
      * Advance rotors starting from the rightmost rotor and record which rotors moved.
      *
-     * @param rotors list of rotors in right→left order
-     * @return immutable list of rotor indices that advanced (0 = rightmost)
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @return immutable list of rotor indices that advanced (0 = leftmost)
      */
     private List<Integer> advance(List<Rotor> rotors) {
 
@@ -174,9 +174,9 @@ public class MachineImpl implements Machine {
     /**
      * Apply backward transformation through rotors while recording traces.
      *
-     * @param rotors list of rotors from right to left
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @param value input index to transform
-     * @return immutable list of RotorTrace (rightmost first)
+     * @return immutable list of RotorTrace (leftmost first)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
 
@@ -204,7 +204,7 @@ public class MachineImpl implements Machine {
 
     /**
      * Build the window string representing the current rotor positions.
-     * @param rotors list of rotors from right to left
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @return window string by format
      */
     private String buildWindowString(List<Rotor> rotors) {
