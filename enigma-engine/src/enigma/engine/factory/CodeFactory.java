@@ -12,9 +12,9 @@ import enigma.machine.code.Code;
  * instances. Validation of inputs (spec/config) should be performed by the
  * caller (the engine); the factory focuses on object construction.</p>
  *
- * Ordering note: configuration objects (e.g. {@link CodeConfig}) are expressed
- * in left→right order (user-facing); factories may reorder values for runtime
- * (right→left) as needed.
+ * <p><b>Ordering note:</b> configuration objects (e.g. {@link CodeConfig}) are expressed
+ * in left→right order (user-facing). The factory preserves this left→right order
+ * in the resulting {@link Code}; no reversal is performed.</p>
  *
  * @since 1.0
  */

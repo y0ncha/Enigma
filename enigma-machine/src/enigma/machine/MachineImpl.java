@@ -147,6 +147,13 @@ public class MachineImpl implements Machine {
         return List.copyOf(advanced);
     }
 
+    /**
+     * Apply forward transformation through rotors while recording traces.
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @param value input index to transform
+     * @return immutable list of RotorTrace in traversal order (rightmost first)
+     */
     private List<RotorTrace> forwardTransform(List<Rotor> rotors, int value) {
 
         List<RotorTrace> steps = new ArrayList<>();
@@ -176,7 +183,7 @@ public class MachineImpl implements Machine {
      *
      * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @param value input index to transform
-     * @return immutable list of RotorTrace (leftmost first)
+     * @return immutable list of RotorTrace in traversal order (leftmost first)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
 
