@@ -23,5 +23,7 @@ public interface RotorFactory {
      * @param startPosition initial window position (0-based index into alphabet)
      * @return a runtime rotor instance
      */
-    Rotor create(RotorSpec spec, int startPosition);
+    Rotor createVirtual(RotorSpec spec, int startPosition);
+
+    Rotor createMechanical(RotorSpec spec, int startPosition);
 }

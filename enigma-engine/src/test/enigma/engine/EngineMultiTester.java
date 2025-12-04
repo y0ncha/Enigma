@@ -41,7 +41,7 @@ public class EngineMultiTester {
                 "I"                           // reflector
         );
         System.out.println("Code configuration: " + config + "\n");
-        engine.codeManual(config);
+        engine.codeManualVirtual(config);
 
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {

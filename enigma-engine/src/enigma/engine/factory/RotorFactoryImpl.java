@@ -1,14 +1,15 @@
 package enigma.engine.factory;
 
+import enigma.machine.rotor.MechanicalRotor;
 import enigma.shared.spec.RotorSpec;
 import enigma.machine.alphabet.Alphabet;
 import enigma.machine.rotor.Rotor;
-import enigma.machine.rotor.RotorImpl;
+import enigma.machine.rotor.VirtualRotor;
 
 import java.util.Objects;
 
 /**
- * Default {@link RotorFactory} implementation producing {@link RotorImpl} instances.
+ * Default {@link RotorFactory} implementation producing {@link VirtualRotor} instances.
  *
  * <p>This implementation is bound to an {@link Alphabet} instance.
  * The factory constructs rotors from a {@link RotorSpec} and an initial position
@@ -32,7 +33,7 @@ public class RotorFactoryImpl implements RotorFactory {
      * </ul>
      *
      * <p>This factory does <b>not</b> modify or invert the mappings; it simply adapts
-     * the immutable {@link RotorSpec} data into a runtime {@link RotorImpl}.</p>
+     * the immutable {@link RotorSpec} data into a runtime {@link VirtualRotor}.</p>
      */
     public RotorFactoryImpl(Alphabet alphabet) {
         if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
@@ -43,7 +44,7 @@ public class RotorFactoryImpl implements RotorFactory {
      * {@inheritDoc}
      */
     @Override
-    public Rotor create(RotorSpec spec, int startPosition) {
+    public Rotor createVirtual(RotorSpec spec, int startPosition) {
         Objects.requireNonNull(spec, "spec must not be null");
 
         if (startPosition < 0 || startPosition >= alphabet.size()) {
@@ -61,13 +62,27 @@ public class RotorFactoryImpl implements RotorFactory {
 
         int notchIndex = spec.notchIndex(); // 0-based notch index
 
-        return new RotorImpl(
+        return new VirtualRotor(
                 alphabet,
                 forward,        // right→left
                 backward,       // left→right
                 notchIndex,
                 startPosition
         );
+    }
+
+    @Override
+    public Rotor createMechanical(RotorSpec spec, int startPosition) {
+        Objects.requireNonNull(spec, "spec must not be null");
+
+        if (startPosition < 0 || startPosition >= alphabet.size()) {
+            throw new IllegalArgumentException(
+                    "startPosition out of range: " + startPosition +
+                            " (alphabet size=" + alphabet.size() + ")"
+            );
+        }
+
+        return new MechanicalRotor(spec.getForwardMapping(), spec.notchIndex(), alphabet.size());
     }
 }
 

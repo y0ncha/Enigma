@@ -79,12 +79,21 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void codeManual(CodeConfig config) {
+    public void codeManualVirtual(CodeConfig config) {
         validateCodeConfig(spec, config);
-        Code code = codeFactory.create(spec, config);
+        Code code = codeFactory.createVirtual(spec, config);
         if (origConfig == null) origConfig = config;
         machine.setCode(code);
     }
+
+    @Override
+    public void codeManualMechanical(CodeConfig config) {
+        validateCodeConfig(spec, config);
+        Code code = codeFactory.createMechanical(spec, config);
+        if (origConfig == null) origConfig = config;
+        machine.setCode(code);
+    }
+
 
     /**
      * Create a random, valid {@link CodeConfig} and configure the machine
@@ -92,14 +101,14 @@ public class EngineImpl implements Engine {
      *
      * <p>This method samples rotor ids, starting positions and a reflector
      * id using a local {@link SecureRandom} instance, validates the sampled
-     * configuration and delegates to {@link #codeManual(CodeConfig)} so the
+     * configuration and delegates to {@link #codeManualVirtual(CodeConfig)} so the
      * same creation path is used for manual and random flows.</p>
      *
      * @throws IllegalStateException when the machine spec is not loaded
      */
     public void codeRandom() {
         CodeConfig config = randomCodeConfig(spec);
-        codeManual(config);
+        codeManualVirtual(config);
     }
 
 

@@ -27,5 +27,7 @@ public interface CodeFactory {
      * @param selection configuration describing rotor ids, positions and reflector
      * @return created {@link Code}
      */
-    Code create(MachineSpec spec, CodeConfig selection);
+    Code createVirtual(MachineSpec spec, CodeConfig selection);
+
+    Code createMechanical(MachineSpec spec, CodeConfig selection);
 }

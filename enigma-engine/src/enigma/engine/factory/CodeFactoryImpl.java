@@ -85,7 +85,7 @@ public class CodeFactoryImpl implements CodeFactory {
      *         and reflector stored in left→right order
      */
     @Override
-    public Code create(MachineSpec spec, CodeConfig config) {
+    public Code createVirtual(MachineSpec spec, CodeConfig config) {
         // Assume inputs (spec, config) are already validated by caller
 
         Alphabet alphabet = spec.alphabet();
@@ -103,7 +103,45 @@ public class CodeFactoryImpl implements CodeFactory {
             int rotorId = rotorIdsLeftToRight.get(i);   // left -> right
             RotorSpec rs = spec.getRotorById(rotorId);
             int startPosition = positionsLeftToRight.get(i); // same index, left -> right
-            Rotor rotor = rotorFactory.create(rs, startPosition);
+            Rotor rotor = rotorFactory.createVirtual(rs, startPosition);
+            rotorsLeftToRight.add(rotor);
+        }
+
+        // Reflector
+        ReflectorSpec rf = spec.getReflectorById(config.reflectorId());
+        Reflector reflector = reflectorFactory.create(rf);
+
+        // CodeImpl now receives everything in left -> right order
+        return new CodeImpl(
+                alphabet,
+                rotorsLeftToRight,                 // left -> right
+                reflector,
+                rotorIdsLeftToRight,              // left -> right
+                positionsLeftToRight,             // left -> right
+                config.reflectorId()
+        );
+    }
+
+    @Override
+    public Code createMechanical(MachineSpec spec, CodeConfig config) {
+        // Assume inputs (spec, config) are already validated by caller
+
+        Alphabet alphabet = spec.alphabet();
+        RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
+        ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
+
+        // Positions: left -> right, as given in config
+        List<Integer> positionsLeftToRight = new ArrayList<>(config.initialPositions());
+
+        // Rotors: build in left -> right order
+        List<Rotor> rotorsLeftToRight = new ArrayList<>();
+        List<Integer> rotorIdsLeftToRight = new ArrayList<>(config.rotorIds());
+
+        for (int i = 0; i < rotorIdsLeftToRight.size(); i++) {
+            int rotorId = rotorIdsLeftToRight.get(i);   // left -> right
+            RotorSpec rs = spec.getRotorById(rotorId);
+            int startPosition = positionsLeftToRight.get(i); // same index, left -> right
+            Rotor rotor = rotorFactory.createMechanical(rs, startPosition);
             rotorsLeftToRight.add(rotor);
         }
 

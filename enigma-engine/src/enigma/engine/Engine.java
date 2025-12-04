@@ -39,7 +39,9 @@ public interface Engine {
      * Implementations should prompt for or accept manual rotor/reflector/position
      * settings and apply them to the machine.
      */
-    void codeManual(CodeConfig config);
+    void codeManualVirtual(CodeConfig config);
+
+    void codeManualMechanical(CodeConfig config);
 
     /**
      * Generate or assign a random code configuration and apply it to the machine.

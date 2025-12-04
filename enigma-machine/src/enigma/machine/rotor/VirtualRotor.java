@@ -8,7 +8,7 @@ import enigma.machine.alphabet.Alphabet;
  *
  * @since 1.0
  */
-public class RotorImpl implements Rotor {
+public class VirtualRotor implements Rotor {
 
     private final Alphabet alphabet;
     private final int[] forwardMapping;     // from right → left
@@ -27,11 +27,11 @@ public class RotorImpl implements Rotor {
      * @param startPosition initial rotor position (0..alphabetSize-1)
      * @since 1.0
      */
-    public RotorImpl(Alphabet alphabet,
-                     int[] forwardMapping,
-                     int[] backwardMapping,
-                     int notch,
-                     int startPosition) {
+    public VirtualRotor(Alphabet alphabet,
+                        int[] forwardMapping,
+                        int[] backwardMapping,
+                        int notch,
+                        int startPosition) {
 
         this.alphabet = alphabet;
         this.forwardMapping = forwardMapping;

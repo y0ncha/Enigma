@@ -35,7 +35,7 @@ public class EngineOneLetterTester {
         engine.loadMachime(XML_PATH); // keep the current Engine API as-is
 
         System.out.println("Code configuration: " + CODE_CONFIG);
-        engine.codeManual(CODE_CONFIG);
+        engine.codeManualMechanical(CODE_CONFIG);
 
         DebugTrace debug = engine.processDebug(INPUT);
         System.out.println();
