@@ -76,8 +76,12 @@ public class RotorFactoryImpl implements RotorFactory {
      * @param wiringSpec the wiring specification string (alphabet permutation)
      * @param alphabet the alphabet string defining character-to-index mapping
      * @return array where index i maps to the output index
+     * @throws IllegalArgumentException if wiringSpec length doesn't match alphabet length,
+     *         or if wiringSpec contains characters not in the alphabet
      */
     public int[] buildForwardMapping(String wiringSpec, String alphabet) {
+        validateWiringSpec(wiringSpec, alphabet);
+        
         Map<Character, Integer> charToIndex = buildCharToIndexMap(alphabet);
         int[] mapping = new int[alphabet.length()];
         
@@ -130,8 +134,12 @@ public class RotorFactoryImpl implements RotorFactory {
      * @param wiringSpec the wiring specification string
      * @param alphabet the alphabet string
      * @return a two-element array: [rightColumn, leftColumn]
+     * @throws IllegalArgumentException if wiringSpec length doesn't match alphabet length,
+     *         or if wiringSpec contains characters not in the alphabet
      */
     public List<List<Integer>> buildColumns(String wiringSpec, String alphabet) {
+        validateWiringSpec(wiringSpec, alphabet);
+        
         Map<Character, Integer> charToIndex = buildCharToIndexMap(alphabet);
         List<Integer> rightColumn = new ArrayList<>();
         List<Integer> leftColumn = new ArrayList<>();
@@ -174,5 +182,30 @@ public class RotorFactoryImpl implements RotorFactory {
             map.put(alphabet.charAt(i), i);
         }
         return map;
+    }
+    
+    /**
+     * Validates that a wiring specification is compatible with the alphabet.
+     * 
+     * @param wiringSpec the wiring specification string
+     * @param alphabet the alphabet string
+     * @throws IllegalArgumentException if validation fails
+     */
+    private void validateWiringSpec(String wiringSpec, String alphabet) {
+        if (wiringSpec.length() != alphabet.length()) {
+            throw new IllegalArgumentException(
+                "Wiring spec length (" + wiringSpec.length() + 
+                ") must match alphabet length (" + alphabet.length() + ")");
+        }
+        
+        Map<Character, Integer> charToIndex = buildCharToIndexMap(alphabet);
+        for (int i = 0; i < wiringSpec.length(); i++) {
+            char c = wiringSpec.charAt(i);
+            if (!charToIndex.containsKey(c)) {
+                throw new IllegalArgumentException(
+                    "Wiring spec contains character '" + c + 
+                    "' at position " + i + " which is not in the alphabet");
+            }
+        }
     }
 }
