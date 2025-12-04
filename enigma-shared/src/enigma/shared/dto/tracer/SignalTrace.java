@@ -44,16 +44,16 @@ public record SignalTrace(
             sb.append("  rotor ")
                     .append(r.rotorIndex())
                     .append(": ")
-                    .append(r.entryChar()).append('(').append(r.entryIndex()).append(')')
+                    .append(r.entryIndex())
                     .append(" -> ")
-                    .append(r.exitChar()).append('(').append(r.exitIndex()).append(')')
+                    .append(r.exitIndex())
                     .append('\n');
         }
 
         sb.append("\nReflector:\n  ")
-                .append(reflectorStep.entryChar()).append('(').append(reflectorStep.entryIndex()).append(')')
+                .append(reflectorStep.entryIndex())
                 .append(" -> ")
-                .append(reflectorStep.exitChar()).append('(').append(reflectorStep.exitIndex()).append(')')
+                .append(reflectorStep.exitIndex())
                 .append('\n');
 
         sb.append("\nBackward path (left → right):\n");
@@ -61,9 +61,9 @@ public record SignalTrace(
             sb.append("  rotor ")
                     .append(r.rotorIndex())
                     .append(": ")
-                    .append(r.entryChar()).append('(').append(r.entryIndex()).append(')')
+                    .append(r.entryIndex())
                     .append(" -> ")
-                    .append(r.exitChar()).append('(').append(r.exitIndex()).append(')')
+                    .append(r.exitIndex())
                     .append('\n');
         }
 
