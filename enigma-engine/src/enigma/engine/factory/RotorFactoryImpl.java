@@ -82,7 +82,9 @@ public class RotorFactoryImpl implements RotorFactory {
             );
         }
 
-        return new MechanicalRotor(spec.getForwardMapping(), spec.notchIndex(), alphabet.size());
+        MechanicalRotor rotor = new MechanicalRotor(spec.getForwardMapping(), spec.backwardMapping(), spec.notchIndex(), alphabet.size(), spec.id());
+        rotor.setPosition(startPosition);
+        return rotor;
     }
 }
 

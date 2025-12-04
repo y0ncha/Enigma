@@ -138,10 +138,12 @@ public class CodeFactoryImpl implements CodeFactory {
         List<Integer> rotorIdsLeftToRight = new ArrayList<>(config.rotorIds());
 
         for (int i = 0; i < rotorIdsLeftToRight.size(); i++) {
-            int rotorId = rotorIdsLeftToRight.get(i);   // left -> right
+            int rotorId = rotorIdsLeftToRight.get(i);          // left -> right
             RotorSpec rs = spec.getRotorById(rotorId);
-            int startPosition = positionsLeftToRight.get(i); // same index, left -> right
-            Rotor rotor = rotorFactory.createMechanical(rs, startPosition);
+            int targetPosition = positionsLeftToRight.get(i);  // desired window index (0..N-1)
+
+            // Create mechanical rotor in some base orientation (e.g. 0)
+            Rotor rotor = rotorFactory.createMechanical(rs, targetPosition);
             rotorsLeftToRight.add(rotor);
         }
 
@@ -149,13 +151,12 @@ public class CodeFactoryImpl implements CodeFactory {
         ReflectorSpec rf = spec.getReflectorById(config.reflectorId());
         Reflector reflector = reflectorFactory.create(rf);
 
-        // CodeImpl now receives everything in left -> right order
         return new CodeImpl(
                 alphabet,
-                rotorsLeftToRight,                 // left -> right
+                rotorsLeftToRight,        // left -> right
                 reflector,
-                rotorIdsLeftToRight,              // left -> right
-                positionsLeftToRight,             // left -> right
+                rotorIdsLeftToRight,      // left -> right
+                positionsLeftToRight,     // left -> right
                 config.reflectorId()
         );
     }

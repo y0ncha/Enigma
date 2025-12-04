@@ -17,7 +17,8 @@ public class MechanicalRotor implements Rotor {
     private final List<Integer> leftColumn;   // inward-facing contacts
     private final int alphabetSize;
 
-    private int notchIndex; // which row triggers stepping of next rotor
+    private final int notchIndex; // which row triggers stepping of next rotor
+    private final int id;
 
     /**
      * Construct a rotor from forward mapping and notch index.
@@ -26,27 +27,23 @@ public class MechanicalRotor implements Rotor {
      * @param notchIndex index at which the rotor triggers stepping (0..N-1)
      * @param alphabetSize size of alphabet
      */
-    public MechanicalRotor(int[] forwardMapping, int notchIndex, int alphabetSize) {
+    public MechanicalRotor(int[] forwardMapping, int[] backwardMapping, int notchIndex, int alphabetSize, int id) {
         this.alphabetSize = alphabetSize;
-
-        // Build inverse mapping (left → right)
-        int[] inverse = new int[alphabetSize];
-        for (int r = 0; r < alphabetSize; r++) {
-            int leftVal = forwardMapping[r];
-            inverse[leftVal] = r;
-        }
-
         // Build columns
         this.rightColumn = new ArrayList<>(alphabetSize);
         this.leftColumn  = new ArrayList<>(alphabetSize);
 
         for (int i = 0; i < alphabetSize; i++) {
             rightColumn.add(i);          // fixed identity column (A,B,C,...)
-            leftColumn.add(inverse[i]);  // rotated via inverse mapping
         }
+        for (int i = 0; i < alphabetSize; i++) {
+            leftColumn.add(forwardMapping[i]);
+        }
+
 
         // Store notch
         this.notchIndex = makeInBounds(notchIndex);
+        this.id = id;
     }
 
     // ---------------------------------------------------------
@@ -58,7 +55,8 @@ public class MechanicalRotor implements Rotor {
         rotate();
 
         // Return true if the NEW top letter equals notch position
-        return getPosition() == notchIndex;
+        int pos = getPosition();
+        return pos == notchIndex;
     }
 
     @Override
@@ -74,6 +72,17 @@ public class MechanicalRotor implements Rotor {
         return rightColumn.getFirst();
     }
 
+    public void setPosition(int pos) {
+        pos = makeInBounds(pos);
+        int safety = alphabetSize;
+        while (getPosition() != pos && safety-- > 0) {
+            rotate();
+        }
+        if (getPosition() != pos) {
+            throw new IllegalStateException("Failed to reach position " + pos + " in MechanicalRotor");
+        }
+    }
+
     @Override
     public int getNotchInd() {
         return notchIndex;
@@ -87,12 +96,14 @@ public class MechanicalRotor implements Rotor {
         // right entry gives the "symbol"
         int sym = rightColumn.get(entryIndex);
         // find where this symbol appears in left column
-        return leftColumn.indexOf(sym);
+        int index = leftColumn.indexOf(sym);
+        return index;
     }
 
     private int encodeBackward(int entryIndex) {
         int sym = leftColumn.get(entryIndex);
-        return rightColumn.indexOf(sym);
+        int index = rightColumn.indexOf(sym);
+        return index;
     }
 
     /** Rotate both columns by shifting the first row to bottom */
@@ -102,9 +113,6 @@ public class MechanicalRotor implements Rotor {
 
         rightColumn.add(r0);
         leftColumn.add(l0);
-
-        // notch physically moves relative to top
-        notchIndex = makeInBounds(notchIndex - 1);
     }
 
     private int makeInBounds(int x) {
