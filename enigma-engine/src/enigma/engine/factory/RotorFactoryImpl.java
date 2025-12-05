@@ -4,7 +4,6 @@ import enigma.machine.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
 import enigma.machine.alphabet.Alphabet;
 import enigma.machine.rotor.Rotor;
-import enigma.machine.rotor.virtual.VirtualRotor;
 
 import java.util.Objects;
 
@@ -64,44 +63,6 @@ public class RotorFactoryImpl implements RotorFactory {
         RotorImpl rotor = buildMechanicalRotor(spec);
         rotor.setPosition(startPosition);
         return rotor;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #create(RotorSpec, int)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    @SuppressWarnings("deprecation")
-    public Rotor createVirtual(RotorSpec spec, int startPosition) {
-        validateInputs(spec, startPosition);
-
-        // Preserve directional semantics from RotorSpec:
-        // forward:  right -> left
-        // backward: left  -> right
-        int[] forward = spec.getForwardMapping();
-        int[] backward = spec.getBackwardMapping();
-        int notchIndex = spec.notchIndex();
-
-        return new VirtualRotor(
-                alphabet,
-                forward,
-                backward,
-                notchIndex,
-                startPosition
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #create(RotorSpec, int)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    public Rotor createMechanical(RotorSpec spec, int startPosition) {
-        return create(spec, startPosition);
     }
 
     // ---------------------------------------------------------

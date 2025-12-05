@@ -11,6 +11,7 @@ package enigma.shared.dto.tracer;
  * @since 1.0
  */
 public record RotorTrace(
+        int id,
         int rotorIndex,   // 0 = rightmost, 1 = next to it, ...
         int entryIndex,   // numeric index entering the rotor
         int exitIndex,    // numeric index exiting the rotor

@@ -43,7 +43,6 @@ import java.util.*;
 public class EngineImpl implements Engine {
 
     private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
-    private final boolean DEBUG = false; // For future console control
 
     private final Machine machine;
     private final Loader loader;
@@ -78,7 +77,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public void machineData(String input) {
-        // no-op for now
+        // TODO implement
     }
 
     /**
@@ -91,36 +90,6 @@ public class EngineImpl implements Engine {
     public void codeManual(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
-        if (origConfig == null) origConfig = config;
-        machine.setCode(code);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #codeManual(CodeConfig)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    @SuppressWarnings("deprecation")
-    public void codeManualVirtual(CodeConfig config) {
-        validateCodeConfig(spec, config);
-        Code code = codeFactory.createVirtual(spec, config);
-        if (origConfig == null) origConfig = config;
-        machine.setCode(code);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #codeManual(CodeConfig)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    @SuppressWarnings("deprecation")
-    public void codeManualMechanical(CodeConfig config) {
-        validateCodeConfig(spec, config);
-        Code code = codeFactory.createMechanical(spec, config);
         if (origConfig == null) origConfig = config;
         machine.setCode(code);
     }
@@ -143,25 +112,15 @@ public class EngineImpl implements Engine {
         codeManual(config);
     }
 
-
+    /**
+     * Process the provided input string through the currently configured
+     * machine/code with detailed debugging information.
+     *
+     * @param input the input text to process
+     * @return detailed debug trace of the processing steps
+     */
     @Override
-    public String process(String input) {
-        if (!machine.isConfigured()) {
-            throw new IllegalStateException("Machine is not configured");
-        }
-        if (input == null) { // TODO: validate input is in alphabet
-            throw new IllegalArgumentException("Input must not be null");
-        }
-        StringBuilder output = new StringBuilder();
-
-        for(char c : input.toCharArray()) {
-            output.append(machine.process(c));
-        }
-        return output.toString();
-    }
-
-    @Override
-    public DebugTrace processDebug(String input) {
+    public DebugTrace process(String input) {
         if (!machine.isConfigured()) {
             throw new IllegalStateException("Machine is not configured");
         }
@@ -187,7 +146,7 @@ public class EngineImpl implements Engine {
      */
     @Override
     public void statistics() {
-        // no-op for now
+        // TODO implement
     }
 
     // --- Flow helpers: machine creation and random code generation ---------

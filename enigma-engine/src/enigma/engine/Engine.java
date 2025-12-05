@@ -46,26 +46,6 @@ public interface Engine {
     void codeManual(CodeConfig config);
 
     /**
-     * Configure the machine using the deprecated virtual rotor model.
-     *
-     * @param config code configuration specifying rotor IDs, positions, and reflector ID
-     * @deprecated Use {@link #codeManual(CodeConfig)} instead. The virtual rotor
-     *             model is deprecated and will be removed in a future release.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    void codeManualVirtual(CodeConfig config);
-
-    /**
-     * Configure the machine using the mechanical rotor model.
-     *
-     * @param config code configuration specifying rotor IDs, positions, and reflector ID
-     * @deprecated Use {@link #codeManual(CodeConfig)} instead. This method is retained
-     *             only for backward compatibility.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    void codeManualMechanical(CodeConfig config);
-
-    /**
      * Generate or assign a random code configuration and apply it to the machine.
      * The engine should ensure the selected configuration is valid for the
      * current machine specification.
@@ -74,21 +54,12 @@ public interface Engine {
 
     /**
      * Process the provided input string through the currently configured
-     * machine/code and return the resulting output.
-     *
-     * @param input the input text to process
-     * @return processed/transformed output text
-     */
-    String process(String input);
-
-    /**
-     * Process the provided input string through the currently configured
      * machine/code with detailed debugging information.
      *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
      */
-    DebugTrace processDebug(String input);
+    DebugTrace process(String input);
 
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).

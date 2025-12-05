@@ -37,7 +37,7 @@ public class EngineOneLetterTester {
         System.out.println("Code configuration: " + CODE_CONFIG);
         engine.codeManual(CODE_CONFIG);
 
-        DebugTrace debug = engine.processDebug(INPUT);
+        DebugTrace debug = engine.process(INPUT);
         System.out.println();
 
         System.out.println(debug); // relies on DebugTrace.toString() / pretty formatting

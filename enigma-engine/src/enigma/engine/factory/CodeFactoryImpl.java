@@ -85,58 +85,6 @@ public class CodeFactoryImpl implements CodeFactory {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    @SuppressWarnings("deprecation")
-    public Code createVirtual(MachineSpec spec, CodeConfig config) {
-        Alphabet alphabet = spec.alphabet();
-        RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
-        ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
-
-        // Positions and rotor IDs: left→right, as given in config
-        List<Integer> positionsLeftToRight = new ArrayList<>(config.initialPositions());
-        List<Integer> rotorIdsLeftToRight = new ArrayList<>(config.rotorIds());
-
-        // Build rotors using deprecated virtual model
-        List<Rotor> rotorsLeftToRight = new ArrayList<>();
-        for (int i = 0; i < rotorIdsLeftToRight.size(); i++) {
-            int rotorId = rotorIdsLeftToRight.get(i);
-            RotorSpec rs = spec.getRotorById(rotorId);
-            int startPosition = positionsLeftToRight.get(i);
-            Rotor rotor = rotorFactory.createVirtual(rs, startPosition);
-            rotorsLeftToRight.add(rotor);
-        }
-
-        // Reflector
-        ReflectorSpec rf = spec.getReflectorById(config.reflectorId());
-        Reflector reflector = reflectorFactory.create(rf);
-
-        return new CodeImpl(
-                alphabet,
-                rotorsLeftToRight,
-                reflector,
-                rotorIdsLeftToRight,
-                positionsLeftToRight,
-                config.reflectorId()
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead
-     */
-    @Override
-    @Deprecated(since = "1.0", forRemoval = true)
-    public Code createMechanical(MachineSpec spec, CodeConfig config) {
-        return create(spec, config);
-    }
-
     // ---------------------------------------------------------
     // Helper methods
     // ---------------------------------------------------------

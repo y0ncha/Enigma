@@ -43,28 +43,4 @@ public interface CodeFactory {
      * @return fully initialized {@link Code} instance
      */
     Code create(MachineSpec spec, CodeConfig selection);
-
-    /**
-     * Create a {@link Code} using the deprecated virtual rotor model.
-     *
-     * @param spec machine specification (must be valid)
-     * @param selection configuration describing rotor ids, positions and reflector
-     * @return created {@link Code}
-     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead. The virtual
-     *             rotor model is deprecated and will be removed in a future release.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    Code createVirtual(MachineSpec spec, CodeConfig selection);
-
-    /**
-     * Create a {@link Code} using the mechanical rotor model.
-     *
-     * @param spec machine specification (must be valid)
-     * @param selection configuration describing rotor ids, positions and reflector
-     * @return created {@link Code}
-     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead. This method
-     *             is retained only for backward compatibility.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    Code createMechanical(MachineSpec spec, CodeConfig selection);
 }

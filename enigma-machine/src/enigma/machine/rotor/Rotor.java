@@ -87,4 +87,19 @@ public interface Rotor {
      * @return notch position as an alphabet index (0..alphabetSize-1)
      */
     int getNotchInd();
+
+
+    /**
+     * Get the rotor's identifier.
+     *
+     * <p>Returns a stable, implementation-defined integer identifier for this
+     * rotor instance or rotor type. Implementations SHOULD use this value for
+     * tracing, logging and diagnostics (for example: a rotor model or catalog
+     * number from the machine specification). This identifier is distinct from
+     * the rotor's current rotational position and does not change when the rotor
+     * rotates.</p>
+     *
+     * @return non-negative integer that identifies the rotor (type or instance)
+     */
+    int getId();
 }

@@ -66,7 +66,7 @@ public class EngineMultiTester {
         for (int i = 0; i < inputs.length; i++) {
 
             String input = inputs[i];
-            DebugTrace debug = engine.processDebug(input);
+            DebugTrace debug = engine.process(input);
 
             boolean ok = debug.output().equals(expectedOutputs[i]);
             if (ok) passed++; else failed++;

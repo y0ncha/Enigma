@@ -40,29 +40,4 @@ public interface RotorFactory {
      * @return a runtime rotor instance ready for use in the machine
      */
     Rotor create(RotorSpec spec, int startPosition);
-
-    /**
-     * Create a {@link Rotor} using the deprecated virtual (index-shifting) model.
-     *
-     * @param spec          rotor specification (id, notch index, mappings)
-     * @param startPosition initial window position (0-based index into alphabet)
-     * @return a runtime rotor instance
-     * @deprecated Use {@link #create(RotorSpec, int)} instead. The virtual rotor model
-     *             is deprecated and will be removed in a future release.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    Rotor createVirtual(RotorSpec spec, int startPosition);
-
-    /**
-     * Create a {@link Rotor} using the mechanical column-rotation model.
-     *
-     * @param spec          rotor specification (id, notch index, mappings)
-     * @param startPosition initial window position (0-based index into alphabet)
-     * @return a runtime rotor instance
-     * @deprecated Use {@link #create(RotorSpec, int)} instead. This method is retained
-     *             only for backward compatibility; the main {@code create} method now
-     *             always uses the mechanical model.
-     */
-    @Deprecated(since = "1.0", forRemoval = true)
-    Rotor createMechanical(RotorSpec spec, int startPosition);
 }

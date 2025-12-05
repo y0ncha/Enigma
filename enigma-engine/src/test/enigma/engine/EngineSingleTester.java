@@ -52,7 +52,7 @@ public class EngineSingleTester {
         System.out.println("Expected: " + EXPECTED);
         System.out.println();
 
-        DebugTrace debug = engine.processDebug(INPUT);
+        DebugTrace debug = engine.process(INPUT);
 
         String actual = debug.output();
         boolean ok = actual.equals(EXPECTED);
