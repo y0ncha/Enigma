@@ -42,10 +42,7 @@ import java.util.LinkedList;
  */
 public class RotorImpl implements Rotor {
 
-    // Wire pairs represent one row in the physical rotor: right (keyboard) and left (reflector)
-    private record Wire(int right, int left) {}
-
-    private final LinkedList<Wire> wires;  // rows in top→bottom order
+    private final LinkedList<Wire> wires;  // rows in top → bottom order
     private final int alphabetSize;
 
     private final int notchIndex; // which row triggers stepping of next rotor
