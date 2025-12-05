@@ -35,12 +35,34 @@ public interface Engine {
     void machineData(String input);
 
     /**
-     * Enter manual code configuration mode (interactive or programmatic).
-     * Implementations should prompt for or accept manual rotor/reflector/position
-     * settings and apply them to the machine.
+     * Configure the machine with a manual code configuration.
+     *
+     * <p>This is the primary method for setting up the machine with a specific
+     * rotor arrangement, positions, and reflector. The configuration uses the
+     * mechanical rotor model ({@link enigma.machine.rotor.RotorImpl}).</p>
+     *
+     * @param config code configuration specifying rotor IDs, positions, and reflector ID
      */
+    void codeManual(CodeConfig config);
+
+    /**
+     * Configure the machine using the deprecated virtual rotor model.
+     *
+     * @param config code configuration specifying rotor IDs, positions, and reflector ID
+     * @deprecated Use {@link #codeManual(CodeConfig)} instead. The virtual rotor
+     *             model is deprecated and will be removed in a future release.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     void codeManualVirtual(CodeConfig config);
 
+    /**
+     * Configure the machine using the mechanical rotor model.
+     *
+     * @param config code configuration specifying rotor IDs, positions, and reflector ID
+     * @deprecated Use {@link #codeManual(CodeConfig)} instead. This method is retained
+     *             only for backward compatibility.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     void codeManualMechanical(CodeConfig config);
 
     /**

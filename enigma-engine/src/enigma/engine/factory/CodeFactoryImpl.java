@@ -17,18 +17,25 @@ import java.util.*;
 /**
  * Default implementation of {@link CodeFactory}.
  *
- * <p><b>Ordering conventions (important):</b></p>
+ * <p>This factory constructs {@link Code} instances using the mechanical rotor
+ * model ({@link enigma.machine.rotor.RotorImpl}). The factory:</p>
  * <ul>
- *   <li>All {@link CodeConfig} inputs (rotor ids and initial positions)
+ *   <li>Creates a {@link RotorFactory} for the given alphabet</li>
+ *   <li>Builds rotors in left→right order from the configuration</li>
+ *   <li>Creates the reflector from the specification</li>
+ *   <li>Assembles all components into a {@link CodeImpl}</li>
+ * </ul>
+ *
+ * <h2>Ordering Conventions</h2>
+ * <ul>
+ *   <li>All {@link CodeConfig} inputs (rotor IDs and initial positions)
  *       are given in <b>left→right</b> order, exactly as they appear in the
  *       machine window and in the XML definition.</li>
- *
  *   <li>The factory <b>preserves left→right ordering</b>. It does not reverse
- *       rotor ids or positions.</li>
- *
- *   <li>The runtime {@link Code} object also stores rotors in left→right
- *       order. The {@code Machine} is responsible for iterating rotors in
- *       the correct physical direction during processing:
+ *       rotor IDs or positions.</li>
+ *   <li>The runtime {@link Code} object stores rotors in left→right order.
+ *       The {@code Machine} is responsible for iterating rotors in the correct
+ *       physical direction during processing:
  *       <ul>
  *         <li>Forward signal: right→left (iterate high index → 0)</li>
  *         <li>Backward signal: left→right (iterate 0 → high index)</li>
@@ -36,73 +43,71 @@ import java.util.*;
  *   </li>
  * </ul>
  *
- * <p>This design eliminates the previous right→left storage convention,
- * aligns all internal structures with the XML/user-facing representation,
- * and avoids unnecessary list reversals or mental conversion.</p>
+ * <p>This design aligns all internal structures with the XML/user-facing
+ * representation and avoids unnecessary list reversals.</p>
  *
+ * <h2>Validation</h2>
  * <p>The factory assumes that all validation is performed by the caller
  * (typically {@link EngineImpl}).</p>
  *
  * @since 1.0
+ * @see RotorFactory
+ * @see ReflectorFactory
  */
 public class CodeFactoryImpl implements CodeFactory {
 
     /**
-     * Create a {@link Code} instance from a validated {@link MachineSpec}
-     * and {@link CodeConfig}.
+     * {@inheritDoc}
      *
-     * <p><b>Input ordering:</b> rotor ids and initial positions must be
-     * provided in <b>left→right</b> order. For example, {@code [3,2,1]}
-     * means:
-     * <ul>
-     *   <li>index 0 → left rotor (id=3)</li>
-     *   <li>index 1 → middle rotor (id=2)</li>
-     *   <li>index 2 → right rotor (id=1)</li>
-     * </ul>
-     * </p>
-     *
-     * <p><b>Runtime behavior:</b></p>
-     * <ul>
-     *   <li>This factory preserves the left→right ordering.</li>
-     *   <li>No reversal is performed.</li>
-     *   <li>The resulting {@link Code} exposes rotors in left→right order.</li>
-     *   <li>The {@code MachineImpl} handles right→left / left→right traversal
-     *       during forward/backward signal propagation.</li>
-     * </ul>
-     *
-     * <p><b>Validation:</b> The method assumes that:
-     * <ul>
-     *   <li>{@code spec} and {@code config} are not null.</li>
-     *   <li>{@code config.rotorIds()} and {@code config.initialPositions()}
-     *       contain exactly the required number of rotors (usually 3).</li>
-     *   <li>{@code config.reflectorId()} refers to a valid reflector in the spec.</li>
-     * </ul>
-     * </p>
-     *
-     * @param spec   validated machine specification
-     * @param config validated code configuration in left→right order
-     * @return an immutable {@link Code} instance containing rotors, positions,
-     *         and reflector stored in left→right order
+     * <p>This is the primary factory method that creates codes using the
+     * mechanical rotor model.</p>
      */
     @Override
-    public Code createVirtual(MachineSpec spec, CodeConfig config) {
-        // Assume inputs (spec, config) are already validated by caller
-
+    public Code create(MachineSpec spec, CodeConfig config) {
         Alphabet alphabet = spec.alphabet();
         RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
         ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
 
-        // Positions: left -> right, as given in config
-        List<Integer> positionsLeftToRight = new ArrayList<>(config.initialPositions());
+        // Build rotors in left→right order
+        List<Rotor> rotors = buildRotors(spec, config, rotorFactory);
 
-        // Rotors: build in left -> right order
-        List<Rotor> rotorsLeftToRight = new ArrayList<>();
+        // Build reflector
+        Reflector reflector = buildReflector(spec, config, reflectorFactory);
+
+        // Assemble code (preserving left→right order)
+        return new CodeImpl(
+                alphabet,
+                rotors,
+                reflector,
+                new ArrayList<>(config.rotorIds()),
+                new ArrayList<>(config.initialPositions()),
+                config.reflectorId()
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead
+     */
+    @Override
+    @Deprecated(since = "1.0", forRemoval = true)
+    @SuppressWarnings("deprecation")
+    public Code createVirtual(MachineSpec spec, CodeConfig config) {
+        Alphabet alphabet = spec.alphabet();
+        RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
+        ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
+
+        // Positions and rotor IDs: left→right, as given in config
+        List<Integer> positionsLeftToRight = new ArrayList<>(config.initialPositions());
         List<Integer> rotorIdsLeftToRight = new ArrayList<>(config.rotorIds());
 
+        // Build rotors using deprecated virtual model
+        List<Rotor> rotorsLeftToRight = new ArrayList<>();
         for (int i = 0; i < rotorIdsLeftToRight.size(); i++) {
-            int rotorId = rotorIdsLeftToRight.get(i);   // left -> right
+            int rotorId = rotorIdsLeftToRight.get(i);
             RotorSpec rs = spec.getRotorById(rotorId);
-            int startPosition = positionsLeftToRight.get(i); // same index, left -> right
+            int startPosition = positionsLeftToRight.get(i);
             Rotor rotor = rotorFactory.createVirtual(rs, startPosition);
             rotorsLeftToRight.add(rotor);
         }
@@ -111,53 +116,66 @@ public class CodeFactoryImpl implements CodeFactory {
         ReflectorSpec rf = spec.getReflectorById(config.reflectorId());
         Reflector reflector = reflectorFactory.create(rf);
 
-        // CodeImpl now receives everything in left -> right order
         return new CodeImpl(
                 alphabet,
-                rotorsLeftToRight,                 // left -> right
+                rotorsLeftToRight,
                 reflector,
-                rotorIdsLeftToRight,              // left -> right
-                positionsLeftToRight,             // left -> right
+                rotorIdsLeftToRight,
+                positionsLeftToRight,
                 config.reflectorId()
         );
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link #create(MachineSpec, CodeConfig)} instead
+     */
     @Override
+    @Deprecated(since = "1.0", forRemoval = true)
     public Code createMechanical(MachineSpec spec, CodeConfig config) {
-        // Assume inputs (spec, config) are already validated by caller
+        return create(spec, config);
+    }
 
-        Alphabet alphabet = spec.alphabet();
-        RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
-        ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
+    // ---------------------------------------------------------
+    // Helper methods
+    // ---------------------------------------------------------
 
-        // Positions: left -> right, as given in config
-        List<Integer> positionsLeftToRight = new ArrayList<>(config.initialPositions());
+    /**
+     * Build rotors from the specification and configuration.
+     *
+     * @param spec machine specification
+     * @param config code configuration
+     * @param rotorFactory factory for creating rotors
+     * @return list of rotors in left→right order
+     */
+    private List<Rotor> buildRotors(MachineSpec spec, CodeConfig config, RotorFactory rotorFactory) {
+        List<Integer> rotorIds = config.rotorIds();
+        List<Integer> positions = config.initialPositions();
+        List<Rotor> rotors = new ArrayList<>(rotorIds.size());
 
-        // Rotors: build in left -> right order
-        List<Rotor> rotorsLeftToRight = new ArrayList<>();
-        List<Integer> rotorIdsLeftToRight = new ArrayList<>(config.rotorIds());
+        for (int i = 0; i < rotorIds.size(); i++) {
+            int rotorId = rotorIds.get(i);
+            RotorSpec rotorSpec = spec.getRotorById(rotorId);
+            int targetPosition = positions.get(i);
 
-        for (int i = 0; i < rotorIdsLeftToRight.size(); i++) {
-            int rotorId = rotorIdsLeftToRight.get(i);          // left -> right
-            RotorSpec rs = spec.getRotorById(rotorId);
-            int targetPosition = positionsLeftToRight.get(i);  // desired window index (0..N-1)
-
-            // Create mechanical rotor in some base orientation (e.g. 0)
-            Rotor rotor = rotorFactory.createMechanical(rs, targetPosition);
-            rotorsLeftToRight.add(rotor);
+            Rotor rotor = rotorFactory.create(rotorSpec, targetPosition);
+            rotors.add(rotor);
         }
 
-        // Reflector
-        ReflectorSpec rf = spec.getReflectorById(config.reflectorId());
-        Reflector reflector = reflectorFactory.create(rf);
+        return rotors;
+    }
 
-        return new CodeImpl(
-                alphabet,
-                rotorsLeftToRight,        // left -> right
-                reflector,
-                rotorIdsLeftToRight,      // left -> right
-                positionsLeftToRight,     // left -> right
-                config.reflectorId()
-        );
+    /**
+     * Build the reflector from the specification and configuration.
+     *
+     * @param spec machine specification
+     * @param config code configuration
+     * @param reflectorFactory factory for creating reflectors
+     * @return reflector instance
+     */
+    private Reflector buildReflector(MachineSpec spec, CodeConfig config, ReflectorFactory reflectorFactory) {
+        ReflectorSpec reflectorSpec = spec.getReflectorById(config.reflectorId());
+        return reflectorFactory.create(reflectorSpec);
     }
 }
