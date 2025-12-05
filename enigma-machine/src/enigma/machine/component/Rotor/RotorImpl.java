@@ -7,13 +7,14 @@ import java.util.List;
  * Mechanical implementation of the Enigma rotor.
  * 
  * <p>This implementation models the physical wiring of a real Enigma rotor using
- * two columns: a right column and a left column. Each row represents a wire
- * connecting a contact on the right side to a contact on the left side.</p>
+ * a list of {@link Wire} pairs. Each wire represents a connection between a
+ * contact on the right side (entry) and a contact on the left side (exit).
+ * Using paired values ensures the rotor's two columns always stay coupled and
+ * prevents accidental desynchronization.</p>
  * 
  * <p><strong>Physical Model:</strong></p>
  * <pre>
- *   Right Column    Left Column
- *   (Entry Side)    (Exit Side)
+ *   Wire List (right → left)
  *       0     ────────→  4
  *       1     ────────→  2
  *       2     ────────→  0
@@ -22,7 +23,7 @@ import java.util.List;
  * </pre>
  * 
  * <p><strong>Rotation Mechanism:</strong></p>
- * <p>When the rotor advances (rotates), the first row moves to the bottom,
+ * <p>When the rotor advances (rotates), the first wire moves to the bottom,
  * simulating the physical rotation of the rotor wheel:</p>
  * <pre>
  *   Before:    After advance():
@@ -35,15 +36,15 @@ import java.util.List;
  * 
  * <p><strong>Signal Processing:</strong></p>
  * <ul>
- *   <li>FORWARD (right→left): Find the row where rightColumn equals input,
- *       return the corresponding leftColumn value.</li>
- *   <li>BACKWARD (left→right): Find the row where leftColumn equals input,
- *       return the corresponding rightColumn value.</li>
+ *   <li>FORWARD (right→left): Find the wire whose {@code right} equals input,
+ *       return its {@code left} value.</li>
+ *   <li>BACKWARD (left→right): Find the wire whose {@code left} equals input,
+ *       return its {@code right} value.</li>
  * </ul>
  * 
  * <p><strong>Position:</strong></p>
- * <p>The position is indicated by the value in rightColumn.get(0), representing
- * the letter visible through the machine's window.</p>
+ * <p>The position is indicated by the value in {@code wires.get(0).right()},
+ * representing the letter visible through the machine's window.</p>
  * 
  * <p><strong>Notch:</strong></p>
  * <p>The notch position is tracked and updated during rotation. When the notch
@@ -52,8 +53,7 @@ import java.util.List;
  */
 public class RotorImpl implements Rotor {
     
-    private final List<Integer> rightColumn;
-    private final List<Integer> leftColumn;
+    private final List<Wire> wires;
     private int notchIndex;
     private final int alphabetSize;
     
@@ -67,35 +67,37 @@ public class RotorImpl implements Rotor {
      * @param notchIndex the initial notch index (position where notch triggers next rotor)
      */
     public RotorImpl(List<Integer> rightColumn, List<Integer> leftColumn, int notchIndex) {
-        this.rightColumn = new ArrayList<>(rightColumn);
-        this.leftColumn = new ArrayList<>(leftColumn);
+        this.wires = new ArrayList<>();
+        for (int i = 0; i < rightColumn.size(); i++) {
+            wires.add(new Wire(rightColumn.get(i), leftColumn.get(i)));
+        }
         this.notchIndex = notchIndex;
-        this.alphabetSize = rightColumn.size();
+        this.alphabetSize = wires.size();
     }
     
     /**
      * {@inheritDoc}
      * 
-     * <p>For FORWARD direction: finds the row where rightColumn equals input,
-     * returns the corresponding leftColumn value (right→left mapping).</p>
+     * <p>For FORWARD direction: finds the wire whose {@code right} equals input,
+     * returns its {@code left} value (right→left mapping).</p>
      * 
-     * <p>For BACKWARD direction: finds the row where leftColumn equals input,
-     * returns the corresponding rightColumn value (left→right mapping).</p>
+     * <p>For BACKWARD direction: finds the wire whose {@code left} equals input,
+     * returns its {@code right} value (left→right mapping).</p>
      */
     @Override
     public int process(int input, Direction direction) {
         if (direction == Direction.FORWARD) {
-            // Forward: find input in right column, return corresponding left column value
+            // Forward: find wire with matching right value, return its left value
             for (int i = 0; i < alphabetSize; i++) {
-                if (rightColumn.get(i) == input) {
-                    return leftColumn.get(i);
+                if (wires.get(i).right() == input) {
+                    return wires.get(i).left();
                 }
             }
         } else {
-            // Backward: find input in left column, return corresponding right column value
+            // Backward: find wire with matching left value, return its right value
             for (int i = 0; i < alphabetSize; i++) {
-                if (leftColumn.get(i) == input) {
-                    return rightColumn.get(i);
+                if (wires.get(i).left() == input) {
+                    return wires.get(i).right();
                 }
             }
         }
@@ -106,8 +108,8 @@ public class RotorImpl implements Rotor {
     /**
      * {@inheritDoc}
      * 
-     * <p>Rotation is performed by moving the first element of both columns
-     * to the end, simulating the physical rotation of the rotor wheel.</p>
+     * <p>Rotation is performed by moving the first wire to the end of the list,
+     * simulating the physical rotation of the rotor wheel.</p>
      * 
      * <p>The notch index is also updated: it decrements by 1, wrapping around
      * when it reaches -1 to become (alphabetSize - 1).</p>
@@ -117,9 +119,8 @@ public class RotorImpl implements Rotor {
         // Check if notch is at window position (index 0) before rotation
         boolean notchAtWindow = (notchIndex == 0);
         
-        // Rotate: move first element to the end for both columns
-        rightColumn.add(rightColumn.remove(0));
-        leftColumn.add(leftColumn.remove(0));
+        // Rotate: move first wire to the end
+        wires.add(wires.remove(0));
         
         // Update notch index (it moves up one position relative to window)
         notchIndex = (notchIndex - 1 + alphabetSize) % alphabetSize;
@@ -130,12 +131,12 @@ public class RotorImpl implements Rotor {
     /**
      * {@inheritDoc}
      * 
-     * <p>Returns the value at the top of the right column, which represents
+     * <p>Returns the {@code right} value of the top wire, which represents
      * the letter currently visible in the machine's window.</p>
      */
     @Override
     public int getPosition() {
-        return rightColumn.get(0);
+        return wires.get(0).right();
     }
     
     /**
@@ -149,7 +150,7 @@ public class RotorImpl implements Rotor {
     /**
      * {@inheritDoc}
      * 
-     * <p>Rotates the rotor until the window letter (rightColumn.get(0))
+     * <p>Rotates the rotor until the window letter ({@code wires.get(0).right()})
      * equals the specified position.</p>
      */
     @Override

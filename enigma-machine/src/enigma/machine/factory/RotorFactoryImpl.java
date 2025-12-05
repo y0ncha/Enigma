@@ -12,9 +12,9 @@ import java.util.Map;
  * Factory implementation for creating mechanical rotors.
  * 
  * <p>This factory creates rotors using the mechanical model implemented in
- * {@link RotorImpl}. The mechanical model represents rotor wiring as two
- * parallel columns (right and left), where each row represents a wire
- * connecting contacts across the rotor.</p>
+ * {@link RotorImpl}. The mechanical model represents rotor wiring as a list
+ * of wire pairs, where each wire connects a right contact (entry) to a left
+ * contact (exit).</p>
  * 
  * <h2>Factory Responsibilities:</h2>
  * <ol>
@@ -27,10 +27,10 @@ import java.util.Map;
  * 
  * <h2>Mapping Construction:</h2>
  * <p>The rotor specification typically defines the wiring as pairs of
- * alphabet characters. This factory converts those to index-based columns:</p>
+ * alphabet characters. This factory converts those to wire pairs:</p>
  * <ul>
- *   <li>Right column: sequential alphabet indices (0, 1, 2, ..., n-1)</li>
- *   <li>Left column: the mapped output indices according to the wiring spec</li>
+ *   <li>Right values: sequential alphabet indices (0, 1, 2, ..., n-1)</li>
+ *   <li>Left values: the mapped output indices according to the wiring spec</li>
  * </ul>
  * 
  * <h2>Example Usage:</h2>
