@@ -1,9 +1,9 @@
 package enigma.engine.factory;
 
 import enigma.shared.spec.ReflectorSpec;
-import enigma.machine.alphabet.Alphabet;
-import enigma.machine.reflector.Reflector;
-import enigma.machine.reflector.ReflectorImpl;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.reflector.ReflectorImpl;
 
 /**
  * Default {@link ReflectorFactory} implementation producing {@link ReflectorImpl}

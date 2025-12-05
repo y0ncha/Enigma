@@ -1,8 +1,9 @@
 package enigma.engine.factory;
 
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
-import enigma.machine.code.Code;
+import enigma.machine.component.code.Code;
 
 /**
  * Factory contract for producing runtime {@link Code} objects from a
@@ -36,7 +37,7 @@ public interface CodeFactory {
      * Create a {@link Code} from an explicit configuration.
      *
      * <p>This is the primary factory method that creates codes using the
-     * mechanical rotor model ({@link enigma.machine.rotor.RotorImpl}).</p>
+     * mechanical rotor model ({@link RotorImpl}).</p>
      *
      * @param spec machine specification containing rotor and reflector definitions
      * @param selection configuration specifying rotor IDs, positions, and reflector ID

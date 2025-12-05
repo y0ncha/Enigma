@@ -6,8 +6,9 @@ import enigma.loader.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
-import enigma.machine.code.Code;
+import enigma.machine.component.code.Code;
 import enigma.machine.Machine;
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
 import enigma.shared.dto.tracer.SignalTrace;
@@ -35,7 +36,7 @@ import java.util.*;
  *       the internal {@link Machine} instance.</li>
  * </ul>
  *
- * <p>The engine uses the mechanical rotor model ({@link enigma.machine.rotor.RotorImpl})
+ * <p>The engine uses the mechanical rotor model ({@link RotorImpl})
  * for all rotor construction, which accurately reflects physical Enigma behavior.</p>
  *
  * @since 1.0

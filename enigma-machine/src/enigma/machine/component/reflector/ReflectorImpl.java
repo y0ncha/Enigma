@@ -1,6 +1,4 @@
-package enigma.machine.reflector;
-
-import enigma.machine.alphabet.Alphabet;
+package enigma.machine.component.reflector;
 
 /**
  * Simple runtime reflector using a symmetric mapping array.

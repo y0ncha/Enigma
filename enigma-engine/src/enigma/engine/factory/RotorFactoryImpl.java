@@ -1,9 +1,9 @@
 package enigma.engine.factory;
 
-import enigma.machine.rotor.RotorImpl;
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
-import enigma.machine.alphabet.Alphabet;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.Objects;
 

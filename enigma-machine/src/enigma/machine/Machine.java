@@ -1,6 +1,6 @@
 package enigma.machine;
 
-import enigma.machine.code.Code;
+import enigma.machine.component.code.Code;
 import enigma.shared.dto.tracer.SignalTrace;
 
 /**

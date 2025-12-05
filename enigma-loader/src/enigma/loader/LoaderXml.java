@@ -1,6 +1,6 @@
 package enigma.loader;
 
-import enigma.machine.alphabet.Alphabet;
+import enigma.machine.component.alphabet.Alphabet;
 import enigma.loader.xml.generated.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;

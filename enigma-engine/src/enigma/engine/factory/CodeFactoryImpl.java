@@ -1,16 +1,17 @@
 package enigma.engine.factory;
 
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
 
 import enigma.engine.EngineImpl;
-import enigma.machine.alphabet.Alphabet;
-import enigma.machine.code.Code;
-import enigma.machine.code.CodeImpl;
-import enigma.machine.rotor.Rotor;
-import enigma.machine.reflector.Reflector;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.code.Code;
+import enigma.machine.component.code.CodeImpl;
+import enigma.machine.component.rotor.Rotor;
+import enigma.machine.component.reflector.Reflector;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ import java.util.*;
  * Default implementation of {@link CodeFactory}.
  *
  * <p>This factory constructs {@link Code} instances using the mechanical rotor
- * model ({@link enigma.machine.rotor.RotorImpl}). The factory:</p>
+ * model ({@link RotorImpl}). The factory:</p>
  * <ul>
  *   <li>Creates a {@link RotorFactory} for the given alphabet</li>
  *   <li>Builds rotors in left→right order from the configuration</li>

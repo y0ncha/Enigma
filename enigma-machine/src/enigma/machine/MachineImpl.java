@@ -1,10 +1,10 @@
 package enigma.machine;
 
-import enigma.machine.code.Code;
-import enigma.machine.keyboard.Keyboard;
-import enigma.machine.keyboard.KeyboardImpl;
-import enigma.machine.rotor.Direction;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.code.Code;
+import enigma.machine.component.keyboard.Keyboard;
+import enigma.machine.component.keyboard.KeyboardImpl;
+import enigma.machine.component.rotor.Direction;
+import enigma.machine.component.rotor.Rotor;
 
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.dto.tracer.RotorTrace;

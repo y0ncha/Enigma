@@ -2,7 +2,7 @@ package enigma.shared.spec;
 
 import java.util.Map;
 import java.util.Comparator;
-import enigma.machine.alphabet.Alphabet;
+import enigma.machine.component.alphabet.Alphabet;
 
 /**
  * Represents the specification of an Enigma machine, including its alphabet,

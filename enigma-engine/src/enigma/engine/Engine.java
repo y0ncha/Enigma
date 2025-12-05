@@ -1,5 +1,6 @@
 package enigma.engine;
 
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
 
@@ -39,7 +40,7 @@ public interface Engine {
      *
      * <p>This is the primary method for setting up the machine with a specific
      * rotor arrangement, positions, and reflector. The configuration uses the
-     * mechanical rotor model ({@link enigma.machine.rotor.RotorImpl}).</p>
+     * mechanical rotor model ({@link RotorImpl}).</p>
      *
      * @param config code configuration specifying rotor IDs, positions, and reflector ID
      */

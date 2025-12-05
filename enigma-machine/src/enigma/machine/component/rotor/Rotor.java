@@ -1,4 +1,4 @@
-package enigma.machine.rotor;
+package enigma.machine.component.rotor;
 
 /**
  * Rotor abstraction providing signal processing and stepping behavior.

@@ -1,7 +1,8 @@
 package enigma.engine.factory;
 
+import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.rotor.Rotor;
 
 /**
  * Factory for creating runtime {@link Rotor} instances from {@link RotorSpec}.
@@ -14,7 +15,7 @@ import enigma.machine.rotor.Rotor;
  *   <li>Setting the initial rotor position</li>
  * </ul>
  *
- * <p>The factory always creates {@link enigma.machine.rotor.RotorImpl} instances,
+ * <p>The factory always creates {@link RotorImpl} instances,
  * which use the mechanical column-rotation model that accurately reflects
  * physical Enigma behavior.</p>
  *
@@ -25,7 +26,7 @@ import enigma.machine.rotor.Rotor;
  * </ul>
  *
  * @since 1.0
- * @see enigma.machine.rotor.RotorImpl
+ * @see RotorImpl
  */
 public interface RotorFactory {
 
