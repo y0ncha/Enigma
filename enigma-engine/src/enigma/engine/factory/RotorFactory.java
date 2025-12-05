@@ -6,24 +6,63 @@ import enigma.machine.rotor.Rotor;
 /**
  * Factory for creating runtime {@link Rotor} instances from {@link RotorSpec}.
  *
- * <p>The factory is responsible only for adapting the immutable specification
- * into a concrete runtime rotor, preserving the directional semantics of the
- * mappings:</p>
+ * <p>This factory adapts the immutable rotor specification from the XML loader
+ * into a concrete runtime rotor instance. The factory is responsible for:</p>
  * <ul>
- *   <li>{@code forwardMapping}: right→left</li>
- *   <li>{@code backwardMapping}: left→right</li>
+ *   <li>Building the forward and backward mappings from the specification</li>
+ *   <li>Constructing the rotor with the correct notch index</li>
+ *   <li>Setting the initial rotor position</li>
  * </ul>
+ *
+ * <p>The factory always creates {@link enigma.machine.rotor.RotorImpl} instances,
+ * which use the mechanical column-rotation model that accurately reflects
+ * physical Enigma behavior.</p>
+ *
+ * <h2>Mapping Semantics</h2>
+ * <ul>
+ *   <li>{@code forwardMapping}: right→left (keyboard side to reflector side)</li>
+ *   <li>{@code backwardMapping}: left→right (reflector side to keyboard side)</li>
+ * </ul>
+ *
+ * @since 1.0
+ * @see enigma.machine.rotor.RotorImpl
  */
 public interface RotorFactory {
 
     /**
      * Create a {@link Rotor} from the given specification and starting position.
      *
+     * <p>The returned rotor uses the mechanical column-rotation model and
+     * is set to the specified initial position.</p>
+     *
+     * @param spec          rotor specification containing id, notch index, and mappings
+     * @param startPosition initial window position (0-based index into alphabet)
+     * @return a runtime rotor instance ready for use in the machine
+     */
+    Rotor create(RotorSpec spec, int startPosition);
+
+    /**
+     * Create a {@link Rotor} using the deprecated virtual (index-shifting) model.
+     *
      * @param spec          rotor specification (id, notch index, mappings)
      * @param startPosition initial window position (0-based index into alphabet)
      * @return a runtime rotor instance
+     * @deprecated Use {@link #create(RotorSpec, int)} instead. The virtual rotor model
+     *             is deprecated and will be removed in a future release.
      */
+    @Deprecated(since = "1.0", forRemoval = true)
     Rotor createVirtual(RotorSpec spec, int startPosition);
 
+    /**
+     * Create a {@link Rotor} using the mechanical column-rotation model.
+     *
+     * @param spec          rotor specification (id, notch index, mappings)
+     * @param startPosition initial window position (0-based index into alphabet)
+     * @return a runtime rotor instance
+     * @deprecated Use {@link #create(RotorSpec, int)} instead. This method is retained
+     *             only for backward compatibility; the main {@code create} method now
+     *             always uses the mechanical model.
+     */
+    @Deprecated(since = "1.0", forRemoval = true)
     Rotor createMechanical(RotorSpec spec, int startPosition);
 }

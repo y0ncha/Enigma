@@ -70,7 +70,7 @@ public class MachineImpl implements Machine {
         // Forward pass (right→left)
         List<RotorTrace> forwardSteps = forwardTransform(rotors, intermediate);
         if (!forwardSteps.isEmpty()) {
-            intermediate = forwardSteps.getLast().exitIndex();
+            intermediate = forwardSteps.get(forwardSteps.size() - 1).exitIndex();
         }
 
         // Reflector
@@ -87,7 +87,7 @@ public class MachineImpl implements Machine {
         // Backward pass (left→right)
         List<RotorTrace> backwardSteps = backwardTransform(rotors, intermediate);
         if (!backwardSteps.isEmpty()) {
-            intermediate = backwardSteps.getLast().exitIndex();
+            intermediate = backwardSteps.get(backwardSteps.size() - 1).exitIndex();
         }
 
         char outputChar = keyboard.lightKey(intermediate);

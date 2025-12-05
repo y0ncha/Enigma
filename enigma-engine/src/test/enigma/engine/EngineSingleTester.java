@@ -45,7 +45,7 @@ public class EngineSingleTester {
         engine.loadMachime(XML_PATH); // keep the current Engine API as-is
 
         System.out.println("Code configuration: " + CODE_CONFIG + "\n");
-        engine.codeManualMechanical(CODE_CONFIG);
+        engine.codeManual(CODE_CONFIG);
 
         System.out.println("===== Single Sanity Case =====");
         System.out.println("Input   : " + INPUT);

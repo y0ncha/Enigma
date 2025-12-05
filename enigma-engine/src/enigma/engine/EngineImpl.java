@@ -35,6 +35,9 @@ import java.util.*;
  *       the internal {@link Machine} instance.</li>
  * </ul>
  *
+ * <p>The engine uses the mechanical rotor model ({@link enigma.machine.rotor.RotorImpl})
+ * for all rotor construction, which accurately reflects physical Enigma behavior.</p>
+ *
  * @since 1.0
  */
 public class EngineImpl implements Engine {
@@ -78,7 +81,28 @@ public class EngineImpl implements Engine {
         // no-op for now
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This is the primary method for configuring the machine. It uses
+     * the mechanical rotor model for accurate Enigma simulation.</p>
+     */
     @Override
+    public void codeManual(CodeConfig config) {
+        validateCodeConfig(spec, config);
+        Code code = codeFactory.create(spec, config);
+        if (origConfig == null) origConfig = config;
+        machine.setCode(code);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link #codeManual(CodeConfig)} instead
+     */
+    @Override
+    @Deprecated(since = "1.0", forRemoval = true)
+    @SuppressWarnings("deprecation")
     public void codeManualVirtual(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.createVirtual(spec, config);
@@ -86,7 +110,14 @@ public class EngineImpl implements Engine {
         machine.setCode(code);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Use {@link #codeManual(CodeConfig)} instead
+     */
     @Override
+    @Deprecated(since = "1.0", forRemoval = true)
+    @SuppressWarnings("deprecation")
     public void codeManualMechanical(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.createMechanical(spec, config);
@@ -101,14 +132,15 @@ public class EngineImpl implements Engine {
      *
      * <p>This method samples rotor ids, starting positions and a reflector
      * id using a local {@link SecureRandom} instance, validates the sampled
-     * configuration and delegates to {@link #codeManualVirtual(CodeConfig)} so the
+     * configuration and delegates to {@link #codeManual(CodeConfig)} so the
      * same creation path is used for manual and random flows.</p>
      *
      * @throws IllegalStateException when the machine spec is not loaded
      */
+    @Override
     public void codeRandom() {
         CodeConfig config = randomCodeConfig(spec);
-        codeManualVirtual(config);
+        codeManual(config);
     }
 
 
