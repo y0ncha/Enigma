@@ -93,6 +93,14 @@ public class VirtualRotor implements Rotor {
      * {@inheritDoc}
      */
     @Override
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getNotchInd() {
         return notchInd;
     }

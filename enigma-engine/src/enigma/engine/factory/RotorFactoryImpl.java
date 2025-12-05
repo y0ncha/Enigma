@@ -137,47 +137,12 @@ public class RotorFactoryImpl implements RotorFactory {
      * @return new RotorImpl instance (position not yet set)
      */
     private RotorImpl buildMechanicalRotor(RotorSpec spec) {
-        int[] forwardMapping = buildForwardMapping(spec);
-        int[] backwardMapping = buildBackwardMapping(spec);
-        int notchIndex = buildNotchIndex(spec);
-
         return new RotorImpl(
-                forwardMapping,
-                backwardMapping,
-                notchIndex,
+                spec.getForwardMapping(),
+                spec.getBackwardMapping(),
+                spec.notchIndex(),
                 alphabet.size(),
                 spec.id()
         );
     }
-
-    /**
-     * Extract the forward mapping (right→left) from the specification.
-     *
-     * @param spec rotor specification
-     * @return defensive copy of the forward mapping array
-     */
-    private int[] buildForwardMapping(RotorSpec spec) {
-        return spec.getForwardMapping();
-    }
-
-    /**
-     * Extract the backward mapping (left→right) from the specification.
-     *
-     * @param spec rotor specification
-     * @return defensive copy of the backward mapping array
-     */
-    private int[] buildBackwardMapping(RotorSpec spec) {
-        return spec.getBackwardMapping();
-    }
-
-    /**
-     * Extract the notch index from the specification.
-     *
-     * @param spec rotor specification
-     * @return notch index (0-based)
-     */
-    private int buildNotchIndex(RotorSpec spec) {
-        return spec.notchIndex();
-    }
 }
-

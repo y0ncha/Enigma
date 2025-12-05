@@ -57,8 +57,12 @@ public class RotorImpl implements Rotor {
      * (reflector side). Specifically, {@code forwardMapping[i]} is the left-column
      * symbol that is wired to right-column symbol {@code i}.</p>
      *
+     * <p>The mechanical model computes backward mappings dynamically by searching
+     * the columns, so the backward mapping parameter is accepted for API consistency
+     * with the specification but not stored.</p>
+     *
      * @param forwardMapping mapping from right→left (base wiring); index = right symbol, value = left symbol
-     * @param backwardMapping inverse mapping (left→right); not directly used but kept for consistency
+     * @param backwardMapping inverse mapping (left→right); accepted for API consistency, computed dynamically
      * @param notchIndex index at which the rotor triggers stepping of the next rotor (0..N-1)
      * @param alphabetSize size of alphabet (typically 26 for A-Z)
      * @param id rotor identifier for debugging/tracing
@@ -136,13 +140,12 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Set the rotor to a specific position by rotating until the window shows
-     * the desired letter index.
+     * {@inheritDoc}
      *
-     * @param pos target position (0..alphabetSize-1)
-     * @throws IllegalStateException if the position cannot be reached within
-     *         alphabetSize rotations (should never happen in a valid rotor)
+     * <p>This implementation rotates the rotor columns until the top of
+     * {@code rightColumn} equals the target position.</p>
      */
+    @Override
     public void setPosition(int pos) {
         pos = makeInBounds(pos);
         int safety = alphabetSize;

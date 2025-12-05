@@ -69,6 +69,16 @@ public interface Rotor {
     int getPosition();
 
     /**
+     * Set the rotor to a specific position.
+     *
+     * <p>This method rotates the rotor until the window shows the desired
+     * letter index. Used during machine configuration to set initial positions.</p>
+     *
+     * @param position target position (0..alphabetSize-1)
+     */
+    void setPosition(int position);
+
+    /**
      * Get the notch position which triggers stepping of the next rotor.
      *
      * <p>When {@link #advance()} causes the rotor to reach this position,
