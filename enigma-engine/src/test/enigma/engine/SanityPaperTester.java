@@ -16,12 +16,12 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class EngineMultiTester {
+public class SanityPaperTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
 
-    private static final String XML_PATH = Paths.get(XML_BASE_DIR, "ex1-sanity-small.xml").toString();
+    private static final String XML_PATH = Paths.get(XML_BASE_DIR, "ex1-sanity-paper-enigma.xml").toString();
 
     /**
      * Entry point for the sanity test.
@@ -34,36 +34,40 @@ public class EngineMultiTester {
 
         engine.loadMachime(XML_PATH);
 
-        // Code: <3,2,1><CCC><I>
+        // Code: <1,2,3><ODX><I>
         CodeConfig config = new CodeConfig(
-                java.util.List.of(3, 2, 1),   // rotors left→right
-                java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
+                java.util.List.of(1, 2, 3),   // rotors left→right
+                java.util.List.of(14, 3, 23), // "ODX" (O=14, D=3, X=23)
                 "I"                           // reflector
         );
+
         System.out.println("Code configuration: " + config + "\n");
         engine.codeManual(config);
 
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {
-                "AABBCCDDEEFF",
-                "FEDCBADDEF",
-                "FEDCBAABCDEF",
-                "AFBFCFDFEFFF",
-                "AAAEEEBBBDDDCCCFFF"
+                "THERAINISDROPPING",
+                "HELLOWORLD",
+                "ENIGMAMACHINEROCKS",
+                "WOWCANTBELIEVEITACTUALLYWORKS",
+                "JAVARULES"
         };
 
         String[] expectedOutputs = {
-                "FFCCBBEEDDAA",
-                "ADEBCFEEDA",
-                "ADEBCFFCBEDA",
-                "FACABAEADAAA",
-                "FFFDDDCCCEEEAFEDCB"
+                "APZTICDXRVMWQHBHU",
+                "DLTBBQVPQV",
+                "QMJIDORMMYQBJDVSBR",
+                "CVRDIZWDAWQKUKBVHJILPKRNDXWIY",
+                "MRUHFRZZR"
         };
 
         int passed = 0;
         int failed = 0;
 
         for (int i = 0; i < inputs.length; i++) {
+
+            // Re-apply the code before each test so the rotors start at CCC for every case
+            engine.codeManual(config);
 
             String input = inputs[i];
             DebugTrace debug = engine.process(input);
