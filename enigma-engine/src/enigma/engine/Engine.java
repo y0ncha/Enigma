@@ -1,5 +1,9 @@
 package enigma.engine;
 
+import enigma.machine.component.rotor.RotorImpl;
+import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.dto.tracer.DebugTrace;
+
 /**
  * Engine API for coordinating machine loading, configuration and processing.
  *
@@ -21,7 +25,7 @@ public interface Engine {
      *
      * @param path file-system path to machine XML
      */
-    void loadXml(String path);
+    void loadMachime(String path);
 
     /**
      * Supply or update machine data (for example wiring/config inputs) from
@@ -32,11 +36,15 @@ public interface Engine {
     void machineData(String input);
 
     /**
-     * Enter manual code configuration mode (interactive or programmatic).
-     * Implementations should prompt for or accept manual rotor/reflector/position
-     * settings and apply them to the machine.
+     * Configure the machine with a manual code configuration.
+     *
+     * <p>This is the primary method for setting up the machine with a specific
+     * rotor arrangement, positions, and reflector. The configuration uses the
+     * mechanical rotor model ({@link RotorImpl}).</p>
+     *
+     * @param config code configuration specifying rotor IDs, positions, and reflector ID
      */
-    void codeManual(/*Args*/);
+    void codeManual(CodeConfig config);
 
     /**
      * Generate or assign a random code configuration and apply it to the machine.
@@ -47,12 +55,12 @@ public interface Engine {
 
     /**
      * Process the provided input string through the currently configured
-     * machine/code and return the resulting output.
+     * machine/code with detailed debugging information.
      *
      * @param input the input text to process
-     * @return processed/transformed output text
+     * @return detailed debug trace of the processing steps
      */
-    String process(String input);
+    DebugTrace process(String input);
 
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).

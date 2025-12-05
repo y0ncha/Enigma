@@ -1,7 +1,8 @@
-package enigma.machine.code;
+package enigma.machine.component.code;
 
-import enigma.machine.reflector.Reflector;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class CodeImpl implements Code {
 
     // active components
+    private final Alphabet alphabet;
     private final List<Rotor> rotors;        // right → left
     private final Reflector reflector;
 
@@ -32,11 +34,12 @@ public class CodeImpl implements Code {
      * @param reflectorId reflector identifier
      * @since 1.0
      */
-    public CodeImpl(List<Rotor> rotors,
+    public CodeImpl(Alphabet alphabet, List<Rotor> rotors,
                     Reflector reflector,
                     List<Integer> rotorIds,
                     List<Integer> positions,
                     String reflectorId) {
+        this.alphabet = alphabet;
 
         this.rotors = List.copyOf(rotors);
         this.reflector = reflector;
@@ -69,4 +72,7 @@ public class CodeImpl implements Code {
     public String getReflectorId() {
         return reflectorId;
     }
+
+    @Override
+    public Alphabet getAlphabet() { return alphabet; }
 }

@@ -1,10 +1,16 @@
 package enigma.machine;
 
-import enigma.machine.code.Code;
-import enigma.machine.keyboard.Keyboard;
-import enigma.machine.rotor.Direction;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.code.Code;
+import enigma.machine.component.keyboard.Keyboard;
+import enigma.machine.component.keyboard.KeyboardImpl;
+import enigma.machine.component.rotor.Direction;
+import enigma.machine.component.rotor.Rotor;
 
+import enigma.shared.dto.tracer.SignalTrace;
+import enigma.shared.dto.tracer.RotorTrace;
+import enigma.shared.dto.tracer.ReflectorTrace;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,98 +21,209 @@ import java.util.List;
  */
 public class MachineImpl implements Machine {
 
-    /*--------------- Fields ---------------*/
+    // --- Fields --------------------------------------------------
     private Code code;
-    private final Keyboard keyboard;
+    private Keyboard keyboard;
 
 
-    /*--------------- Ctor ---------------*/
+    // --- Ctor ----------------------------------------------------
     /**
-     * Construct a machine with a provided {@link Keyboard}.
+     * Construct an empty machine. The machine is created without a configured
+     * {@link Keyboard} or {@link Code}; callers must set the code (and provide
+     * a keyboard via the public API) before using {@link #process(char)}.
      *
-     * @param keyboard keyboard adapter used for char/index conversions
      * @since 1.0
      */
-    public MachineImpl(Keyboard keyboard) {
-
-        this.keyboard = keyboard;
+    public MachineImpl() {
+        this.keyboard = null;
         this.code = null;
     }
 
-    /*--------------- Methods ---------------*/
+    // --- Methods -------------------------------------------------
     /**
      * {@inheritDoc}
      */
     @Override
     public void setCode(Code code) {
         this.code = code;
+        this.keyboard = new KeyboardImpl(code.getAlphabet());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public char process(char input) {
+    public SignalTrace process(char input) {
+        ensureConfigured();
 
+        List<Rotor> rotors = code.getRotors();
+
+        // Window before stepping (left→right as user sees it)
+        String windowBefore = buildWindowString(rotors);
+
+        // Step rotors (same timing as in process) and record which advanced
+        List<Integer> advancedIndices = advance(rotors);
+
+        // Keyboard encoding
+        int intermediate = keyboard.process(input);
+
+        // Forward pass (right→left)
+        List<RotorTrace> forwardSteps = forwardTransform(rotors, intermediate);
+        if (!forwardSteps.isEmpty()) {
+            intermediate = forwardSteps.getLast().exitIndex();
+        }
+
+        // Reflector
+        int reflectEntry = intermediate;
+        int reflectExit = code.getReflector().process(reflectEntry);
+        ReflectorTrace reflectorStep = new ReflectorTrace(
+                reflectEntry,
+                reflectExit,
+                keyboard.lightKey(reflectEntry),
+                keyboard.lightKey(reflectExit)
+        );
+        intermediate = reflectExit;
+
+        // Backward pass (left→right)
+        List<RotorTrace> backwardSteps = backwardTransform(rotors, intermediate);
+        if (!backwardSteps.isEmpty()) {
+            intermediate = backwardSteps.getLast().exitIndex();
+        }
+
+        char outputChar = keyboard.lightKey(intermediate);
+
+        // Window after processing (rotors already stepped at the top)
+        String windowAfter = buildWindowString(rotors);
+
+        return new SignalTrace(
+                input,
+                outputChar,
+                windowBefore,
+                windowAfter,
+                advancedIndices,
+                forwardSteps,
+                reflectorStep,
+                backwardSteps
+        );
+    }
+
+    // --- State Checkers ---------------------------------------------
+    private void ensureConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured with a code");
         }
-
-        int intermediate = keyboard.process(input);
-        List<Rotor> rotors = code.getRotors();
-
-        advance(rotors);
-        intermediate = forwardTransform(rotors, intermediate);
-        intermediate = code.getReflector().process(intermediate);
-        intermediate = backwardTransform(rotors, intermediate);
-
-        return keyboard.lightKey(intermediate);
+        if (keyboard == null) {
+            throw new IllegalStateException("Machine is not configured with a keyboard");
+        }
     }
 
-    /*--------------- Helpers ---------------*/
+    @Override
+    public boolean isConfigured() {
+        return code != null && keyboard != null;
+    }
+
+    // --- Helpers -------------------------------------------------
+
     /**
-     * Advance rotors starting from the rightmost rotor.
+     * Advance rotors starting from the rightmost rotor and record which rotors moved.
      *
      * @param rotors list of rotors in right→left order
-     * @since 1.0
+     * @return immutable list of rotor indices that advanced (0 = rightmost)
      */
-    private void advance(List<Rotor> rotors) {
-        int rotorIndex = 0;
+    private List<Integer> advance(List<Rotor> rotors) {
+
+        List<Integer> advanced = new ArrayList<>();
+
+        int index = rotors.size() - 1; // start at RIGHTMOST
         boolean shouldAdvance;
 
         do {
-            shouldAdvance = rotors.get(rotorIndex).advance();
-            rotorIndex++;
-        } while (shouldAdvance && rotorIndex < rotors.size());
+            Rotor rotor = rotors.get(index);
+            shouldAdvance = rotor.advance();
+            advanced.add(index);        // record natural index (left→right convention)
+            index--;                    // move leftward
+        } while (shouldAdvance && index >= 0);
+
+        return List.copyOf(advanced);
     }
 
-    /**
-     * Apply forward transformation through rotors (right→left).
-     *
-     * @param rotors rotors list
-     * @param value input index
-     * @return transformed index after forward pass
-     * @since 1.0
-     */
-    private static int forwardTransform(List<Rotor> rotors, int value) {
-        for (int i = 0; i < rotors.size(); i++) {
-            value = rotors.get(i).process(value, Direction.FORWARD);
-        }
-        return value;
-    }
+    private List<RotorTrace> forwardTransform(List<Rotor> rotors, int value) {
 
-    /**
-     * Apply backward transformation through rotors (left→right).
-     *
-     * @param rotors rotors list
-     * @param value input index
-     * @return transformed index after backward pass
-     * @since 1.0
-     */
-    private static int backwardTransform(List<Rotor> rotors, int value) {
+        List<RotorTrace> steps = new ArrayList<>();
+
+        // iterate from RIGHTMOST (last index) → LEFTMOST (0)
         for (int i = rotors.size() - 1; i >= 0; i--) {
-            value = rotors.get(i).process(value, Direction.BACKWARD);
+            Rotor rotor = rotors.get(i);
+            int entryIndex = value;
+            int exitIndex = rotor.process(entryIndex, Direction.FORWARD);
+
+            steps.add(new RotorTrace(
+                    rotor.getId(),
+                    i,
+                    entryIndex,
+                    exitIndex,
+                    keyboard.lightKey(entryIndex),
+                    keyboard.lightKey(exitIndex)
+            ));
+
+            value = exitIndex;
         }
-        return value;
+
+        return List.copyOf(steps);
+    }
+
+    /**
+     * Apply backward transformation through rotors while recording traces.
+     *
+     * @param rotors list of rotors from right to left
+     * @param value input index to transform
+     * @return immutable list of RotorTrace (rightmost first)
+     */
+    private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
+
+        List<RotorTrace> steps = new ArrayList<>();
+
+        // iterate from LEFTMOST (0) → RIGHTMOST (last index)
+        for (int i = 0; i < rotors.size(); i++) {
+            Rotor rotor = rotors.get(i);
+            int entryIndex = value;
+            int exitIndex = rotor.process(entryIndex, Direction.BACKWARD);
+
+            steps.add(new RotorTrace(
+                    rotor.getId(),
+                    i,
+                    entryIndex,
+                    exitIndex,
+                    keyboard.lightKey(entryIndex),
+                    keyboard.lightKey(exitIndex)
+            ));
+
+            value = exitIndex;
+        }
+
+        return List.copyOf(steps);
+    }
+
+    /**
+     * Build the window string representing the current rotor positions.
+     * @param rotors list of rotors from right to left
+     * @return window string by format
+     */
+    private String buildWindowString(List<Rotor> rotors) {
+
+        if (keyboard == null) {
+            throw new IllegalStateException("Machine is not configured with a keyboard");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
+        for (Rotor rotor : rotors) {
+            int pos = rotor.getPosition();   // numeric window index (0-based)
+            char c = keyboard.lightKey(pos);         // convert index -> alphabet char
+            sb.append(c);
+        }
+
+        return sb.toString();
     }
 }

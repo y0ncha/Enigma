@@ -1,6 +1,6 @@
 package enigma.loader;
 
-import enigma.machine.alphabet.Alphabet;
+import enigma.machine.component.alphabet.Alphabet;
 import enigma.loader.xml.generated.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -30,7 +30,11 @@ import java.util.*;
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
-    private static final int MINIMUM_ROTOR_COUNT = 3;
+    private static int ROTORS_IN_USE;
+
+    public LoaderXml(int rotorsInUse) {
+        ROTORS_IN_USE = rotorsInUse;
+    }
 
     /**
      * {@inheritDoc}
@@ -43,7 +47,7 @@ public class LoaderXml implements Loader {
      * @throws EnigmaLoadingException on parse or validation errors
      */
     @Override
-    public MachineSpec loadMachine(String filePath) throws EnigmaLoadingException {
+    public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
 
         Alphabet alphabet = extractAlphabet(root);
@@ -257,7 +261,7 @@ public class LoaderXml implements Loader {
             result.put(id, new ReflectorSpec(id, mapping));
         }
 
-        // After building reflectors, ensure ids form a contiguous Roman run starting from I
+        // After building reflectors, ensure ids form a contiguous Roman main starting from I
         validateReflectorIdRun(result.keySet());
 
         return result;
@@ -322,8 +326,8 @@ public class LoaderXml implements Loader {
         if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
             throw new EnigmaLoadingException("No <BTE-Rotors> section or empty rotors list");
         }
-        if (bteRotors.getBTERotor().size() < MINIMUM_ROTOR_COUNT) {
-            throw new EnigmaLoadingException("Machine must define at least " + MINIMUM_ROTOR_COUNT + " rotors, but got " + bteRotors.getBTERotor().size());
+        if (bteRotors.getBTERotor().size() < ROTORS_IN_USE) {
+            throw new EnigmaLoadingException("Machine must define at least " + ROTORS_IN_USE + " rotors, but got " + bteRotors.getBTERotor().size());
         }
     }
 
@@ -400,10 +404,10 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Validate that the set of reflector ids forms a contiguous run of Roman numerals starting from I.
+     * Validate that the set of reflector ids forms a contiguous main of Roman numerals starting from I.
      *
      * @param ids set of reflector ids to validate
-     * @throws EnigmaLoadingException if the run is not contiguous or does not start from I
+     * @throws EnigmaLoadingException if the main is not contiguous or does not start from I
      */
     private void validateReflectorIdRun(Set<String> ids) throws EnigmaLoadingException {
         if (ids == null || ids.isEmpty()) return;
@@ -413,7 +417,7 @@ public class LoaderXml implements Loader {
         for (int i = 0; i < n; i++) {
             String required = ROMAN_ORDER.get(i);
             if (!ids.contains(required)) {
-                throw new EnigmaLoadingException("Reflector ids must form a contiguous Roman run starting from I (e.g. I,II,III). Got: " + ids);
+                throw new EnigmaLoadingException("Reflector ids must form a contiguous Roman main starting from I (e.g. I,II,III). Got: " + ids);
             }
         }
     }

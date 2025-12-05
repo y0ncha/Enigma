@@ -1,4 +1,4 @@
-package enigma.machine.keyboard;
+package enigma.machine.component.keyboard;
 
 /**
  * Keyboard adapter that converts between characters and internal indices.

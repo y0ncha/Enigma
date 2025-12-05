@@ -1,4 +1,4 @@
-package enigma.machine.alphabet;
+package enigma.machine.component.alphabet;
 
 /**
  * Immutable representation of the machine alphabet.

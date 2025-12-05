@@ -1,9 +1,9 @@
 package enigma.engine.factory;
 
 import enigma.shared.spec.ReflectorSpec;
-import enigma.machine.alphabet.Alphabet;
-import enigma.machine.reflector.Reflector;
-import enigma.machine.reflector.ReflectorImpl;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.reflector.ReflectorImpl;
 
 /**
  * Default {@link ReflectorFactory} implementation producing {@link ReflectorImpl}
@@ -16,8 +16,6 @@ import enigma.machine.reflector.ReflectorImpl;
  */
 public class ReflectorFactoryImpl implements ReflectorFactory {
 
-    private final Alphabet alphabet;
-
     /**
      * Create a reflector factory bound to the given alphabet.
      *
@@ -26,7 +24,6 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
      */
     public ReflectorFactoryImpl(Alphabet alphabet) {
         if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
-        this.alphabet = alphabet;
     }
 
     /**
@@ -37,6 +34,6 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
         if (spec == null) throw new IllegalArgumentException("spec must not be null");
         int[] mapping = spec.mapping();
         // ReflectorImpl expects the alphabet and a symmetric integer mapping
-        return new ReflectorImpl(alphabet, mapping);
+        return new ReflectorImpl(mapping);
     }
 }

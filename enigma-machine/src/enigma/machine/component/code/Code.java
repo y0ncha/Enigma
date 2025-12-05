@@ -1,7 +1,8 @@
-package enigma.machine.code;
+package enigma.machine.component.code;
 
-import enigma.machine.reflector.Reflector;
-import enigma.machine.rotor.Rotor;
+import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 
@@ -50,5 +51,7 @@ public interface Code {
      * @return reflector id string
      */
     String getReflectorId();
+
+    Alphabet getAlphabet();
 }
 

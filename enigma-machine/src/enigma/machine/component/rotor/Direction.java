@@ -1,4 +1,4 @@
-package enigma.machine.rotor;
+package enigma.machine.component.rotor;
 
 /**
  * Direction of signal travel through a rotor.

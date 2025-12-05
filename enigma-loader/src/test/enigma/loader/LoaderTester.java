@@ -16,18 +16,16 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class LoaderXmlTest {
+public class LoaderTester {
 
-    // Relative to the project root — actual files are under enigma-engine/src/resources/xml/
-    private static final String XML_BASE_DIR = "enigma-engine/src/resources/xml";
+    // Relative to the project root — actual files are under the enigma-loader test resources directory
+    private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
 
     /**
      * Entry point for the test harness.
-     *
-     * @param args command line arguments (unused)
      */
     public static void main(String[] args) {
-        Loader loader = new LoaderXml();
+        Loader loader = new LoaderXml(3);
 
         String[] files = {
                 "ex1-sanity-small.xml",
@@ -46,8 +44,10 @@ public class LoaderXmlTest {
             try {
                 // Pass an absolute filesystem path string to the loader
                 String absolutePath = path.toAbsolutePath().toString();
-                MachineSpec spec = loader.loadMachine(absolutePath);
+                MachineSpec spec = loader.loadSpecs(absolutePath);
                 System.out.println("Load succeeded.");
+
+                // Print MachineSpec using its toString() (clearly shows rotors/reflectors and mappings)
                 System.out.println(spec);
 
             }

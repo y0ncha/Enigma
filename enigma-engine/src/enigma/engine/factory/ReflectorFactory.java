@@ -1,7 +1,7 @@
 package enigma.engine.factory;
 
 import enigma.shared.spec.ReflectorSpec;
-import enigma.machine.reflector.Reflector;
+import enigma.machine.component.reflector.Reflector;
 
 /**
  * Factory that creates runtime {@link Reflector} instances from {@link ReflectorSpec}.

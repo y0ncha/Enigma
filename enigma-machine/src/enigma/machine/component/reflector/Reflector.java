@@ -1,4 +1,4 @@
-package enigma.machine.reflector;
+package enigma.machine.component.reflector;
 
 /**
  * Reflector maps an internal index to its paired index.

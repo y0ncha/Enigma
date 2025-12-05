@@ -1,6 +1,7 @@
 package enigma.machine;
 
-import enigma.machine.code.Code;
+import enigma.machine.component.code.Code;
+import enigma.shared.dto.tracer.SignalTrace;
 
 /**
  * Core Enigma machine API: configure code and process characters.
@@ -19,12 +20,21 @@ public interface Machine {
     void setCode(Code code);
 
     /**
-     * Process a single character through the configured machine.
+     * Process the provided character through the configured code.
+     * Trace the signal propagation through the rotors and reflector.
      *
      * @param input input character
-     * @return processed output character
+     * @return signal trace of the processing steps
      * @throws IllegalStateException when the machine has no configured code
      * @since 1.0
      */
-    char process(char input);
+    SignalTrace process(char input);
+
+    /**
+     * Check if the machine is configured with a code.
+     *
+     * @return true if the machine has a configured code; false otherwise
+     * @since 1.0
+     */
+    boolean isConfigured();
 }

@@ -19,7 +19,7 @@ public interface Loader {
      * @return validated machine specification
      * @throws EnigmaLoadingException when loading or validation fails
      */
-    MachineSpec loadMachine(String filePath) throws EnigmaLoadingException;
+    MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException;
 
 
 }
