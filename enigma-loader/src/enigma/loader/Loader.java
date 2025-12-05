@@ -1,4 +1,5 @@
 package enigma.loader;
+import enigma.loader.xml.exception.EnigmaLoadingException;
 import enigma.shared.spec.MachineSpec;
 
 /**

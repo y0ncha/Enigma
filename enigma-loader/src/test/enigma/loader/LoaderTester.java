@@ -1,6 +1,6 @@
 package test.enigma.loader;
 
-import enigma.loader.EnigmaLoadingException;
+import enigma.loader.xml.exception.EnigmaLoadingException;
 import enigma.loader.Loader;
 import enigma.loader.LoaderXml;
 import enigma.shared.spec.MachineSpec;

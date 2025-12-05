@@ -1,4 +1,4 @@
-package enigma.loader;
+package enigma.loader.xml.exception;
 
 /**
  * Exception thrown when an error occurs during the loading process in the Enigma engine.
