@@ -70,8 +70,7 @@ public class RotorImpl implements Rotor {
         this.alphabetSize = alphabetSize;
         // Basic validation of backwardMapping to make use of the parameter and catch spec errors
         if (backwardMapping == null) throw new IllegalArgumentException("backwardMapping must not be null");
-        if (backwardMapping.length != alphabetSize)
-            throw new IllegalArgumentException("backwardMapping length must equal alphabetSize");
+        if (backwardMapping.length != alphabetSize) throw new IllegalArgumentException("backwardMapping length must equal alphabetSize");
 
         // Build wires list: right is identity [0,1,2,...], left comes from forwardMapping
         this.wires = new LinkedList<>();

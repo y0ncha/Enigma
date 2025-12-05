@@ -147,14 +147,13 @@ public class MachineImpl implements Machine {
         return List.copyOf(advanced);
     }
 
-    private List<RotorTrace> forwardTransform(List<Rotor> rotors, int value) {
+    private List<RotorTrace> forwardTransform(List<Rotor> rotors, int entryIndex) {
 
         List<RotorTrace> steps = new ArrayList<>();
 
         // iterate from RIGHTMOST (last index) → LEFTMOST (0)
         for (int i = rotors.size() - 1; i >= 0; i--) {
             Rotor rotor = rotors.get(i);
-            int entryIndex = value;
             int exitIndex = rotor.process(entryIndex, Direction.FORWARD);
 
             steps.add(new RotorTrace(
@@ -165,10 +164,8 @@ public class MachineImpl implements Machine {
                     keyboard.lightKey(entryIndex),
                     keyboard.lightKey(exitIndex)
             ));
-
-            value = exitIndex;
+            entryIndex = exitIndex;
         }
-
         return List.copyOf(steps);
     }
 
