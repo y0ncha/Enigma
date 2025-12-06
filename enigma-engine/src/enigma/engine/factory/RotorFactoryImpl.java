@@ -8,26 +8,23 @@ import enigma.machine.component.rotor.Rotor;
 /**
  * Default {@link RotorFactory} implementation producing {@link RotorImpl} instances.
  *
+ * <p><b>Module:</b> enigma-engine</p>
+ *
  * <p>This factory is bound to an {@link Alphabet} instance and constructs rotors
  * using the mechanical column-rotation model. The factory:</p>
  * <ul>
- *   <li>Validates the specification and start position</li>
- *   <li>Extracts the forward mapping from the specification</li>
- *   <li>Builds the notch index from the specification</li>
- *   <li>Constructs the mechanical rotor</li>
+ *   <li>Extracts right/left character columns from {@link RotorSpec}</li>
+ *   <li>Validates column lengths match alphabet size</li>
+ *   <li>Constructs {@link RotorImpl} with notch index and rotor ID</li>
  * </ul>
  *
- * <h2>Mapping Conventions</h2>
- * <p>Mappings are inherited directly from {@link RotorSpec}:</p>
- * <ul>
- *   <li>{@code forwardMapping}: index = right-side position, value = left-side position
- *       (right→left, used on the forward path toward the reflector)</li>
- *   <li>{@code backwardMapping}: index = left-side position, value = right-side position
- *       (left→right, used on the return path from the reflector)</li>
- * </ul>
+ * <h2>Wiring Order</h2>
+ * <p>Character columns are passed directly to {@link RotorImpl} without modification.
+ * The loader ensures columns are in correct XML row order (top→bottom).</p>
  *
- * <p>This factory does <b>not</b> modify or invert the mappings; it passes them
- * directly to the {@link RotorImpl} constructor.</p>
+ * <h2>Mechanical Model</h2>
+ * <p>The constructed rotor uses physical rotation (moving top row to bottom)
+ * and the two-column lookup model that accurately reflects real Enigma behavior.</p>
  *
  * @since 1.0
  * @see RotorImpl
@@ -39,7 +36,7 @@ public class RotorFactoryImpl implements RotorFactory {
     /**
      * Create a rotor factory bound to the given alphabet.
      *
-     * @param alphabet alphabet for bounds checking and rotor construction
+     * @param alphabet alphabet for size validation and rotor construction
      * @throws IllegalArgumentException if alphabet is null
      */
     public RotorFactoryImpl(Alphabet alphabet) {
@@ -48,10 +45,15 @@ public class RotorFactoryImpl implements RotorFactory {
     }
 
     /**
-     * {@inheritDoc}
+     * Create a rotor from the given specification.
      *
-     * <p>This is the primary factory method that creates rotors using the
-     * mechanical column-rotation model ({@link RotorImpl}).</p>
+     * <p>Extracts right/left character columns from the spec and constructs
+     * a {@link RotorImpl} using the mechanical column-rotation model. Columns
+     * are passed as-is without modification (XML row order).</p>
+     *
+     * @param spec rotor specification with ID, columns, and notch index
+     * @return {@link RotorImpl} instance ready for position setting
+     * @throws IllegalStateException if column lengths don't match alphabet size
      */
     @Override
     public Rotor create(RotorSpec spec) {
