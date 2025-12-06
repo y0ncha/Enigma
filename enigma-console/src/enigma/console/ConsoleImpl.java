@@ -227,7 +227,6 @@ public class ConsoleImpl implements Console {
         } else{
             System.out.println("Original code configuration  : <not set yet>");
         }
-        // TODO add current code configuration of the loaded machine
         // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
         CodeConfig currentCode = engine.getCurrentCodeConfig();
         if (currentCode != null) {
