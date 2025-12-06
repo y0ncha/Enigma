@@ -5,7 +5,6 @@ package enigma.console.helper;
  * Contains only static methods and cannot be instantiated.
  */
 public final class Utilities {
-    private static final java.util.Scanner scanner = new java.util.Scanner(System.in);
     private Utilities() {
         // Prevent instantiation
     }
@@ -27,7 +26,7 @@ public final class Utilities {
     /**
      * Reads an integer from the user with validation.
      */
-    public static int readInt(String prompt) {
+    public static int readInt(java.util.Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
             String line = scanner.nextLine().trim();
@@ -46,7 +45,7 @@ public final class Utilities {
     /**
      * Reads a non-empty line from the user and returns it trimmed.
      */
-    public static String readNonEmptyLine(String prompt) {
+    public static String readNonEmptyLine(java.util.Scanner scanner, String prompt) {
         while (true) {
             System.out.println(prompt);
             System.out.print("> ");
@@ -61,7 +60,7 @@ public final class Utilities {
     /**
      * Asks the user a yes/no question and returns true for YES, false for NO.
      */
-    public static boolean askUserToRetry(String prompt) {
+    public static boolean askUserToRetry(java.util.Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
             String line = scanner.nextLine().trim().toUpperCase();

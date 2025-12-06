@@ -268,20 +268,20 @@ public class ConsoleImpl implements Console {
             // =========================
             while (true) {
                 System.out.println("Available rotors: " + engine.getMachineSpec().getTotalRotors());
-                String rotorsLine = Utilities.readNonEmptyLine(
+                String rotorsLine = Utilities.readNonEmptyLine(scanner,
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545):");
                 try {
                     rotorIds = InputParsers.parseRotorIds(rotorsLine);
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry("Do you want to try again with a different rotor list? (Y/N): ")) {
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different rotor list? (Y/N): ")) {
                         return; // back to main menu
                     }
                     continue;
                 }
                 if (rotorIds.isEmpty()) {
                     Utilities.printError("You must specify at least one rotor id.");
-                    if (!Utilities.askUserToRetry("Do you want to try again with a different rotor list? (Y/N): ")) {
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different rotor list? (Y/N): ")) {
                         return;
                     }
                     continue;
@@ -293,12 +293,12 @@ public class ConsoleImpl implements Console {
             // 2) Initial positions (loop until valid or user exits)
             // =========================
             while (true) {
-                String positions = Utilities.readNonEmptyLine(
+                String positions = Utilities.readNonEmptyLine(scanner,
                         "Enter initial positions as a continuous sequence of characters (e.g. ABCD):");
                 if (positions.length() != rotorIds.size()) {
                     Utilities.printError("Number of positions (" + positions.length()
                             + ") must match number of rotors (" + rotorIds.size() + ").");
-                    if (!Utilities.askUserToRetry("Do you want to try again with different positions? (Y/N): ")) {
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
                         return;
                     }
                     continue;
@@ -309,7 +309,7 @@ public class ConsoleImpl implements Console {
                     break;
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry("Do you want to try again with different positions? (Y/N): ")) {
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
                         return;
                     }
                 }
@@ -327,11 +327,11 @@ public class ConsoleImpl implements Console {
                 for (int i = 1; i <= reflectorsCount; i++) {
                     System.out.println(" " + i + ". " + InputParsers.toRoman(i));
                 }
-                int reflectorChoice = Utilities.readInt(
+                int reflectorChoice = Utilities.readInt(scanner,
                         "Choose reflector by number (1-" + reflectorsCount + "): ");
                 if (reflectorChoice < 1 || reflectorChoice > reflectorsCount) {
                     Utilities.printError("Reflector index must be between 1 and " + reflectorsCount + ".");
-                    if (!Utilities.askUserToRetry("Do you want to try again with a different reflector? (Y/N): ")) {
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N): ")) {
                         return;
                     }
                     continue;
@@ -355,7 +355,7 @@ public class ConsoleImpl implements Console {
                 keepTrying = false; // success – exit command
             } catch (IllegalArgumentException e) {
                 Utilities.printError("Invalid code configuration: " + e.getMessage());
-                if (!Utilities.askUserToRetry("Do you want to try again and fix the configuration? (Y/N): ")) {
+                if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
                 }
                 // if user chose YES – outer while(keepTrying) repeats from the beginning
@@ -409,7 +409,7 @@ public class ConsoleImpl implements Console {
         while (keepTrying) {
             try {
                 // 2. Read input from user
-                String originalInput = Utilities.readNonEmptyLine(
+                String originalInput = Utilities.readNonEmptyLine(scanner,
                         "Enter the text you want to process (only characters from the machine alphabet):");
 
                 // Normalize to upper-case to make input case-insensitive
@@ -430,7 +430,7 @@ public class ConsoleImpl implements Console {
                     }
                 }
                 if (!valid) {
-                    if (!Utilities.askUserToRetry(
+                    if (!Utilities.askUserToRetry(scanner,
                             "Do you want to try again with a different input string? (Y/N): ")) {
                         return; // back to main menu
                     }
@@ -454,7 +454,7 @@ public class ConsoleImpl implements Console {
                 keepTrying = false; // success → exit command
             } catch (IllegalArgumentException | IllegalStateException e) {
                 Utilities.printError("Failed to process input: " + e.getMessage());
-                if (!Utilities.askUserToRetry(
+                if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different input string? (Y/N): ")) {
                     return;
                 }
