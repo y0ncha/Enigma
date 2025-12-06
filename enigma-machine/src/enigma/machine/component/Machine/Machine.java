@@ -4,5 +4,6 @@ import enigma.machine.component.code.Code;
 
 public interface Machine {
     void setCode(Code code);
+    Code getCode();
     char process(char input);
 }

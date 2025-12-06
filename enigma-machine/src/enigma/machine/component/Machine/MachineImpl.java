@@ -21,6 +21,11 @@ public class MachineImpl implements Machine{
     }
 
     @Override
+    public Code getCode() {
+        return code;
+    }
+
+    @Override
     public char process(char input) {
         int intermediate =  keyboard.process(input);
         List<Rotor> rotors = code.getRotors();
