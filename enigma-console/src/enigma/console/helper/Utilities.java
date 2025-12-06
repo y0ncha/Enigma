@@ -50,11 +50,8 @@ public final class Utilities {
         while (true) {
             System.out.println(prompt);
             System.out.print("> ");
-            String line = scanner.nextLine();
-            if (line != null) {
-                line = line.trim();
-            }
-            if (line == null || line.isEmpty()) {
+            String line = scanner.nextLine().trim();
+            if (line.isEmpty()) {
                 Utilities.printError("Input cannot be empty. Please try again.");
                 continue;
             }
