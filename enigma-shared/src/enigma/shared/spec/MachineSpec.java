@@ -77,14 +77,29 @@ public record MachineSpec(
         return sb.toString();
     }
 
+    /**
+     * Returns the total number of reflectors defined in this machine specification.
+     *
+     * @return the number of reflectors, or 0 if none are defined
+     */
     public int getTotalReflectors() {
         return (reflectorsById == null) ? 0 : reflectorsById.size();
     }
 
+    /**
+     * Returns the total number of rotors defined in this machine specification.
+     *
+     * @return the number of rotors, or 0 if none are defined
+     */
     public int getTotalRotors() {
         return (rotorsById == null) ? 0 : rotorsById.size();
     }
 
+    /**
+     * Returns the string of letters that make up the machine's alphabet.
+     *
+     * @return the alphabet letters as a string
+     */
     public String getLetters() {
         return alphabet.getLetters();
     }
