@@ -8,10 +8,10 @@ import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
 import enigma.machine.component.code.Code;
 import enigma.machine.Machine;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.CodeState;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.spec.MachineSpec;
 
@@ -29,7 +29,7 @@ import java.util.*;
  *   <li>Validate runtime {@link CodeConfig} (rotor IDs, positions, reflector)</li>
  *   <li>Build runtime {@link Code} using {@link CodeFactory}</li>
  *   <li>Assign code to internal {@link Machine} instance</li>
- *   <li>Process messages and return {@link processTrace} DTOs</li>
+ *   <li>Process messages and return {@link ProcessTrace} DTOs</li>
  * </ul>
  *
  * <h2>Configuration Flow</h2>
@@ -176,7 +176,7 @@ public class EngineImpl implements Engine {
      * @return detailed debug trace of the processing steps
      */
     @Override
-    public processTrace process(String input) {
+    public ProcessTrace process(String input) {
         if (!machine.isConfigured()) {
             throw new IllegalStateException("Machine is not configured");
         }
@@ -193,7 +193,7 @@ public class EngineImpl implements Engine {
             output.append(trace.outputChar());
         }
         this.stringsProcessed++;
-        return new processTrace(output.toString(), List.copyOf(traces));
+        return new ProcessTrace(output.toString(), List.copyOf(traces));
     }
 
     /**

@@ -13,14 +13,12 @@ import java.util.List;
  * and backward pass.</p>
  *
  * <h2>Usage</h2>
- * <p>Returned by {@link enigma.engine.Engine#process(String)} to provide
- * both the result and detailed debugging information for analysis or display.</p>
  *
  * @param output final processed output string
  * @param signalTraces per-character signal traces (one per input character)
  * @since 1.0
  */
-public record processTrace(
+public record ProcessTrace(
         String output,                  // final processed string
         List<SignalTrace> signalTraces  // one trace per input character
 ) {
@@ -28,7 +26,7 @@ public record processTrace(
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("=== processTrace ===\n");
+        sb.append("=== ProcessTrace ===\n");
         sb.append("Final output: ").append(output).append("\n\n");
 
         for (int i = 0; i < signalTraces.size(); i++) {

@@ -1,10 +1,9 @@
 package enigma.engine;
 
-import enigma.machine.Machine;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
-import enigma.shared.dto.tracer.processTrace;
 
 /**
  * Engine API for coordinating machine loading, configuration and processing.
@@ -16,7 +15,7 @@ import enigma.shared.dto.tracer.processTrace;
  *   <li>Load machine specifications from XML via {@link enigma.loader.Loader}</li>
  *   <li>Validate {@link CodeConfig} against loaded {@link enigma.shared.spec.MachineSpec}</li>
  *   <li>Build runtime {@link enigma.machine.component.code.Code} via factories</li>
- *   <li>Process messages and return {@link processTrace} DTOs</li>
+ *   <li>Process messages and return {@link ProcessTrace} DTOs</li>
  * </ul>
  *
  * <h2>What Engine Does NOT Do</h2>
@@ -85,14 +84,14 @@ public interface Engine {
      *
      * <p>Each character is processed individually, generating a {@link enigma.shared.dto.tracer.SignalTrace}
      * for detailed step-by-step analysis. The output string and all traces are bundled
-     * into a {@link processTrace} DTO.</p>
+     * into a {@link ProcessTrace} DTO.</p>
      *
      * @param input the input text to process (all chars must be in alphabet)
      * @return detailed debug trace of the processing steps
      * @throws IllegalStateException if machine is not configured
      * @throws IllegalArgumentException if input contains invalid characters
      */
-    processTrace process(String input);
+    ProcessTrace process(String input);
 
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).
