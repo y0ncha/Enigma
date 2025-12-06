@@ -2,26 +2,51 @@ package enigma.machine.component.keyboard;
 
 /**
  * Keyboard adapter that converts between characters and internal indices.
- * Implementations should validate input characters against the machine alphabet.
+ *
+ * <p>The Keyboard is the boundary between the char (symbol) world and the
+ * int (index) world [0, alphabetSize). Implementations must validate input
+ * and provide bidirectional conversion.</p>
  *
  * @since 1.0
  */
 public interface Keyboard {
-    /**
-     * Convert input character to internal index.
-     *
-     * @param input character to convert
-     * @return internal index (0..alphabetSize-1)
-     * @throws IllegalArgumentException when the character is not part of the machine alphabet
-     */
-    int process(char input);
 
     /**
-     * Convert an internal index to the corresponding output character.
+     * Convert an internal index to its alphabet character.
      *
-     * @param input internal index
-     * @return output character
+     * @param idx internal index (0..alphabetSize-1)
+     * @return corresponding alphabet character
      */
-    char lightKey(int input);
+    char toChar(int idx);
 
+    /**
+     * Convert an alphabet character to its internal index.
+     *
+     * @param ch character from the alphabet
+     * @return corresponding internal index (0..alphabetSize-1)
+     */
+    int toIdx(char ch);
+
+    /**
+     * Check if a character is valid for this keyboard's alphabet.
+     *
+     * @param ch character to test
+     * @return true if ch is in the alphabet
+     */
+    boolean charInbound(char ch);
+
+    /**
+     * Check if an index is valid for this keyboard's alphabet.
+     *
+     * @param idx index to test
+     * @return true if idx is in [0, alphabetSize)
+     */
+    boolean idxInbound(int idx);
+
+    /**
+     * Get the alphabet size.
+     *
+     * @return number of characters in the alphabet
+     */
+    int size();
 }

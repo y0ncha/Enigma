@@ -17,20 +17,66 @@ import java.util.List;
  * Default {@link Machine} implementation that coordinates rotor stepping,
  * forward/backward transformations and reflector processing.
  *
+ * <p><b>Module:</b> enigma-machine (core mechanics, no I/O)</p>
+ *
+ * <h2>Responsibilities</h2>
+ * <ul>
+ *   <li>Execute the full encryption data flow for each character</li>
+ *   <li>Manage rotor stepping and notch propagation</li>
+ *   <li>Coordinate forward (right→left) and backward (left→right) signal paths</li>
+ *   <li>Generate detailed trace objects for debugging and display</li>
+ * </ul>
+ *
+ * <h2>Encryption Data Flow</h2>
+ * <p>For each input character, the machine performs the following steps:</p>
+ * <ol>
+ *   <li><b>Rotor Stepping:</b> Advance rotors starting from rightmost, propagating
+ *       left when notches engage (before signal processing)</li>
+ *   <li><b>Keyboard → Index:</b> Convert input char to int index via {@link Keyboard#toIdx(char)}</li>
+ *   <li><b>Forward Pass (right→left):</b> Transform through rotors from rightmost to leftmost</li>
+ *   <li><b>Reflector:</b> Apply symmetric reflection at leftmost position</li>
+ *   <li><b>Backward Pass (left→right):</b> Transform through rotors from leftmost to rightmost</li>
+ *   <li><b>Index → Keyboard:</b> Convert final int index to output char via {@link Keyboard#toChar(int)}</li>
+ * </ol>
+ *
+ * <h2>Rotor Position Model</h2>
+ * <p>Rotor positions are represented as {@code char} values from the alphabet
+ * (e.g., 'A', 'B', 'C'). The internal signal path uses {@code int} indices
+ * in [0, alphabetSize). The {@link Keyboard} is the sole boundary performing
+ * char ↔ index conversions.</p>
+ *
+ * <h2>Invariants</h2>
+ * <ul>
+ *   <li>Machine must be configured with a valid {@link Code} before processing</li>
+ *   <li>All rotor positions must be valid alphabet characters</li>
+ *   <li>Keyboard and Code alphabet must match</li>
+ * </ul>
+ *
+ * <h2>What This Class Does NOT Do</h2>
+ * <ul>
+ *   <li>Does not perform I/O or printing (except toString for diagnostics)</li>
+ *   <li>Does not validate XML or construct components (engine responsibility)</li>
+ *   <li>Does not manage configuration history or statistics</li>
+ * </ul>
+ *
  * @since 1.0
  */
 public class MachineImpl implements Machine {
 
-    // --- Fields --------------------------------------------------
+    // ---------------------------------------------------------
+    // Fields
+    // ---------------------------------------------------------
     private Code code;
     private Keyboard keyboard;
 
 
-    // --- Ctor ----------------------------------------------------
+    // ---------------------------------------------------------
+    // Constructor
+    // ---------------------------------------------------------
     /**
      * Construct an empty machine. The machine is created without a configured
-     * {@link Keyboard} or {@link Code}; callers must set the code (and provide
-     * a keyboard via the public API) before using {@link #process(char)}.
+     * {@link Keyboard} or {@link Code}; callers must set the code via
+     * {@link #setCode(Code)} before using {@link #process(char)}.
      *
      * @since 1.0
      */
@@ -39,7 +85,9 @@ public class MachineImpl implements Machine {
         this.code = null;
     }
 
-    // --- Methods -------------------------------------------------
+    // ---------------------------------------------------------
+    // Machine interface implementation
+    // ---------------------------------------------------------
     /**
      * {@inheritDoc}
      */
@@ -50,7 +98,22 @@ public class MachineImpl implements Machine {
     }
 
     /**
-     * {@inheritDoc}
+     * Process one input character through the complete Enigma encryption path.
+     *
+     * <p><b>Data Flow:</b></p>
+     * <ol>
+     *   <li>Step rotors (rightmost first, propagate left on notch)</li>
+     *   <li>Convert input char → int index (via keyboard)</li>
+     *   <li>Forward pass: transform right→left through rotors</li>
+     *   <li>Reflector: symmetric mapping at leftmost position</li>
+     *   <li>Backward pass: transform left→right through rotors</li>
+     *   <li>Convert final int index → output char (via keyboard)</li>
+     * </ol>
+     *
+     * @param input character to encrypt (must be in the alphabet)
+     * @return {@link SignalTrace} containing detailed processing information
+     * @throws IllegalStateException if machine is not configured with code and keyboard
+     * @throws IllegalArgumentException if input char is not in the alphabet
      */
     @Override
     public SignalTrace process(char input) {
@@ -65,7 +128,7 @@ public class MachineImpl implements Machine {
         List<Integer> advancedIndices = advance(rotors);
 
         // Keyboard encoding
-        int intermediate = keyboard.process(input);
+        int intermediate = keyboard.toIdx(input);
 
         // Forward pass (right→left)
         List<RotorTrace> forwardSteps = forwardTransform(rotors, intermediate);
@@ -78,9 +141,7 @@ public class MachineImpl implements Machine {
         int reflectExit = code.getReflector().process(reflectEntry);
         ReflectorTrace reflectorStep = new ReflectorTrace(
                 reflectEntry,
-                reflectExit,
-                keyboard.lightKey(reflectEntry),
-                keyboard.lightKey(reflectExit)
+                reflectExit
         );
         intermediate = reflectExit;
 
@@ -90,7 +151,7 @@ public class MachineImpl implements Machine {
             intermediate = backwardSteps.getLast().exitIndex();
         }
 
-        char outputChar = keyboard.lightKey(intermediate);
+        char outputChar = keyboard.toChar(intermediate);
 
         // Window after processing (rotors already stepped at the top)
         String windowAfter = buildWindowString(rotors);
@@ -107,7 +168,9 @@ public class MachineImpl implements Machine {
         );
     }
 
-    // --- State Checkers ---------------------------------------------
+    // ---------------------------------------------------------
+    // State Checkers
+    // ---------------------------------------------------------
     private void ensureConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured with a code");
@@ -122,31 +185,50 @@ public class MachineImpl implements Machine {
         return code != null && keyboard != null;
     }
 
-    // --- Helpers -------------------------------------------------
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
 
     /**
      * Advance rotors starting from the rightmost rotor and record which rotors moved.
      *
-     * @param rotors list of rotors in right→left order
-     * @return immutable list of rotor indices that advanced (0 = rightmost)
+     * <p><b>Stepping Logic:</b></p>
+     * <ul>
+     *   <li>Rightmost rotor always advances</li>
+     *   <li>If a rotor reaches its notch after advancing, the rotor to its left also advances</li>
+     *   <li>Propagation continues leftward until a rotor does not reach its notch</li>
+     * </ul>
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @return immutable list of rotor indices that advanced (using same indexing: 0 = leftmost)
      */
     private List<Integer> advance(List<Rotor> rotors) {
 
         List<Integer> advanced = new ArrayList<>();
 
-        int index = rotors.size() - 1; // start at RIGHTMOST
+        int index = rotors.size() - 1; // start at RIGHTMOST (last index)
         boolean shouldAdvance;
 
         do {
             Rotor rotor = rotors.get(index);
             shouldAdvance = rotor.advance();
-            advanced.add(index);        // record natural index (left→right convention)
+            advanced.add(index);        // record index (0 = leftmost per standard indexing)
             index--;                    // move leftward
         } while (shouldAdvance && index >= 0);
 
         return List.copyOf(advanced);
     }
 
+    /**
+     * Apply forward transformation through rotors while recording traces.
+     *
+     * <p>Forward direction processes signal from keyboard (right side) toward
+     * reflector (left side). Rotors are traversed from rightmost to leftmost.</p>
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @param entryIndex initial index from keyboard (0..alphabetSize-1)
+     * @return immutable list of RotorTrace (rightmost first, in iteration order)
+     */
     private List<RotorTrace> forwardTransform(List<Rotor> rotors, int entryIndex) {
 
         List<RotorTrace> steps = new ArrayList<>();
@@ -161,8 +243,8 @@ public class MachineImpl implements Machine {
                     i,
                     entryIndex,
                     exitIndex,
-                    keyboard.lightKey(entryIndex),
-                    keyboard.lightKey(exitIndex)
+                    keyboard.toChar(entryIndex),
+                    keyboard.toChar(exitIndex)
             ));
             entryIndex = exitIndex;
         }
@@ -172,9 +254,12 @@ public class MachineImpl implements Machine {
     /**
      * Apply backward transformation through rotors while recording traces.
      *
-     * @param rotors list of rotors from right to left
-     * @param value input index to transform
-     * @return immutable list of RotorTrace (rightmost first)
+     * <p>Backward direction processes signal from reflector (left side) back
+     * toward keyboard (right side). Rotors are traversed from leftmost to rightmost.</p>
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @param value input index from reflector (0..alphabetSize-1)
+     * @return immutable list of RotorTrace (leftmost first, in iteration order)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
 
@@ -191,8 +276,8 @@ public class MachineImpl implements Machine {
                     i,
                     entryIndex,
                     exitIndex,
-                    keyboard.lightKey(entryIndex),
-                    keyboard.lightKey(exitIndex)
+                    keyboard.toChar(entryIndex),
+                    keyboard.toChar(exitIndex)
             ));
 
             value = exitIndex;
@@ -203,8 +288,12 @@ public class MachineImpl implements Machine {
 
     /**
      * Build the window string representing the current rotor positions.
-     * @param rotors list of rotors from right to left
-     * @return window string by format
+     *
+     * <p>Positions are represented as characters from the alphabet (e.g., "ODX").
+     * The string is built in left→right order matching user's visual perspective.</p>
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @return window string in left→right format
      */
     private String buildWindowString(List<Rotor> rotors) {
 
@@ -216,11 +305,169 @@ public class MachineImpl implements Machine {
 
         // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
         for (Rotor rotor : rotors) {
-            int pos = rotor.getPosition();   // numeric window index (0-based)
-            char c = keyboard.lightKey(pos);         // convert index -> alphabet char
+            char c = rotor.getPosition();   // window position character
             sb.append(c);
         }
 
         return sb.toString();
     }
-}
+
+    /**
+     * Generate a detailed visual representation of the machine's wiring configuration.
+     *
+     * <p><b>Display Format:</b></p>
+     * <ul>
+     *   <li>Index column: 0-based row numbers (matches internal representation)</li>
+     *   <li>Reflector column: pair labels computed as min(i, partner) + 1</li>
+     *   <li>Rotor columns: left | right wiring, leftmost rotor printed first</li>
+     *   <li>Keyboard column: alphabet symbols in order</li>
+     * </ul>
+     *
+     * <p><b>Important:</b> Rows follow XML index order (0..alphabetSize-1).
+     * No lexicographic sorting by letters is applied.</p>
+     *
+     * @return multi-line string showing complete machine wiring
+     */
+    @Override
+    public String toString() {
+        if (!isConfigured()) {
+            return "Machine not configured";
+        }
+
+        List<Rotor> rotors = code.getRotors(); // left → right (index 0 = leftmost)
+        Keyboard kb = keyboard;
+
+        // Build left-to-right rotor rendering order based on configured rotor IDs.
+        // The Code stores rotors in left→right order matching the config ids.
+        // To guarantee the printed leftmost rotor matches the configured first rotor id,
+        // map config ids to rotor instances and render according to that sequence.
+        List<Rotor> leftToRight = new ArrayList<>();
+        try {
+            List<Integer> configuredIds = code.getRotorIds(); // expected left->right
+            // Map rotor id -> Rotor instance
+            java.util.Map<Integer, Rotor> idToRotor = new java.util.HashMap<>();
+            for (Rotor r : rotors) idToRotor.put(r.getId(), r);
+
+            boolean allFound = true;
+            for (Integer id : configuredIds) {
+                Rotor r = idToRotor.get(id);
+                if (r == null) { allFound = false; break; }
+                leftToRight.add(r);
+            }
+            if (!allFound) {
+                // Fallback: use rotor objects order as provided
+                leftToRight = new ArrayList<>(rotors);
+            }
+        } catch (Exception e) {
+            // Any unexpected error: fallback to raw rotor list
+            leftToRight = new ArrayList<>(rotors);
+        }
+
+        StringBuilder out = new StringBuilder();
+
+        out.append("\n+----------------------------------------------------------+\n");
+        out.append("|                      ENIGMA MACHINE                      |\n");
+        out.append("+----------------------------------------------------------+\n\n");
+
+        // Header for wiring table
+        out.append("Detailed Wiring (Right Column → Left Column)\n\n");
+
+        int numRows = kb.size();
+
+        // Prepare reflector display (left of rotors)
+        enigma.machine.component.reflector.Reflector refl = code.getReflector();
+
+        // Use component toString() outputs for columns
+        String reflCol = refl.toString();
+
+        List<String> rotorCols = new ArrayList<>();
+        for (Rotor r : leftToRight) rotorCols.add(r.toString());
+
+        // Build idx column (matches rotor column height)
+        final int colInner = 9;
+        final int idxInner = 5;
+        final String gap = "  ";
+
+        java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
+            if (s == null) s = "";
+            if (s.length() >= w) return s.substring(0,w);
+            int left = (w - s.length())/2;
+            int right = w - s.length() - left;
+            return " ".repeat(left) + s + " ".repeat(right);
+        };
+
+        // Compose idx column using same visual style as rotor.toString()
+        StringBuilder idxSb = new StringBuilder();
+        // for rotor/ref columns
+        int colWidth = colInner + 4; // total width per column
+        // leading padding to match other columns which start with two spaces
+        String lead = "  ";
+
+        // small ID box for Idx - use same inner width as other columns so header aligns
+        idxSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        idxSb.append(lead).append("│").append(center.apply("Idx", colInner)).append("│").append('\n');
+        idxSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
+
+        // main tall box top
+        idxSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+
+        // data rows: numbers (0-based) as requested by you
+        for (int r = 0; r < numRows; r++) {
+            String num = String.valueOf(r);
+            idxSb.append(lead).append("│").append(center.apply(num, colInner)).append("│").append('\n');
+        }
+
+        // bottom
+        idxSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
+
+        // Alphabet column (rightmost) build
+        StringBuilder alphaSb = new StringBuilder();
+        alphaSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        alphaSb.append(lead).append("│").append(center.apply("KB", colInner)).append("│").append('\n');
+        alphaSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
+        alphaSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        for (int r = 0; r < numRows; r++) {
+            char c = kb.toChar(r);
+            alphaSb.append(lead).append("│").append(center.apply(String.valueOf(c), colInner)).append("│").append('\n');
+        }
+        alphaSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
+
+        // Now split columns into lines
+        java.util.List<String[]> cols = new ArrayList<>();
+        cols.add(idxSb.toString().split("\\R", -1));
+        cols.add(reflCol.split("\\R", -1));
+        for (String s : rotorCols) cols.add(s.split("\\R", -1));
+        cols.add(alphaSb.toString().split("\\R", -1));
+
+        // compute max lines and widths (use max line length per column)
+        int maxLines = 0;
+        int[] widths = new int[cols.size()];
+        for (int i = 0; i < cols.size(); i++) {
+            String[] arr = cols.get(i);
+            int w = 0;
+            for (String lineStr : arr) {
+                if (lineStr != null) w = Math.max(w, lineStr.length());
+            }
+            widths[i] = w;
+            maxLines = Math.max(maxLines, arr.length);
+        }
+
+        // Stitch lines together, right-pad pieces to column width for alignment
+        for (int line = 0; line < maxLines; line++) {
+            StringBuilder row = new StringBuilder();
+            for (int c = 0; c < cols.size(); c++) {
+                String[] arr = cols.get(c);
+                String piece = line < arr.length ? arr[line] : "";
+                int pad = widths[c] - piece.length();
+                row.append(piece);
+                if (pad > 0) row.append(" ".repeat(pad));
+                if (c < cols.size() - 1) row.append(gap);
+            }
+            out.append(row).append('\n');
+        }
+
+        out.append('\n');
+
+        return out.toString();
+    }
+ }

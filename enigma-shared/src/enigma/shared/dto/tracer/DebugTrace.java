@@ -5,11 +5,19 @@ import java.util.List;
 /**
  * Container for full debug output from processing a string through the machine.
  *
- * <p>Contains the final output string and a per-character trace of the signal
- * path through rotors and reflector.</p>
+ * <p><b>Module:</b> enigma-shared (DTOs)</p>
+ *
+ * <p>Bundles the final encrypted output string with detailed per-character
+ * signal traces. Each {@link SignalTrace} contains the complete encryption
+ * path for one character including rotor stepping, forward pass, reflector,
+ * and backward pass.</p>
+ *
+ * <h2>Usage</h2>
+ * <p>Returned by {@link enigma.engine.Engine#process(String)} to provide
+ * both the result and detailed debugging information for analysis or display.</p>
  *
  * @param output final processed output string
- * @param signalTraces per-character signal traces
+ * @param signalTraces per-character signal traces (one per input character)
  * @since 1.0
  */
 public record DebugTrace(

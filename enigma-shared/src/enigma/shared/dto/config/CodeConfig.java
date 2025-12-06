@@ -1,19 +1,43 @@
 package enigma.shared.dto.config;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Configuration for creating a Code: chosen rotor ids (left→right), initial positions
- * as numeric indices (left→right), and reflector id.
+ * Configuration for creating a Code: chosen rotor IDs (left→right), initial positions
+ * as characters (left→right), and reflector ID.
  *
- * @param rotorIds rotor IDs in user-selected order (left→right)
- * @param initialPositions numeric positions left→right (0-based indices)
- * @param reflectorId reflector identifier (e.g. "I")
+ * <p><b>Module:</b> enigma-shared (DTOs)</p>
+ *
+ * <h2>Ordering Convention</h2>
+ * <p>All fields use <b>left→right</b> ordering matching the user-facing machine
+ * window view:</p>
+ * <ul>
+ *   <li><b>rotorIds:</b> [1, 2, 3] means rotor 1 leftmost, rotor 3 rightmost</li>
+ *   <li><b>initialPositions:</b> ['O', 'D', 'X'] means leftmost='O', rightmost='X'</li>
+ * </ul>
+ *
+ * <h2>Position Model</h2>
+ * <p>Rotor positions are represented as <b>char</b> values from the alphabet
+ * (e.g., 'A', 'B', 'C', 'O', 'D', 'X'). This matches the visual window
+ * letters visible on a physical Enigma machine.</p>
+ *
+ * <h2>String Format</h2>
+ * <p>toString() produces config format: {@code <1,2,3><ODX><I>}</p>
+ * <ul>
+ *   <li>First group: rotor IDs (left→right)</li>
+ *   <li>Second group: positions as chars (left→right)</li>
+ *   <li>Third group: reflector ID</li>
+ * </ul>
+ *
+ * @param rotorIds rotor IDs in left→right order (e.g., [1, 2, 3])
+ * @param initialPositions starting positions as characters in left→right order (e.g., ['O','D','X'])
+ * @param reflectorId reflector identifier (e.g., "I", "II")
  * @since 1.0
  */
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
-        List<Integer> initialPositions, // numeric positions left→right (0-based indices)
+        List<Character> initialPositions, // starting positions as characters (left→right), e.g. ['O','D','X']
         String reflectorId            // e.g. "I"
 ) {
     /**
@@ -24,9 +48,9 @@ public record CodeConfig(
         return "<%s><%s><%s>"
                 .formatted(
                         rotorIds.toString().replaceAll("[\\[\\] ]", ""),
-                        initialPositions.stream()
-                                .map(i -> String.valueOf((char)('A' + i)))
-                                .reduce("", String::concat),
+                        initialPositions == null ? "" : initialPositions.stream()
+                                .map(String::valueOf)
+                                .collect(Collectors.joining()),
                         reflectorId
                 );
     }

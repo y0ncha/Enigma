@@ -1,4 +1,4 @@
-package test.enigma.engine;
+package test.enigma.engine.sanitysamll;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class SmallSanityTester {
+public class SmallMultiWordTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
@@ -37,12 +37,14 @@ public class SmallSanityTester {
         // Code: <3,2,1><CCC><I>
         CodeConfig config = new CodeConfig(
                 java.util.List.of(3, 2, 1),   // rotors left→right
-                java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
+                java.util.List.of('C', 'C', 'C'),   // "CCC" (A=0,B=1,C=2)
                 "I"                           // reflector
         );
 
         System.out.println("Code configuration: " + config + "\n");
-        engine.codeManual(config);
+        engine.configManual(config);
+
+        engine.machineData();
 
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {
@@ -67,7 +69,7 @@ public class SmallSanityTester {
         for (int i = 0; i < inputs.length; i++) {
 
             // Re-apply the code before each test so the rotors start at CCC for every case
-            engine.codeManual(config);
+            engine.configManual(config);
 
             String input = inputs[i];
             DebugTrace debug = engine.process(input);

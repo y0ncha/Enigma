@@ -64,30 +64,19 @@ public interface Rotor {
      * <p>The position represents the letter visible in the machine window and
      * determines the rotor's electrical alignment with the rest of the circuit.</p>
      *
-     * @return current position as an alphabet index (0..alphabetSize-1)
+     * @return current character in the window
      */
-    int getPosition();
+    char getPosition();
 
     /**
      * Set the rotor to a specific position.
      *
      * <p>This method rotates the rotor until the window shows the desired
-     * letter index. Used during machine configuration to set initial positions.</p>
+     * character. Used during machine configuration to set initial positions.</p>
      *
-     * @param position target position (0..alphabetSize-1)
+     * @param position target position character from the alphabet
      */
-    void setPosition(int position);
-
-    /**
-     * Get the notch position which triggers stepping of the next rotor.
-     *
-     * <p>When {@link #advance()} causes the rotor to reach this position,
-     * it returns {@code true} to signal cascade stepping.</p>
-     *
-     * @return notch position as an alphabet index (0..alphabetSize-1)
-     */
-    int getNotchInd();
-
+    void setPosition(char position);
 
     /**
      * Get the rotor's identifier.
@@ -102,4 +91,6 @@ public interface Rotor {
      * @return non-negative integer that identifies the rotor (type or instance)
      */
     int getId();
+
+    Wire getWire(int row);
 }

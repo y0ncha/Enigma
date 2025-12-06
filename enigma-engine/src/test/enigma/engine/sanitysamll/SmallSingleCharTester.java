@@ -1,4 +1,4 @@
-package test.enigma.engine;
+package test.enigma.engine.sanitysamll;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
@@ -12,7 +12,7 @@ import java.nio.file.Paths;
  * Loads the small sanity XML, applies a code configuration and processes a single
  * input character, printing both the output and the detailed {@link DebugTrace}.
  */
-public class EngineOneLetterTester {
+public class SmallSingleCharTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
@@ -24,7 +24,7 @@ public class EngineOneLetterTester {
     // Code: <3,2,1><CCC><I>
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
             java.util.List.of(3, 2, 1),   // rotors left→right
-            java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
+            java.util.List.of('C', 'C', 'C'),   // "CCC" (A=0,B=1,C=2)
             "I"                           // reflector
     );
 
@@ -35,7 +35,7 @@ public class EngineOneLetterTester {
         engine.loadMachine(XML_PATH); // keep the current Engine API as-is
 
         System.out.println("Code configuration: " + CODE_CONFIG);
-        engine.codeManual(CODE_CONFIG);
+        engine.configManual(CODE_CONFIG);
 
         DebugTrace debug = engine.process(INPUT);
         System.out.println();
