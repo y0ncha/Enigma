@@ -9,4 +9,3 @@ package enigma.machine.component.rotor;
  * This is a small value type intended to be used by {@link RotorImpl}.
  */
 public record Wire(int right, int left) {}
-

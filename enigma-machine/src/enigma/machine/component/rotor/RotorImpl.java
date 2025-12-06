@@ -1,6 +1,7 @@
 package enigma.machine.component.rotor;
 
 import java.util.LinkedList;
+import enigma.machine.component.alphabet.Alphabet;
 
 /**
  * Canonical runtime rotor implementation using the mechanical column-rotation model.
@@ -43,40 +44,39 @@ import java.util.LinkedList;
 public class RotorImpl implements Rotor {
 
     private final LinkedList<Wire> wires;  // rows in top → bottom order
+    private final Alphabet alphabet;       // machine alphabet for rendering
     private final int alphabetSize;
 
     private final int notchIndex; // which row triggers stepping of next rotor
     private final int id;
 
     /**
-     * Construct a rotor from forward mapping and notch index.
+     * Construct a rotor from row-ordered right/left columns and a notch index.
      *
-     * <p>The forward mapping defines the wiring from right (keyboard side) to left
-     * (reflector side). Specifically, {@code forwardMapping[i]} is the left-column
-     * symbol that is wired to right-column symbol {@code i}.</p>
+     * <p>The {@code rightColumn} and {@code leftColumn} arrays contain the symbol
+     * indices for each row in top→bottom order as parsed from the XML
+     * <BTE-Positioning> entries. Both arrays must have the same length equal to the
+     * alphabet size.</p>
      *
-     * <p>The mechanical model computes backward mappings dynamically by searching
-     * the wires list, so the backward mapping parameter is accepted for API consistency
-     * with the specification but not stored. We perform a light sanity-check on the
-     * backward mapping to catch malformed specs early.</p>
-     *
-     * @param forwardMapping mapping from right→left (base wiring); index = right symbol, value = left symbol
-     * @param backwardMapping inverse mapping (left→right); accepted for API consistency, validated for length
+     * @param rightColumn row-ordered right-column symbols (0-based indices)
+     * @param leftColumn row-ordered left-column symbols (0-based indices)
      * @param notchIndex index at which the rotor triggers stepping of the next rotor (0..N-1)
-     * @param alphabetSize size of alphabet (typically 26 for A-Z)
+     * @param alphabet machine alphabet used for bounds
      * @param id rotor identifier for debugging/tracing
      */
-    public RotorImpl(int[] forwardMapping, int[] backwardMapping, int notchIndex, int alphabetSize, int id) {
-        this.alphabetSize = alphabetSize;
-        // Basic validation of backwardMapping to make use of the parameter and catch spec errors
-        if (backwardMapping == null) throw new IllegalArgumentException("backwardMapping must not be null");
-        if (backwardMapping.length != alphabetSize) throw new IllegalArgumentException("backwardMapping length must equal alphabetSize");
+    public RotorImpl(int[] rightColumn, int[] leftColumn, int notchIndex, Alphabet alphabet, int id) {
+        if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
+        this.alphabet = alphabet;
+        this.alphabetSize = alphabet.size();
 
-        // Build wires list: right is identity [0,1,2,...], left comes from forwardMapping
+        if (rightColumn == null || leftColumn == null) throw new IllegalArgumentException("right/left column must not be null");
+        if (rightColumn.length != this.alphabetSize || leftColumn.length != this.alphabetSize)
+            throw new IllegalArgumentException("Rotor column lengths must equal alphabet size");
+
         this.wires = new LinkedList<>();
-
-        for (int i = 0; i < alphabetSize; i++) {
-            wires.add(new Wire(i, forwardMapping[i]));
+        // Build wires list using provided row-ordered columns (top->bottom)
+        for (int i = 0; i < this.alphabetSize; i++) {
+            wires.add(new Wire(rightColumn[i], leftColumn[i]));
         }
 
         // Store notch (bounded)
@@ -162,7 +162,6 @@ public class RotorImpl implements Rotor {
 
     private int encodeForward(int entryIndex) {
         int sym = wires.get(entryIndex).right();
-        // find where this symbol appears as left in wires
         for (int i = 0; i < wires.size(); i++) {
             if (wires.get(i).left() == sym) return i;
         }
@@ -219,5 +218,50 @@ public class RotorImpl implements Rotor {
             throw new IllegalArgumentException("Invalid row index: " + row);
         }
         return wires.get(idx).left();
+    }
+
+    @Override
+    public String toString() {
+        // Render a single rotor column: small ID box above, then a tall box with L | R per row.
+        final int colInner = 9;
+        StringBuilder sb = new StringBuilder();
+
+        java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
+            if (s == null) s = "";
+            if (s.length() >= w) return s.substring(0,w);
+            int left = (w - s.length())/2;
+            int right = w - s.length() - left;
+            return " ".repeat(left) + s + " ".repeat(right);
+        };
+
+        // total line width for this column (2 leading + border + inner + border) = colInner + 4
+        final int colWidth = colInner + 4;
+        java.util.function.BiFunction<String,Integer,String> rpad = (s,w) -> {
+            if (s == null) s = "";
+            if (s.length() >= w) return s;
+            return s + " ".repeat(w - s.length());
+        };
+
+        // small ID box (pad each line to fixed width)
+        sb.append(rpad.apply("  ┌" + "─".repeat(colInner) + "┐", colWidth)).append('\n');
+        sb.append(rpad.apply("  │" + center.apply("Rotor " + id, colInner) + "│", colWidth)).append('\n');
+        sb.append(rpad.apply("  └" + "─".repeat(colInner) + "┘", colWidth)).append('\n');
+
+        // main tall box top
+        sb.append(rpad.apply("  ┌" + "─".repeat(colInner) + "┐", colWidth)).append('\n');
+
+        // data rows: render using the machine alphabet (left | right characters)
+        for (Wire w : wires) {
+            char leftChar = alphabet.charAt(w.left());
+            char rightChar = alphabet.charAt(w.right());
+            String row = String.format("%c | %c", leftChar, rightChar);
+            String line = "  │" + center.apply(row, colInner) + "│";
+            sb.append(rpad.apply(line, colWidth)).append('\n');
+        }
+
+        // bottom
+        sb.append(rpad.apply("  └" + "─".repeat(colInner) + "┘", colWidth)).append('\n');
+
+        return sb.toString();
     }
 }

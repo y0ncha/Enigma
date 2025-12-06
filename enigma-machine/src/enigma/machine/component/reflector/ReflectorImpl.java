@@ -36,5 +36,39 @@ public class ReflectorImpl implements Reflector {
         return id;
     }
 
+    @Override
+    public String toString() {
+        final int colInner = 9;
+        StringBuilder sb = new StringBuilder();
+
+        java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
+            if (s == null) s = "";
+            if (s.length() >= w) return s.substring(0,w);
+            int left = (w - s.length())/2;
+            int right = w - s.length() - left;
+            return " ".repeat(left) + s + " ".repeat(right);
+        };
+
+        // small ID box
+        sb.append("  ┌").append("─".repeat(colInner)).append("┐\n");
+        sb.append("  │").append(center.apply("Ref " + id, colInner)).append("│\n");
+        sb.append("  └").append("─".repeat(colInner)).append("┘\n");
+
+        // main tall box top
+        sb.append("  ┌").append("─".repeat(colInner)).append("┐\n");
+
+        // data rows: show pair label (min(i, partner)+1)
+        for (int i = 0; i < mapping.length; i++) {
+            int partner = mapping[i];
+            int pairLabel = Math.min(i, partner) + 1; // 1-based
+            sb.append("  │").append(center.apply(String.valueOf(pairLabel), colInner)).append("│\n");
+        }
+
+        // bottom
+        sb.append("  └").append("─".repeat(colInner)).append("┘\n");
+
+        return sb.toString();
+    }
+
 
 }

@@ -44,6 +44,8 @@ public class MultiWordTester {
         System.out.println("Code configuration: " + config + "\n");
         engine.configManual(config);
 
+        engine.machineData();
+
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {
                 "AABBCCDDEEFF",

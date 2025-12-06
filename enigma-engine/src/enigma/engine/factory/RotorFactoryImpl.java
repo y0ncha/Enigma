@@ -60,8 +60,8 @@ public class RotorFactoryImpl implements RotorFactory {
     public Rotor create(RotorSpec spec, int startPosition) {
         validateInputs(spec, startPosition);
 
-        RotorImpl rotor = buildMechanicalRotor(spec);
-        rotor.setPosition(startPosition);
+        RotorImpl rotor =  buildRotor(spec);
+        rotor.setPosition(startPosition); // TODO move setPositon
         return rotor;
     }
 
@@ -88,21 +88,16 @@ public class RotorFactoryImpl implements RotorFactory {
         }
     }
 
-    /**
-     * Build a mechanical rotor from the specification.
-     *
-     * <p>Extracts the forward mapping, backward mapping, and notch index
-     * from the spec and constructs a new {@link RotorImpl}.</p>
-     *
-     * @param spec rotor specification
-     * @return new RotorImpl instance (position not yet set)
-     */
-    private RotorImpl buildMechanicalRotor(RotorSpec spec) {
+    private RotorImpl buildRotor(RotorSpec spec) {
+        // RotorSpec stores row-ordered right/left columns. RotorImpl now
+        // accepts these columns directly (top->bottom order).
+        int[] rightCol = spec.getRightColumn();
+        int[] leftCol = spec.getLeftColumn();
         return new RotorImpl(
-                spec.getForwardMapping(),
-                spec.getBackwardMapping(),
+                rightCol,
+                leftCol,
                 spec.notchIndex(),
-                alphabet.size(),
+                this.alphabet,
                 spec.id()
         );
     }

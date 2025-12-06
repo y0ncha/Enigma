@@ -348,8 +348,8 @@ public class MachineImpl implements Machine {
         for (int row = 0; row < numRows; row++) {
             StringBuilder rowLine = new StringBuilder();
 
-            // index column (1-based)
-            rowLine.append("  │").append(center.apply(String.valueOf(row + 1), idxInner)).append("│").append(gap);
+            // index column (0-based)
+            rowLine.append("  │").append(center.apply(String.valueOf(row), idxInner)).append("│").append(gap);
 
             // reflector cell: show the wired pair label (use the XML 'input' label)
             // compute partner index and use the smaller index as the pair id (1-based)
@@ -363,7 +363,8 @@ public class MachineImpl implements Machine {
             for (Rotor rotor : leftToRight) {
                 int rightVal = rotor.getWireRight(row);
                 int leftVal = rotor.getWireLeft(row);
-                String cell = center.apply(kb.lightKey(rightVal) + " | " + kb.lightKey(leftVal), colInner);
+                // print left-side wiring on the left and right-side wiring on the right
+                String cell = center.apply(kb.lightKey(leftVal) + " | " + kb.lightKey(rightVal), colInner);
                 rowLine.append(gap).append("│").append(cell).append("│");
             }
 
