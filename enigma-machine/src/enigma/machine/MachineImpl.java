@@ -223,4 +223,125 @@ public class MachineImpl implements Machine {
 
         return sb.toString();
     }
-}
+
+    @Override
+    public String toString() {
+        if (!isConfigured()) {
+            return "Machine not configured";
+        }
+
+        List<Rotor> rotors = code.getRotors(); // right → left internally
+        Keyboard kb = keyboard;
+
+        // Convert to left→right for user-facing display
+        List<Rotor> leftToRight = new ArrayList<>(rotors);
+        java.util.Collections.reverse(leftToRight);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\n+----------------------------------------------------------+\n");
+        sb.append("|                      ENIGMA MACHINE                      |\n");
+        sb.append("+----------------------------------------------------------+\n\n");
+
+        // Reflector
+        sb.append("Reflector: ").append(code.getReflector().getId()).append("\n\n");
+
+        // Header for wiring table
+        sb.append("Detailed Wiring (Right Column → Left Column)\n\n");
+
+        int numRows = kb.size();
+
+        // Prepare reflector display (left of rotors)
+        enigma.machine.component.reflector.Reflector refl = code.getReflector();
+
+        // Column inner widths
+        final int idxInner = 5;     // index column inner width (e.g. '  1  ')
+        final int colInner = 9;     // reflector and rotor inner width
+        final String gap = "  ";   // gap between columns
+
+        // helpers for centering text inside a fixed-width cell
+        // center a string to width w
+        java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
+            if (s == null) s = "";
+            if (s.length() >= w) return s.substring(0,w);
+            int left = (w - s.length())/2;
+            int right = w - s.length() - left;
+            return " ".repeat(left) + s + " ".repeat(right);
+        };
+
+        // Draw small ID boxes above each column (Idx, Ref, Rotor N)
+        // Box widths equal the column inner widths so they align perfectly
+        StringBuilder idTop = new StringBuilder();
+        StringBuilder idMid = new StringBuilder();
+        StringBuilder idBot = new StringBuilder();
+
+        // start padding
+        idTop.append("  ");
+        idMid.append("  ");
+        idBot.append("  ");
+
+        // Idx box
+        idTop.append("┌").append("─".repeat(idxInner)).append("┐").append(gap);
+        idMid.append("│").append(center.apply("Idx", idxInner)).append("│").append(gap);
+        idBot.append("└").append("─".repeat(idxInner)).append("┘").append(gap);
+
+        // Reflector box
+        idTop.append("┌").append("─".repeat(colInner)).append("┐");
+        idMid.append("│").append(center.apply("Ref " + (refl.getId() == null ? "" : refl.getId()), colInner)).append("│");
+        idBot.append("└").append("─".repeat(colInner)).append("┘");
+
+        // Rotor boxes
+        for (Rotor r : leftToRight) {
+            idTop.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
+            idMid.append(gap).append("│").append(center.apply("Rotor " + r.getId(), colInner)).append("│");
+            idBot.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+        }
+
+        sb.append(idTop).append("\n");
+        sb.append(idMid).append("\n");
+        sb.append(idBot).append("\n");
+
+        // Top border line for all columns
+        StringBuilder topLine = new StringBuilder();
+        topLine.append("  ").append("┌").append("─".repeat(idxInner)).append("┐").append(gap)
+               .append("┌").append("─".repeat(colInner)).append("┐");
+        for (int i = 0; i < leftToRight.size(); i++) {
+            topLine.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
+        }
+        sb.append(topLine).append("\n");
+
+        // (no inner label/separator row; boxed IDs above are sufficient)
+
+        // Data rows: index, reflector char, then each rotor R|L
+        for (int row = 0; row < numRows; row++) {
+            StringBuilder rowLine = new StringBuilder();
+            // index column (1-based)
+            rowLine.append("  │").append(center.apply(String.valueOf(row + 1), idxInner)).append("│").append(gap);
+
+            // reflector value
+            char rc = kb.lightKey(refl.process(row));
+            rowLine.append("│").append(center.apply(String.valueOf(rc), colInner)).append("│");
+
+            // rotor columns
+            for (Rotor rotor : leftToRight) {
+                int rightVal = rotor.getWireRight(row);
+                int leftVal = rotor.getWireLeft(row);
+                String cell = center.apply(kb.lightKey(rightVal) + " | " + kb.lightKey(leftVal), colInner);
+                rowLine.append(gap).append("│").append(cell).append("│");
+            }
+
+            sb.append(rowLine).append("\n");
+        }
+
+        // Bottom border line
+        StringBuilder bottomLine = new StringBuilder();
+        bottomLine.append("  └").append("─".repeat(idxInner)).append("┘").append(gap)
+                  .append("└").append("─".repeat(colInner)).append("┘");
+        for (int i = 0; i < leftToRight.size(); i++) {
+            bottomLine.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+        }
+        sb.append(bottomLine).append("\n\n");
+
+        return sb.toString();
+    }
+ }

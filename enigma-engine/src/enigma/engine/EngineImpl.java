@@ -77,8 +77,8 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void machineData(String input) {
-        // TODO implement
+    public void machineData() {
+        System.out.println(machine);
     }
 
     /**

@@ -41,4 +41,7 @@ public class KeyboardImpl implements Keyboard {
     public char lightKey(int input) {
         return alphabet.charAt(input);
     }
+
+    @Override
+    public int size() {return alphabet.size(); }
 }

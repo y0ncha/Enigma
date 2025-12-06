@@ -102,4 +102,8 @@ public interface Rotor {
      * @return non-negative integer that identifies the rotor (type or instance)
      */
     int getId();
+
+    int getWireRight(int row);
+
+    int getWireLeft(int row);
 }

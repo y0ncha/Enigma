@@ -189,4 +189,35 @@ public class RotorImpl implements Rotor {
         x %= alphabetSize;
         return x < 0 ? x + alphabetSize : x;
     }
+
+    @Override
+    public int getWireRight(int row) {
+        // Accept either 0-based (0..N-1) or 1-based (1..N) row indices.
+        // Normalize to 0-based internal index and validate.
+        int idx;
+        if (row >= 0 && row < wires.size()) {
+            // already 0-based
+            idx = row;
+        } else if (row >= 1 && row <= wires.size()) {
+            // 1-based passed in; convert to 0-based
+            idx = row - 1;
+        } else {
+            throw new IllegalArgumentException("Invalid row index: " + row);
+        }
+        return wires.get(idx).right();
+    }
+
+    @Override
+    public int getWireLeft(int row) {
+        // Mirror of getWireRight: accept 0-based or 1-based indices.
+        int idx;
+        if (row >= 0 && row < wires.size()) {
+            idx = row;
+        } else if (row >= 1 && row <= wires.size()) {
+            idx = row - 1;
+        } else {
+            throw new IllegalArgumentException("Invalid row index: " + row);
+        }
+        return wires.get(idx).left();
+    }
 }

@@ -39,6 +39,8 @@ public class OneLetterTester {
         System.out.println("Code configuration: " + CODE_CONFIG);
         engine.configManual(CODE_CONFIG);
 
+        engine.machineData();
+
         DebugTrace debug = engine.process(INPUT);
         System.out.println();
 

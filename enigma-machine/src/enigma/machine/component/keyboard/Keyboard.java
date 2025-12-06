@@ -24,4 +24,5 @@ public interface Keyboard {
      */
     char lightKey(int input);
 
+    int size();
 }

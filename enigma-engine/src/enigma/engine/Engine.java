@@ -30,10 +30,8 @@ public interface Engine {
     /**
      * Supply or update machine data (for example wiring/config inputs) from
      * an external source. The exact semantics are implementation-specific.
-     *
-     * @param input arbitrary input string used by the engine to update machine state
      */
-    void machineData(String input);
+    void machineData();
 
     /**
      * Configure the machine with a manual code configuration.

@@ -34,6 +34,6 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
         if (spec == null) throw new IllegalArgumentException("spec must not be null");
         int[] mapping = spec.mapping();
         // ReflectorImpl expects the alphabet and a symmetric integer mapping
-        return new ReflectorImpl(mapping);
+        return new ReflectorImpl(mapping, spec.id());
     }
 }

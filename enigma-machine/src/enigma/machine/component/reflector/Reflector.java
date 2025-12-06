@@ -15,4 +15,6 @@ public interface Reflector {
      * @since 1.0
      */
     int process(int input);
+
+    String getId();
 }
