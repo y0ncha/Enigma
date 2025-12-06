@@ -24,6 +24,8 @@ import java.util.List;
  * Note: All methods are static and this class should not be instantiated.
  */
 public class InputParsers {
+    // Prevent instantiation
+    private InputParsers() {}
 
     public static List<Integer> parseRotorIds(String line) {
         List<Integer> result = new ArrayList<>();
