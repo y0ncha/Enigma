@@ -6,6 +6,7 @@ import enigma.machine.component.keyboard.KeyboardImpl;
 import enigma.machine.component.rotor.Direction;
 import enigma.machine.component.rotor.Rotor;
 
+import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.dto.tracer.RotorTrace;
 import enigma.shared.dto.tracer.ReflectorTrace;
@@ -363,4 +364,10 @@ public class MachineImpl implements Machine {
 
         return out.toString();
     }
+
+    @Override
+    public CodeConfig getConfig() {
+        return code.getConfig();
+    }
+
  }
