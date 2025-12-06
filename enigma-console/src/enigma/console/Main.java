@@ -12,9 +12,10 @@ public class Main {
     public static void main(String[] args) {
         Engine engine = new EngineImpl();
 
-        Scanner scanner = new Scanner(System.in);
-        Console console = new ConsoleImpl(engine, scanner);
-        console.run();
+        try (Scanner scanner = new Scanner(System.in)) {
+            Console console = new ConsoleImpl(engine, scanner);
+            console.run();
+        }
     }
 
 }
