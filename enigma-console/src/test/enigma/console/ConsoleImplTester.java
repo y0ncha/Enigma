@@ -32,16 +32,19 @@ public class ConsoleImplTester {
         System.out.println("========================================\n");
 
         // Test invalid command input handling
-        passed += testInvalidCommandInput() ? 1 : 0;
-        failed += testInvalidCommandInput() ? 0 : 1;
+        boolean test1 = testInvalidCommandInput();
+        passed += test1 ? 1 : 0;
+        failed += test1 ? 0 : 1;
 
         // Test command state validation
-        passed += testCommandStateValidation() ? 1 : 0;
-        failed += testCommandStateValidation() ? 0 : 1;
+        boolean test2 = testCommandStateValidation();
+        passed += test2 ? 1 : 0;
+        failed += test2 ? 0 : 1;
 
         // Test exit command
-        passed += testExitCommand() ? 1 : 0;
-        failed += testExitCommand() ? 0 : 1;
+        boolean test3 = testExitCommand();
+        passed += test3 ? 1 : 0;
+        failed += test3 ? 0 : 1;
 
         // Summary
         System.out.println("\n=========== SUMMARY ===========");

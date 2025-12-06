@@ -23,16 +23,19 @@ public class ConsoleCommandTester {
         System.out.println("========================================\n");
 
         // Test fromId with valid IDs
-        passed += testFromIdValid() ? 1 : 0;
-        failed += testFromIdValid() ? 0 : 1;
+        boolean test1 = testFromIdValid();
+        passed += test1 ? 1 : 0;
+        failed += test1 ? 0 : 1;
 
         // Test fromId with invalid IDs
-        passed += testFromIdInvalid() ? 1 : 0;
-        failed += testFromIdInvalid() ? 0 : 1;
+        boolean test2 = testFromIdInvalid();
+        passed += test2 ? 1 : 0;
+        failed += test2 ? 0 : 1;
 
         // Test all commands have correct properties
-        passed += testCommandProperties() ? 1 : 0;
-        failed += testCommandProperties() ? 0 : 1;
+        boolean test3 = testCommandProperties();
+        passed += test3 ? 1 : 0;
+        failed += test3 ? 0 : 1;
 
         // Summary
         System.out.println("\n=========== SUMMARY ===========");

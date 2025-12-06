@@ -25,23 +25,28 @@ public class InputParsersTester {
         System.out.println("========================================\n");
 
         // Test parseRotorIds
-        passed += testParseRotorIds() ? 1 : 0;
-        failed += testParseRotorIds() ? 0 : 1;
+        boolean test1 = testParseRotorIds();
+        passed += test1 ? 1 : 0;
+        failed += test1 ? 0 : 1;
 
         // Test toRoman
-        passed += testToRoman() ? 1 : 0;
-        failed += testToRoman() ? 0 : 1;
+        boolean test2 = testToRoman();
+        passed += test2 ? 1 : 0;
+        failed += test2 ? 0 : 1;
 
         // Test buildInitialPositions
-        passed += testBuildInitialPositions() ? 1 : 0;
-        failed += testBuildInitialPositions() ? 0 : 1;
+        boolean test3 = testBuildInitialPositions();
+        passed += test3 ? 1 : 0;
+        failed += test3 ? 0 : 1;
 
         // Test error cases
-        passed += testParseRotorIdsErrors() ? 1 : 0;
-        failed += testParseRotorIdsErrors() ? 0 : 1;
+        boolean test4 = testParseRotorIdsErrors();
+        passed += test4 ? 1 : 0;
+        failed += test4 ? 0 : 1;
 
-        passed += testBuildInitialPositionsErrors() ? 1 : 0;
-        failed += testBuildInitialPositionsErrors() ? 0 : 1;
+        boolean test5 = testBuildInitialPositionsErrors();
+        passed += test5 ? 1 : 0;
+        failed += test5 ? 0 : 1;
 
         // Summary
         System.out.println("\n=========== SUMMARY ===========");
