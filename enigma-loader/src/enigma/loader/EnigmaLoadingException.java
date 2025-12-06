@@ -1,11 +1,20 @@
 package enigma.loader;
 
 /**
- * Exception thrown when an error occurs during the loading process in the Enigma engine.
- * <p>
- * This exception represents failures related to loading components, resources, or configuration
- * within the Enigma engine. It is typically thrown when the loading process encounters
- * invalid data, missing files, or other unrecoverable errors.
+ * Exception thrown when an error occurs during XML loading/validation.
+ *
+ * <p><b>Module:</b> enigma-loader</p>
+ *
+ * <p>This exception represents failures in the loading and validation process,
+ * including:</p>
+ * <ul>
+ *   <li>File not found or invalid extension</li>
+ *   <li>XML parsing errors (malformed XML)</li>
+ *   <li>Validation failures (alphabet, rotor, reflector constraints)</li>
+ * </ul>
+ *
+ * <p>Exception messages are detailed and indicate the specific validation
+ * rule that failed.</p>
  *
  * @since 1.0
  */

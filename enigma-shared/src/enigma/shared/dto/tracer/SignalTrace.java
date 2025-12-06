@@ -5,13 +5,37 @@ import java.util.List;
 /**
  * Trace of a single character's path through the Enigma machine.
  *
- * <p>Records the input/output characters, rotor window states before and after
- * processing, which rotors advanced, and detailed forward/backward rotor traces
- * including the reflector step.</p>
+ * <p><b>Module:</b> enigma-shared (DTOs)</p>
+ *
+ * <p>Records the complete encryption process for one character including:</p>
+ * <ul>
+ *   <li>Input and output characters</li>
+ *   <li>Rotor window states before and after processing</li>
+ *   <li>Which rotors advanced (stepping record)</li>
+ *   <li>Forward pass through rotors (right→left)</li>
+ *   <li>Reflector transformation</li>
+ *   <li>Backward pass through rotors (left→right)</li>
+ * </ul>
+ *
+ * <h2>Field Semantics</h2>
+ * <ul>
+ *   <li><b>inputChar:</b> original input character from user</li>
+ *   <li><b>outputChar:</b> final encrypted output character</li>
+ *   <li><b>windowBefore:</b> rotor positions as chars before stepping (e.g., "ODX")</li>
+ *   <li><b>windowAfter:</b> rotor positions as chars after processing (e.g., "ODY")</li>
+ *   <li><b>advancedIndices:</b> list of rotor indices that stepped (0 = leftmost)</li>
+ *   <li><b>forwardSteps:</b> rotor transformations from right→left (toward reflector)</li>
+ *   <li><b>reflectorStep:</b> symmetric transformation at leftmost position</li>
+ *   <li><b>backwardSteps:</b> rotor transformations from left→right (back to keyboard)</li>
+ * </ul>
+ *
+ * <h2>Rotor Position Model</h2>
+ * <p>Window strings use char positions (alphabet characters) in left→right order
+ * matching the user's visual perspective of the machine.</p>
  *
  * @param inputChar original input character
  * @param outputChar final output character
- * @param windowBefore rotor window before stepping (left→right)
+ * @param windowBefore rotor window before stepping (left→right, e.g., "ODX")
  * @param windowAfter rotor window after processing (left→right)
  * @param advancedIndices rotors that advanced (index 0 = leftmost)
  * @param forwardSteps rotor traces for forward pass (right→left)

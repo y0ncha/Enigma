@@ -148,6 +148,19 @@ public class RotorImpl implements Rotor {
     // Core encoding logic using wires list
     // ---------------------------------------------------------
 
+    /**
+     * Encode signal in forward direction (right→left).
+     *
+     * <p>Forward path logic:</p>
+     * <ol>
+     *   <li>Get right-side symbol at entryIndex row</li>
+     *   <li>Find that symbol in left-side column</li>
+     *   <li>Return the row index where it was found</li>
+     * </ol>
+     *
+     * @param entryIndex row index on right side (0..alphabetSize-1)
+     * @return exit row index on left side
+     */
     private int encodeForward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
             throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
@@ -164,6 +177,19 @@ public class RotorImpl implements Rotor {
         throw new IllegalStateException("Forward encoding: symbol not found in left column: " + inChar);
     }
 
+    /**
+     * Encode signal in backward direction (left→right).
+     *
+     * <p>Backward path logic:</p>
+     * <ol>
+     *   <li>Get left-side symbol at entryIndex row</li>
+     *   <li>Find that symbol in right-side column</li>
+     *   <li>Return the row index where it was found</li>
+     * </ol>
+     *
+     * @param entryIndex row index on left side (0..alphabetSize-1)
+     * @return exit row index on right side
+     */
     private int encodeBackward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
             throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
@@ -180,16 +206,34 @@ public class RotorImpl implements Rotor {
         throw new IllegalStateException("Backward encoding: symbol not found in right column: " + inChar);
     }
 
+    /**
+     * Physically rotate the rotor by moving the top row to the bottom.
+     */
     private void rotate() {
         Wire top = wires.removeFirst();
         wires.addLast(top);
     }
 
+    /**
+     * Get the wire at a specific row index.
+     *
+     * @param row row index (0..alphabetSize-1)
+     * @return Wire at that row
+     */
     @Override
     public Wire getWire(int row) {
             return wires.get(row);
     }
 
+    /**
+     * Generate a visual column representation of the rotor wiring.
+     *
+     * <p>Displays left | right character pairs for each row in the rotor's
+     * current rotational state. Rows are shown top-to-bottom matching the
+     * internal wires list order.</p>
+     *
+     * @return multi-line string column for wiring display
+     */
     @Override
     public String toString() {
         // Render a single rotor column: small ID box above, then a tall box with L | R per row.

@@ -18,29 +18,72 @@ import java.util.*;
 /**
  * Loads and parses Enigma machine specifications from XML files.
  *
- * <p>Responsibilities:
+ * <p><b>Module:</b> enigma-loader (XML → MachineSpec)</p>
+ *
+ * <h2>Responsibilities</h2>
  * <ul>
- *   <li>Unmarshal XML into generated JAXB objects.</li>
- *   <li>Validate XML content (alphabet, rotors, reflectors) and translate
- *       it into {@link MachineSpec}, {@link RotorSpec} and {@link ReflectorSpec}.</li>
+ *   <li>Unmarshal XML into generated JAXB objects</li>
+ *   <li>Validate alphabet (even-length, unique characters)</li>
+ *   <li>Validate rotors (IDs 1..N, full permutations, notch in range)</li>
+ *   <li>Validate reflectors (Roman IDs, symmetric mapping, bijectivity)</li>
+ *   <li>Translate into {@link MachineSpec}, {@link RotorSpec}, {@link ReflectorSpec}</li>
  * </ul>
  *
- * Validation errors and parsing failures are reported as {@link EnigmaLoadingException}.
+ * <h2>Critical Design Point: Wire Ordering</h2>
+ * <p><b>The loader must NOT reorder wires or change XML-defined order.</b></p>
+ * <ul>
+ *   <li>Rotor columns are stored in XML row order (top→bottom as parsed)</li>
+ *   <li>Reflector mapping is constructed from XML pairs without reordering</li>
+ *   <li>This ensures the mechanical model matches the specification exactly</li>
+ * </ul>
+ *
+ * <h2>Validation Rules</h2>
+ * <ul>
+ *   <li><b>Alphabet:</b> even-length, non-empty, unique chars</li>
+ *   <li><b>Rotor IDs:</b> contiguous sequence 1..N (e.g., 1,2,3,4,5)</li>
+ *   <li><b>Rotor columns:</b> each column must be full permutation (bijectivity)</li>
+ *   <li><b>Notch:</b> 1-based index in [1, alphabetSize]</li>
+ *   <li><b>Reflector IDs:</b> Roman numerals starting from I (I, II, III, ...)</li>
+ *   <li><b>Reflector mapping:</b> symmetric, no self-mapping, covers all indices</li>
+ * </ul>
+ *
+ * <h2>Invariants After Loading</h2>
+ * <ul>
+ *   <li>All rotors and reflectors reference valid alphabet characters</li>
+ *   <li>Rotor columns form valid permutations</li>
+ *   <li>Reflector mappings are symmetric: mapping[i] = j ⟹ mapping[j] = i</li>
+ * </ul>
+ *
+ * <p>Validation errors are reported as {@link EnigmaLoadingException} with
+ * detailed error messages indicating the problem location.</p>
+ *
+ * @since 1.0
  */
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
     private static int ROTORS_IN_USE;
 
+    /**
+     * Create a loader that expects exactly {@code rotorsInUse} rotors in the machine.
+     *
+     * @param rotorsInUse expected number of rotors (typically 3)
+     */
     public LoaderXml(int rotorsInUse) {
         ROTORS_IN_USE = rotorsInUse;
     }
 
     /**
-     * {@inheritDoc}
+     * Load and validate machine specification from XML file.
      *
-     * <p>High level flow: unmarshal XML -> validate/extract alphabet -> rotors -> reflectors
-     * and build a {@link MachineSpec}.</p>
+     * <p>High-level flow:</p>
+     * <ol>
+     *   <li>Unmarshal XML → JAXB objects</li>
+     *   <li>Validate and extract alphabet</li>
+     *   <li>Validate and extract rotors</li>
+     *   <li>Validate and extract reflectors</li>
+     *   <li>Build {@link MachineSpec}</li>
+     * </ol>
      *
      * @param filePath path to XML file
      * @return validated MachineSpec
@@ -103,9 +146,22 @@ public class LoaderXml implements Loader {
     /**
      * Parse rotor definitions and build {@link RotorSpec} entries.
      *
+     * <p><b>Important:</b> Rotor columns are stored in XML row order without
+     * reordering. Right/left columns follow the XML &lt;BTE-Positioning&gt;
+     * sequence exactly.</p>
+     *
+     * <p>Validation performed:</p>
+     * <ul>
+     *   <li>Rotor IDs are unique</li>
+     *   <li>Notch is in valid range [1, alphabetSize]</li>
+     *   <li>Right and left columns form full permutations (bijectivity)</li>
+     *   <li>All characters are in the alphabet</li>
+     *   <li>Final ID set forms contiguous sequence 1..N</li>
+     * </ul>
+     *
      * @param root JAXB root containing rotors
      * @param alphabet validated Alphabet used for mapping
-     * @return map of rotor id -> RotorSpec
+     * @return map of rotor id → RotorSpec
      * @throws EnigmaLoadingException on validation/parsing errors
      */
     private Map<Integer, RotorSpec> extractRotors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
@@ -197,9 +253,23 @@ public class LoaderXml implements Loader {
     /**
      * Parse reflector definitions and build {@link ReflectorSpec} entries.
      *
+     * <p><b>Important:</b> Reflector mapping is constructed directly from XML
+     * pairs without reordering or sorting. The mapping preserves XML-defined
+     * pair relationships exactly.</p>
+     *
+     * <p>Validation performed:</p>
+     * <ul>
+     *   <li>Reflector IDs are unique</li>
+     *   <li>IDs follow Roman numeral format (I, II, III, ...)</li>
+     *   <li>Mapping is symmetric: if i→j then j→i</li>
+     *   <li>No self-mapping (i→i is forbidden)</li>
+     *   <li>All indices [0, alphabetSize) are covered</li>
+     *   <li>Final ID set starts from "I" and forms contiguous Roman sequence</li>
+     * </ul>
+     *
      * @param root JAXB root containing reflectors
      * @param alphabet validated Alphabet used for mapping
-     * @return map of reflector id -> ReflectorSpec
+     * @return map of reflector id → ReflectorSpec
      * @throws EnigmaLoadingException on validation/parsing errors
      */
     private Map<String, ReflectorSpec> extractReflectors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {

@@ -17,20 +17,66 @@ import java.util.List;
  * Default {@link Machine} implementation that coordinates rotor stepping,
  * forward/backward transformations and reflector processing.
  *
+ * <p><b>Module:</b> enigma-machine (core mechanics, no I/O)</p>
+ *
+ * <h2>Responsibilities</h2>
+ * <ul>
+ *   <li>Execute the full encryption data flow for each character</li>
+ *   <li>Manage rotor stepping and notch propagation</li>
+ *   <li>Coordinate forward (right→left) and backward (left→right) signal paths</li>
+ *   <li>Generate detailed trace objects for debugging and display</li>
+ * </ul>
+ *
+ * <h2>Encryption Data Flow</h2>
+ * <p>For each input character, the machine performs the following steps:</p>
+ * <ol>
+ *   <li><b>Rotor Stepping:</b> Advance rotors starting from rightmost, propagating
+ *       left when notches engage (before signal processing)</li>
+ *   <li><b>Keyboard → Index:</b> Convert input char to int index via {@link Keyboard#toIdx(char)}</li>
+ *   <li><b>Forward Pass (right→left):</b> Transform through rotors from rightmost to leftmost</li>
+ *   <li><b>Reflector:</b> Apply symmetric reflection at leftmost position</li>
+ *   <li><b>Backward Pass (left→right):</b> Transform through rotors from leftmost to rightmost</li>
+ *   <li><b>Index → Keyboard:</b> Convert final int index to output char via {@link Keyboard#toChar(int)}</li>
+ * </ol>
+ *
+ * <h2>Rotor Position Model</h2>
+ * <p>Rotor positions are represented as {@code char} values from the alphabet
+ * (e.g., 'A', 'B', 'C'). The internal signal path uses {@code int} indices
+ * in [0, alphabetSize). The {@link Keyboard} is the sole boundary performing
+ * char ↔ index conversions.</p>
+ *
+ * <h2>Invariants</h2>
+ * <ul>
+ *   <li>Machine must be configured with a valid {@link Code} before processing</li>
+ *   <li>All rotor positions must be valid alphabet characters</li>
+ *   <li>Keyboard and Code alphabet must match</li>
+ * </ul>
+ *
+ * <h2>What This Class Does NOT Do</h2>
+ * <ul>
+ *   <li>Does not perform I/O or printing (except toString for diagnostics)</li>
+ *   <li>Does not validate XML or construct components (engine responsibility)</li>
+ *   <li>Does not manage configuration history or statistics</li>
+ * </ul>
+ *
  * @since 1.0
  */
 public class MachineImpl implements Machine {
 
-    // --- Fields --------------------------------------------------
+    // ---------------------------------------------------------
+    // Fields
+    // ---------------------------------------------------------
     private Code code;
     private Keyboard keyboard;
 
 
-    // --- Ctor ----------------------------------------------------
+    // ---------------------------------------------------------
+    // Constructor
+    // ---------------------------------------------------------
     /**
      * Construct an empty machine. The machine is created without a configured
-     * {@link Keyboard} or {@link Code}; callers must set the code (and provide
-     * a keyboard via the public API) before using {@link #process(char)}.
+     * {@link Keyboard} or {@link Code}; callers must set the code via
+     * {@link #setCode(Code)} before using {@link #process(char)}.
      *
      * @since 1.0
      */
@@ -39,7 +85,9 @@ public class MachineImpl implements Machine {
         this.code = null;
     }
 
-    // --- Methods -------------------------------------------------
+    // ---------------------------------------------------------
+    // Machine interface implementation
+    // ---------------------------------------------------------
     /**
      * {@inheritDoc}
      */
@@ -50,7 +98,22 @@ public class MachineImpl implements Machine {
     }
 
     /**
-     * {@inheritDoc}
+     * Process one input character through the complete Enigma encryption path.
+     *
+     * <p><b>Data Flow:</b></p>
+     * <ol>
+     *   <li>Step rotors (rightmost first, propagate left on notch)</li>
+     *   <li>Convert input char → int index (via keyboard)</li>
+     *   <li>Forward pass: transform right→left through rotors</li>
+     *   <li>Reflector: symmetric mapping at leftmost position</li>
+     *   <li>Backward pass: transform left→right through rotors</li>
+     *   <li>Convert final int index → output char (via keyboard)</li>
+     * </ol>
+     *
+     * @param input character to encrypt (must be in the alphabet)
+     * @return {@link SignalTrace} containing detailed processing information
+     * @throws IllegalStateException if machine is not configured with code and keyboard
+     * @throws IllegalArgumentException if input char is not in the alphabet
      */
     @Override
     public SignalTrace process(char input) {
@@ -105,7 +168,9 @@ public class MachineImpl implements Machine {
         );
     }
 
-    // --- State Checkers ---------------------------------------------
+    // ---------------------------------------------------------
+    // State Checkers
+    // ---------------------------------------------------------
     private void ensureConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured with a code");
@@ -120,10 +185,19 @@ public class MachineImpl implements Machine {
         return code != null && keyboard != null;
     }
 
-    // --- Helpers -------------------------------------------------
+    // ---------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------
 
     /**
      * Advance rotors starting from the rightmost rotor and record which rotors moved.
+     *
+     * <p><b>Stepping Logic:</b></p>
+     * <ul>
+     *   <li>Rightmost rotor always advances</li>
+     *   <li>If a rotor reaches its notch after advancing, the rotor to its left also advances</li>
+     *   <li>Propagation continues leftward until a rotor does not reach its notch</li>
+     * </ul>
      *
      * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @return immutable list of rotor indices that advanced (using same indexing: 0 = leftmost)
@@ -145,6 +219,16 @@ public class MachineImpl implements Machine {
         return List.copyOf(advanced);
     }
 
+    /**
+     * Apply forward transformation through rotors while recording traces.
+     *
+     * <p>Forward direction processes signal from keyboard (right side) toward
+     * reflector (left side). Rotors are traversed from rightmost to leftmost.</p>
+     *
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @param entryIndex initial index from keyboard (0..alphabetSize-1)
+     * @return immutable list of RotorTrace (rightmost first, in iteration order)
+     */
     private List<RotorTrace> forwardTransform(List<Rotor> rotors, int entryIndex) {
 
         List<RotorTrace> steps = new ArrayList<>();
@@ -170,8 +254,11 @@ public class MachineImpl implements Machine {
     /**
      * Apply backward transformation through rotors while recording traces.
      *
+     * <p>Backward direction processes signal from reflector (left side) back
+     * toward keyboard (right side). Rotors are traversed from leftmost to rightmost.</p>
+     *
      * @param rotors list of rotors in left→right order (index 0 = leftmost)
-     * @param value input index to transform
+     * @param value input index from reflector (0..alphabetSize-1)
      * @return immutable list of RotorTrace (leftmost first, in iteration order)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
@@ -201,8 +288,12 @@ public class MachineImpl implements Machine {
 
     /**
      * Build the window string representing the current rotor positions.
+     *
+     * <p>Positions are represented as characters from the alphabet (e.g., "ODX").
+     * The string is built in left→right order matching user's visual perspective.</p>
+     *
      * @param rotors list of rotors in left→right order (index 0 = leftmost)
-     * @return window string by format
+     * @return window string in left→right format
      */
     private String buildWindowString(List<Rotor> rotors) {
 
@@ -221,6 +312,22 @@ public class MachineImpl implements Machine {
         return sb.toString();
     }
 
+    /**
+     * Generate a detailed visual representation of the machine's wiring configuration.
+     *
+     * <p><b>Display Format:</b></p>
+     * <ul>
+     *   <li>Index column: 0-based row numbers (matches internal representation)</li>
+     *   <li>Reflector column: pair labels computed as min(i, partner) + 1</li>
+     *   <li>Rotor columns: left | right wiring, leftmost rotor printed first</li>
+     *   <li>Keyboard column: alphabet symbols in order</li>
+     * </ul>
+     *
+     * <p><b>Important:</b> Rows follow XML index order (0..alphabetSize-1).
+     * No lexicographic sorting by letters is applied.</p>
+     *
+     * @return multi-line string showing complete machine wiring
+     */
     @Override
     public String toString() {
         if (!isConfigured()) {

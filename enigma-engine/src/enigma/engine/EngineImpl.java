@@ -20,24 +20,47 @@ import java.util.*;
 /**
  * Default {@link Engine} implementation.
  *
- * <p>This class coordinates the high-level engine flow: it obtains a
- * {@link MachineSpec} from the configured {@link Loader}, generates or
- * validates {@link CodeConfig} instances, and delegates construction of
- * a runtime {@link Code} to a {@link CodeFactory} implementation. The
- * Engine assumes the {@link Loader} performs full validation of the
- * {@link MachineSpec} contents; the Engine validates runtime configuration
- * (code selection and positions) before creating a code instance.</p>
+ * <p><b>Module:</b> enigma-engine (orchestration + validation, no UI)</p>
  *
- * <p>Responsibilities (concise):</p>
+ * <h2>Responsibilities</h2>
  * <ul>
- *   <li>Load machine specification (XML) via {@link Loader}.</li>
- *   <li>Produce validated {@link CodeConfig} (manual or random).</li>
- *   <li>Build a runtime {@link Code} using {@link CodeFactory} and assign it to
- *       the internal {@link Machine} instance.</li>
+ *   <li>Load machine specification (XML) via {@link Loader}</li>
+ *   <li>Validate runtime {@link CodeConfig} (rotor IDs, positions, reflector)</li>
+ *   <li>Build runtime {@link Code} using {@link CodeFactory}</li>
+ *   <li>Assign code to internal {@link Machine} instance</li>
+ *   <li>Process messages and return {@link DebugTrace} DTOs</li>
  * </ul>
  *
- * <p>The engine uses the mechanical rotor model ({@link RotorImpl})
- * for all rotor construction, which accurately reflects physical Enigma behavior.</p>
+ * <h2>Configuration Flow</h2>
+ * <ol>
+ *   <li>Load XML → {@link MachineSpec} (via loader)</li>
+ *   <li>Manual or random config → {@link CodeConfig}</li>
+ *   <li>Validate config against spec</li>
+ *   <li>Build {@link Code} (via factory)</li>
+ *   <li>Assign code to machine</li>
+ * </ol>
+ *
+ * <h2>Validation Boundary</h2>
+ * <p>Engine validates:</p>
+ * <ul>
+ *   <li>Number of rotors matches expected count (currently 3)</li>
+ *   <li>Rotor IDs are unique and exist in spec</li>
+ *   <li>Reflector ID exists in spec</li>
+ *   <li>Position characters are valid alphabet members</li>
+ * </ul>
+ * <p>Factories assume inputs are valid and focus on object construction.</p>
+ *
+ * <h2>Rotor Position Model</h2>
+ * <p>Positions in {@link CodeConfig} are characters from the alphabet
+ * (e.g., 'O', 'D', 'X') in left→right order. The factory and machine
+ * preserve this ordering throughout construction and operation.</p>
+ *
+ * <h2>What Engine Does NOT Do</h2>
+ * <ul>
+ *   <li>Does not perform I/O or printing (except machineData for diagnostics)</li>
+ *   <li>Does not expose internal machine or component objects</li>
+ *   <li>Does not revalidate spec contents (loader responsibility)</li>
+ * </ul>
  *
  * @since 1.0
  */
@@ -56,9 +79,8 @@ public class EngineImpl implements Engine {
      * Construct an Engine that uses the default XML {@link Loader} and
      * the default {@link CodeFactory} implementation.
      *
-     * <p>The engine creates a {@link Machine} instance and keeps it as an
-     * internal field; the {@link Machine} is configured later when a
-     * {@link Code} is created (manual or random).</p>
+     * <p>The engine creates an internal {@link Machine} instance which
+     * is configured later when a {@link Code} is assigned (manual or random).</p>
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
@@ -66,6 +88,16 @@ public class EngineImpl implements Engine {
         this.codeFactory = new CodeFactoryImpl();
     }
 
+    /**
+     * Load machine specification from XML file path.
+     *
+     * <p>Delegates to {@link Loader#loadSpecs(String)} which parses and
+     * validates the XML. The resulting {@link MachineSpec} is stored for
+     * later code construction.</p>
+     *
+     * @param path file-system path to XML file
+     * @throws RuntimeException wrapping {@link EnigmaLoadingException} on failure
+     */
     @Override
     public void loadMachine(String path) {
         try {
@@ -76,16 +108,28 @@ public class EngineImpl implements Engine {
         }
     }
 
+    /**
+     * Print detailed machine wiring information to System.out.
+     *
+     * <p>Delegates to {@code machine.toString()} which displays index column,
+     * reflector pairs, rotor wirings, and keyboard mapping.</p>
+     */
     @Override
     public void machineData() {
         System.out.println(machine);
     }
 
     /**
-     * {@inheritDoc}
+     * Configure machine with a manual {@link CodeConfig}.
      *
-     * <p>This is the primary method for configuring the machine. It uses
-     * the mechanical rotor model for accurate Enigma simulation.</p>
+     * <p>Validates the config against the loaded spec, then delegates to
+     * {@link CodeFactory#create(MachineSpec, CodeConfig)} to build the runtime
+     * {@link Code}. The code is assigned to the internal machine via
+     * {@link Machine#setCode(Code)}.</p>
+     *
+     * @param config configuration with rotor IDs, positions (chars), reflector ID
+     * @throws IllegalArgumentException if validation fails
+     * @throws IllegalStateException if spec is not loaded
      */
     @Override
     public void configManual(CodeConfig config) {
@@ -97,15 +141,17 @@ public class EngineImpl implements Engine {
 
 
     /**
-     * Create a random, valid {@link CodeConfig} and configure the machine
-     * with the resulting code.
+     * Generate a random, valid {@link CodeConfig} and configure the machine.
      *
-     * <p>This method samples rotor ids, starting positions and a reflector
-     * id using a local {@link SecureRandom} instance, validates the sampled
-     * configuration and delegates to {@link #configManual(CodeConfig)} so the
-     * same creation path is used for manual and random flows.</p>
+     * <p>Sampling strategy:</p>
+     * <ul>
+     *   <li>Pick {@value #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Generate random char positions (left→right) from alphabet</li>
+     *   <li>Pick one random reflector ID</li>
+     * </ul>
+     * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
      *
-     * @throws IllegalStateException when the machine spec is not loaded
+     * @throws IllegalStateException when spec is not loaded
      */
     @Override
     public void configRandom() {
@@ -150,19 +196,21 @@ public class EngineImpl implements Engine {
         // TODO implement
     }
 
-    // --- Flow helpers: machine creation and random code generation ---------
+    // ---------------------------------------------------------
+    // Flow helpers: machine creation and random code generation
+    // ---------------------------------------------------------
 
     /**
      * Generate a random {@link CodeConfig} from the loaded {@link MachineSpec}.
      *
-     * <p>Sampling rules:
+     * <p>Sampling rules:</p>
      * <ul>
-     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor ids (left→right)</li>
-     *   <li>Pick one reflector id at random</li>
-     *   <li>Generate random starting positions (0 .. alphabet.size()-1) for each rotor</li>
+     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick one reflector ID at random</li>
+     *   <li>Generate random starting positions as chars (left→right)</li>
      * </ul>
-     * The returned {@link CodeConfig} uses left→right ordering for rotors and
-     * positions (caller/engine conventions).</p>
+     * <p>The returned {@link CodeConfig} uses left→right ordering for rotors and
+     * positions (user-facing conventions).</p>
      *
      * @param spec machine specification (must be non-null)
      * @return randomly sampled {@link CodeConfig}
@@ -198,14 +246,21 @@ public class EngineImpl implements Engine {
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
 
-    // --- Engine-level validation helpers ------------------------------------------------
+    // ---------------------------------------------------------
+    // Engine-level validation helpers
+    // ---------------------------------------------------------
 
     /**
      * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
      *
-     * <p>Checks performed here are limited to configuration-level constraints:
-     * number of rotors/positions, uniqueness of rotor ids, existence of ids in
-     * the spec, and valid numeric ranges for positions.</p>
+     * <p>Checks performed:</p>
+     * <ul>
+     *   <li>Number of rotors/positions equals {@link #ROTORS_IN_USE}</li>
+     *   <li>Rotor IDs are unique and exist in spec</li>
+     *   <li>Reflector ID exists in spec</li>
+     *   <li>Position chars are valid alphabet members</li>
+     * </ul>
+     * <p>Spec contents are assumed valid (loader responsibility).</p>
      *
      * @param spec   machine specification (assumed valid by the loader)
      * @param config code configuration to validate

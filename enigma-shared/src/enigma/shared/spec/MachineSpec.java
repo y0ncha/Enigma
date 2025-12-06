@@ -7,10 +7,34 @@ import enigma.machine.component.alphabet.Alphabet;
 /**
  * Represents the specification of an Enigma machine, including its alphabet,
  * available rotors and reflectors.
- * This record serves as a model for configuring and describing the machine's
- * components and constraints.
- * Note: maps are stored as provided (no defensive deep copy) to preserve existing behaviour.
  *
+ * <p><b>Module:</b> enigma-shared (specs)</p>
+ *
+ * <p>This record serves as an immutable data container holding the validated
+ * machine specification loaded from XML. It provides convenient access to
+ * rotors and reflectors by their identifiers.</p>
+ *
+ * <h2>Contents</h2>
+ * <ul>
+ *   <li><b>alphabet:</b> The machine's character set (validated: even-length, unique)</li>
+ *   <li><b>rotorsById:</b> Map of rotor ID → RotorSpec (IDs form 1..N sequence)</li>
+ *   <li><b>reflectorsById:</b> Map of reflector ID → ReflectorSpec (Roman numerals)</li>
+ * </ul>
+ *
+ * <h2>Invariants (ensured by loader)</h2>
+ * <ul>
+ *   <li>Alphabet has even length and unique characters</li>
+ *   <li>Rotor IDs form contiguous sequence 1..N</li>
+ *   <li>Reflector IDs are Roman numerals starting from "I"</li>
+ *   <li>All rotor columns and reflector mappings reference valid alphabet indices</li>
+ * </ul>
+ *
+ * <p><b>Note:</b> Maps are stored as provided (no defensive deep copy) to
+ * preserve existing behavior. Callers should not modify returned maps.</p>
+ *
+ * @param alphabet machine alphabet (even-length, unique chars)
+ * @param rotorsById map of rotor ID → RotorSpec
+ * @param reflectorsById map of reflector ID → ReflectorSpec
  * @since 1.0
  */
 public record MachineSpec(
@@ -22,7 +46,7 @@ public record MachineSpec(
     /**
      * Convenience lookup for a reflector specification by its identifier.
      *
-     * @param id reflector id (e.g. "I", "II")
+     * @param id reflector ID (e.g., "I", "II", "III")
      * @return ReflectorSpec instance for the given id, or null if not found
      */
     public ReflectorSpec getReflectorById(String id) {
@@ -30,9 +54,9 @@ public record MachineSpec(
     }
 
     /**
-     * Convenience lookup for a rotor specification by its numeric id.
+     * Convenience lookup for a rotor specification by its numeric ID.
      *
-     * @param id rotor id
+     * @param id rotor ID (1..N)
      * @return RotorSpec instance for the given id, or null if not found
      */
     public RotorSpec getRotorById(int id) {
@@ -40,8 +64,11 @@ public record MachineSpec(
     }
 
     /**
-     * @inheritDoc
-     * @return
+     * Generate a multi-line string representation of the machine specification.
+     *
+     * <p>Includes alphabet, rotor list (sorted by ID), and reflector list (sorted by ID).</p>
+     *
+     * @return formatted spec summary
      */
     @Override
     public String toString() {
