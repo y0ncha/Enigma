@@ -39,6 +39,7 @@ public record MachineSpec(
         return (rotorsById == null) ? null : rotorsById.get(id);
     }
 
+
     /**
      * @inheritDoc
      * @return
@@ -74,5 +75,17 @@ public record MachineSpec(
         }
 
         return sb.toString();
+    }
+
+    public int getTotalReflectors() {
+        return (reflectorsById == null) ? 0 : reflectorsById.size();
+    }
+
+    public int getTotalRotors() {
+        return (rotorsById == null) ? 0 : rotorsById.size();
+    }
+
+    public String getLetters() {
+        return alphabet.getLetters();
     }
 }

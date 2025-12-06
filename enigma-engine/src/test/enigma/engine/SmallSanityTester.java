@@ -32,7 +32,7 @@ public class SmallSanityTester {
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
 
-        engine.loadMachime(XML_PATH);
+        engine.loadMachine(XML_PATH);
 
         // Code: <3,2,1><CCC><I>
         CodeConfig config = new CodeConfig(

@@ -32,7 +32,7 @@ public class SanityPaperTester {
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
 
-        engine.loadMachime(XML_PATH);
+        engine.loadMachine(XML_PATH);
 
         // Code: <1,2,3><ODX><I>
         CodeConfig config = new CodeConfig(

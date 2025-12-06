@@ -51,6 +51,7 @@ public class EngineImpl implements Engine {
 
     private MachineSpec spec;
     private CodeConfig origConfig;
+    private CodeConfig currentConfig;
 
     /**
      * Construct an Engine that uses the default XML {@link Loader} and
@@ -67,7 +68,7 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void loadMachime(String path) {
+    public void loadMachine(String path) {
         try {
             spec = loader.loadSpecs(path);
         }
@@ -92,6 +93,7 @@ public class EngineImpl implements Engine {
         validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
         if (origConfig == null) origConfig = config;
+        currentConfig = config;
         machine.setCode(code);
     }
 
@@ -150,6 +152,20 @@ public class EngineImpl implements Engine {
         // TODO implement
     }
 
+    public MachineSpec getMachineSpec() {
+        return spec;
+    }
+
+    @Override
+    public CodeConfig getCurrentCodeConfig() {
+        return currentConfig;
+    }
+
+    @Override
+    public long getTotalProcessedMessages() {
+        return 0;
+    }
+
     // --- Flow helpers: machine creation and random code generation ---------
 
     /**
@@ -168,6 +184,7 @@ public class EngineImpl implements Engine {
      * @return randomly sampled {@link CodeConfig}
      * @throws IllegalStateException when {@code spec} is null
      */
+
     private CodeConfig randomCodeConfig(MachineSpec spec) {
         if (spec == null) {
             throw new IllegalStateException(

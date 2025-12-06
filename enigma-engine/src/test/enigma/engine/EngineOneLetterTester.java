@@ -32,7 +32,7 @@ public class EngineOneLetterTester {
         Engine engine = new EngineImpl();
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
-        engine.loadMachime(XML_PATH); // keep the current Engine API as-is
+        engine.loadMachine(XML_PATH); // keep the current Engine API as-is
 
         System.out.println("Code configuration: " + CODE_CONFIG);
         engine.codeManual(CODE_CONFIG);

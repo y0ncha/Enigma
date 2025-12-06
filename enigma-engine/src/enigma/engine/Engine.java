@@ -3,6 +3,7 @@ package enigma.engine;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.spec.MachineSpec;
 
 /**
  * Engine API for coordinating machine loading, configuration and processing.
@@ -25,7 +26,7 @@ public interface Engine {
      *
      * @param path file-system path to machine XML
      */
-    void loadMachime(String path);
+    void loadMachine(String path);
 
     /**
      * Supply or update machine data (for example wiring/config inputs) from
@@ -67,4 +68,10 @@ public interface Engine {
      * Exact format and destination are implementation-specific.
      */
     void statistics();
+
+    MachineSpec getMachineSpec();
+
+    CodeConfig getCurrentCodeConfig();
+
+    long getTotalProcessedMessages();
 }
