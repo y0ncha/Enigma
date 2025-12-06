@@ -1,6 +1,7 @@
 package enigma.machine;
 
 import enigma.machine.component.code.Code;
+import enigma.shared.dto.config.CodeConfig;
 import enigma.machine.component.keyboard.Keyboard;
 import enigma.machine.component.keyboard.KeyboardImpl;
 import enigma.machine.component.rotor.Direction;
@@ -14,50 +15,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Default {@link Machine} implementation that coordinates rotor stepping,
- * forward/backward transformations and reflector processing.
+ * Machine runtime implementation.
  *
- * <p><b>Module:</b> enigma-machine (core mechanics, no I/O)</p>
+ * <p>Concise contract:
+ * - Holds a runtime {@link Code} and {@link Keyboard} and performs the
+ *   mechanical Enigma processing: stepping, forward (right→left), reflector,
+ *   and backward (left→right) passes for each input character.
+ * - Public API is small: configure via {@link #setCode(Code)} and process
+ *   characters with {@link #process(char)}. The implementation is deterministic
+ *   and not responsible for high-level validation (engine handles config validation).
+ * </p>
  *
- * <h2>Responsibilities</h2>
- * <ul>
- *   <li>Execute the full encryption data flow for each character</li>
- *   <li>Manage rotor stepping and notch propagation</li>
- *   <li>Coordinate forward (right→left) and backward (left→right) signal paths</li>
- *   <li>Generate detailed trace objects for debugging and display</li>
- * </ul>
+ * Example:
+ * <pre>
+ *   MachineImpl m = new MachineImpl();
+ *   m.setCode(code);            // attach runtime Code
+ *   SignalTrace t = m.process('A');
+ * </pre>
  *
- * <h2>Encryption Data Flow</h2>
- * <p>For each input character, the machine performs the following steps:</p>
- * <ol>
- *   <li><b>Rotor Stepping:</b> Advance rotors starting from rightmost, propagating
- *       left when notches engage (before signal processing)</li>
- *   <li><b>Keyboard → Index:</b> Convert input char to int index via {@link Keyboard#toIdx(char)}</li>
- *   <li><b>Forward Pass (right→left):</b> Transform through rotors from rightmost to leftmost</li>
- *   <li><b>Reflector:</b> Apply symmetric reflection at leftmost position</li>
- *   <li><b>Backward Pass (left→right):</b> Transform through rotors from leftmost to rightmost</li>
- *   <li><b>Index → Keyboard:</b> Convert final int index to output char via {@link Keyboard#toChar(int)}</li>
- * </ol>
- *
- * <h2>Rotor Position Model</h2>
- * <p>Rotor positions are represented as {@code char} values from the alphabet
- * (e.g., 'A', 'B', 'C'). The internal signal path uses {@code int} indices
- * in [0, alphabetSize). The {@link Keyboard} is the sole boundary performing
- * char ↔ index conversions.</p>
- *
- * <h2>Invariants</h2>
- * <ul>
- *   <li>Machine must be configured with a valid {@link Code} before processing</li>
- *   <li>All rotor positions must be valid alphabet characters</li>
- *   <li>Keyboard and Code alphabet must match</li>
- * </ul>
- *
- * <h2>What This Class Does NOT Do</h2>
- * <ul>
- *   <li>Does not perform I/O or printing (except toString for diagnostics)</li>
- *   <li>Does not validate XML or construct components (engine responsibility)</li>
- *   <li>Does not manage configuration history or statistics</li>
- * </ul>
+ * Important invariants:
+ * - Rotors passed in {@link Code#getRotors()} are expected left→right (index 0 = leftmost).
+ * - {@link Keyboard} is the boundary for char↔index conversion; Machine uses indices internally.
+ * - Methods throw {@link IllegalStateException} when the machine is not configured.
  *
  * @since 1.0
  */
@@ -90,6 +69,12 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     /**
      * {@inheritDoc}
+     *
+     * <p>Concise: attach a runtime {@link Code} and create a {@link Keyboard}
+     * based on the code alphabet. Caller must ensure the {@code Code} is
+     * valid (engine performs validation).</p>
+     *
+     * @param code runtime code (rotors, reflector, alphabet)
      */
     @Override
     public void setCode(Code code) {
@@ -110,8 +95,8 @@ public class MachineImpl implements Machine {
      *   <li>Convert final int index → output char (via keyboard)</li>
      * </ol>
      *
-     * @param input character to encrypt (must be in the alphabet)
-     * @return {@link SignalTrace} containing detailed processing information
+     * @param input input character (must be in the machine alphabet)
+     * @return trace containing output char and per-step details
      * @throws IllegalStateException if machine is not configured with code and keyboard
      * @throws IllegalArgumentException if input char is not in the alphabet
      */
@@ -183,6 +168,14 @@ public class MachineImpl implements Machine {
     @Override
     public boolean isConfigured() {
         return code != null && keyboard != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CodeConfig getConfig() {
+        return code.getConfig();
     }
 
     // ---------------------------------------------------------
@@ -385,7 +378,6 @@ public class MachineImpl implements Machine {
 
         // Build idx column (matches rotor column height)
         final int colInner = 9;
-        final int idxInner = 5;
         final String gap = "  ";
 
         java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
@@ -399,7 +391,6 @@ public class MachineImpl implements Machine {
         // Compose idx column using same visual style as rotor.toString()
         StringBuilder idxSb = new StringBuilder();
         // for rotor/ref columns
-        int colWidth = colInner + 4; // total width per column
         // leading padding to match other columns which start with two spaces
         String lead = "  ";
 
@@ -470,4 +461,4 @@ public class MachineImpl implements Machine {
 
         return out.toString();
     }
- }
+}
