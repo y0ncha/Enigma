@@ -50,13 +50,13 @@ public class RotorImpl implements Rotor {
     /**
      * Construct a rotor from row-ordered right/left columns and a notch index.
      *
-     * <p>The {@code rightColumn} and {@code leftColumn} arrays contain the symbol
-     * indices for each row in top→bottom order as parsed from the XML
+     * <p>The {@code rightColumn} and {@code leftColumn} arrays contain the character
+     * values for each row in top→bottom order as parsed from the XML
      * <BTE-Positioning> entries. Both arrays must have the same length equal to the
      * alphabet size.</p>
      *
-     * @param rightColumn row-ordered right-column symbols (0-based indices)
-     * @param leftColumn row-ordered left-column symbols (0-based indices)
+     * @param rightColumn row-ordered right-column character values from the alphabet
+     * @param leftColumn row-ordered left-column character values from the alphabet
      * @param notchIndex index at which the rotor triggers stepping of the next rotor (0..N-1)
      * @param alphabetSize machine alphabet size used for bounds
      * @param id rotor identifier for debugging/tracing
