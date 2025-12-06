@@ -4,6 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Utility class for parsing and converting user input related to Enigma machine configuration.
+ * <p>
+ * Provides static methods to:
+ * <ul>
+ *   <li>Parse comma-separated rotor IDs from a string ({@link #parseRotorIds(String)})</li>
+ *   <li>Convert integer values to Roman numerals ({@link #toRoman(int)})</li>
+ *   <li>Build initial rotor positions from a string input ({@link #buildInitialPositions(String)})</li>
+ * </ul>
+ * <p>
+ * Usage example:
+ * <pre>
+ *   List&lt;Integer&gt; rotorIds = InputParsers.parseRotorIds("1,2,3");
+ *   String roman = InputParsers.toRoman(2); // "II"
+ *   List&lt;Integer&gt; positions = InputParsers.buildInitialPositions("ABC");
+ * </pre>
+ * <p>
+ * Note: All methods are static and this class should not be instantiated.
+ */
 public class InputParsers {
 
     public static List<Integer> parseRotorIds(String line) {
