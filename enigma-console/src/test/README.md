@@ -9,8 +9,7 @@ test/enigma/console/
 ├── helper/
 │   └── InputParsersTester.java      # Tests for InputParsers utility class
 ├── ConsoleCommandTester.java        # Tests for ConsoleCommand enum
-├── ConsoleImplTester.java           # Integration tests for ConsoleImpl
-└── ConsoleTestDocumentation.java    # Test documentation and coverage summary
+└── ConsoleImplTester.java           # Integration tests for ConsoleImpl
 ```
 
 ## Test Coverage
