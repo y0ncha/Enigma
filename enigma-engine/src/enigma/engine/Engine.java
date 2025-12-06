@@ -84,9 +84,23 @@ public interface Engine {
     CodeConfig getCurrentCodeConfig();
 
     /**
-     * Returns the total number of messages processed by this engine instance.
+    /**
+     * Returns the current machine specification loaded by the engine.
      *
-     * @return the count of processed messages
+     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
+     */
+    MachineSpec getMachineSpec();
+
+    /**
+     * Returns the current code configuration applied to the machine.
+     *
+     * @return the current {@link CodeConfig}, or {@code null} if not configured
+     */
+    CodeConfig getCurrentCodeConfig();
+
+    /**
+     * Returns the total number of messages processed by the engine since initialization.
+     *
+     * @return the total count of processed messages (non-negative)
      */
     long getTotalProcessedMessages();
-}
