@@ -3,7 +3,9 @@ package enigma.machine.component.code;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
+import enigma.shared.dto.config.CodeConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +15,6 @@ import java.util.List;
  * <p><b>Module:</b> enigma-machine</p>
  *
  * <p>This class is a simple immutable container for runtime code configuration.
- * Construction is handled by the engine's {@link enigma.engine.factory.CodeFactory}.
  * All lists are defensively copied to ensure immutability.</p>
  *
  * @since 1.0
@@ -37,12 +38,11 @@ public class CodeImpl implements Code {
      * and sizes must be consistent.</p>
      *
      * @param alphabet shared alphabet for all components
-     * @param rotors active rotors in left→right order (index 0 = leftmost)
+     * @param rotors active rotors in left→right order
      * @param reflector active reflector
-     * @param rotorIds rotor numeric IDs in left→right order (index 0 = leftmost)
+     * @param rotorIds rotor numeric IDs in left→right order
      * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
-     * @since 1.0
      */
     public CodeImpl(Alphabet alphabet, List<Rotor> rotors,
                     Reflector reflector,
@@ -58,21 +58,40 @@ public class CodeImpl implements Code {
         this.reflectorId = reflectorId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Rotor> getRotors() {
         return rotors;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Reflector getReflector() {
         return reflector;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Integer> getRotorIds() {
         return rotorIds;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Alphabet getAlphabet() { return alphabet; }
+
+    /** {@inheritDoc} */
+    @Override
+    public CodeConfig getConfig() {
+        return new CodeConfig(rotorIds, positions, reflectorId);
+    }
+
+    @Override
+    public List<Integer> getNotchDist() {
+        List<Integer> notchDist = new ArrayList<>();
+        for (Rotor r : rotors) {
+            notchDist.add(r.notchDist());
+        }
+        return notchDist;
+    }
 }

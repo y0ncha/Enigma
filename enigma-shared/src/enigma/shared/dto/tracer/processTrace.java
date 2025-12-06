@@ -20,7 +20,7 @@ import java.util.List;
  * @param signalTraces per-character signal traces (one per input character)
  * @since 1.0
  */
-public record DebugTrace(
+public record processTrace(
         String output,                  // final processed string
         List<SignalTrace> signalTraces  // one trace per input character
 ) {
@@ -28,7 +28,7 @@ public record DebugTrace(
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("=== DebugTrace ===\n");
+        sb.append("=== processTrace ===\n");
         sb.append("Final output: ").append(output).append("\n\n");
 
         for (int i = 0; i < signalTraces.size(); i++) {

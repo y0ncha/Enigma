@@ -226,6 +226,27 @@ public class RotorImpl implements Rotor {
     }
 
     /**
+     * Distance from the current rotor position to the notch.
+     *
+     * <p>Computed as the number of single-step rotations (top->bottom) required
+     * to bring the notch character to the top row starting from the current
+     * visible position.</p>
+     *
+     * @return distance in range [0..alphabetSize-1]
+     */
+    @Override
+    public int notchDist() {
+        int index = 0;
+        for (Wire w : wires) {
+            if (w.right() == notch) {
+                return index;
+            }
+            index++;
+        }
+        throw new IllegalStateException("Notch not found in wires list");
+    }
+
+    /**
      * Generate a visual column representation of the rotor wiring.
      *
      * <p>Displays left | right character pairs for each row in the rotor's
