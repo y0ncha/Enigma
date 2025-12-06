@@ -93,4 +93,6 @@ public interface Rotor {
     int getId();
 
     Wire getWire(int row);
+
+    int notchDist();
 }

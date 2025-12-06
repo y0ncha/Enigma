@@ -1,7 +1,7 @@
 package enigma.engine;
 
-import enigma.machine.component.rotor.RotorImpl;
-import enigma.shared.dto.MachineState;
+import enigma.machine.Machine;
+import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.processTrace;
 
@@ -15,7 +15,7 @@ import enigma.shared.dto.tracer.processTrace;
  *   <li>Load machine specifications from XML via {@link enigma.loader.Loader}</li>
  *   <li>Validate {@link CodeConfig} against loaded {@link enigma.shared.spec.MachineSpec}</li>
  *   <li>Build runtime {@link enigma.machine.component.code.Code} via factories</li>
- *   <li>Process messages and return {@link DebugTrace} DTOs</li>
+ *   <li>Process messages and return {@link processTrace} DTOs</li>
  * </ul>
  *
  * <h2>What Engine Does NOT Do</h2>
@@ -52,7 +52,7 @@ public interface Engine {
      * <p>The exact output format and destination are implementation-specific.
      * Typically delegates to {@code machine.toString()} for detailed wiring display.</p>
      */
-    MachineState machineData();
+    MachineState getState();
 
     /**
      * Configure the machine with a manual code configuration.
@@ -84,7 +84,7 @@ public interface Engine {
      *
      * <p>Each character is processed individually, generating a {@link enigma.shared.dto.tracer.SignalTrace}
      * for detailed step-by-step analysis. The output string and all traces are bundled
-     * into a {@link DebugTrace} DTO.</p>
+     * into a {@link processTrace} DTO.</p>
      *
      * @param input the input text to process (all chars must be in alphabet)
      * @return detailed debug trace of the processing steps

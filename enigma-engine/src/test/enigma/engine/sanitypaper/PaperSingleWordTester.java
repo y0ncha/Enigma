@@ -3,6 +3,7 @@ package test.enigma.engine.sanitypaper;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.state.MachineState;
 import enigma.shared.dto.tracer.processTrace;
 
 import java.nio.file.Paths;
@@ -43,6 +44,10 @@ public class PaperSingleWordTester {
         System.out.println("Code configuration: " + CODE_CONFIG + "\n");
         engine.configManual(CODE_CONFIG);
 
+        // Print machine state before processing
+        MachineState before = engine.getState();
+        System.out.println("MachineState (before): " + before + "\n");
+
         System.out.println("===== Single Sanity Case =====");
         System.out.println("Input   : " + INPUT);
         System.out.println("Expected: " + EXPECTED);
@@ -59,6 +64,8 @@ public class PaperSingleWordTester {
 
         System.out.println(debug); // relies on processTrace.toString() / pretty formatting
         System.out.println("------------------------");
+
+        MachineState after = engine.getState();
+        System.out.println("MachineState (after): " + after + "\n");
     }
 }
-

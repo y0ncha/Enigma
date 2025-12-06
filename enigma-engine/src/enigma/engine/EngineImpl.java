@@ -8,8 +8,8 @@ import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
 import enigma.machine.component.code.Code;
 import enigma.machine.Machine;
-import enigma.machine.component.rotor.RotorImpl;
-import enigma.shared.dto.MachineState;
+import enigma.shared.state.CodeState;
+import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.processTrace;
 import enigma.shared.dto.tracer.SignalTrace;
@@ -29,7 +29,7 @@ import java.util.*;
  *   <li>Validate runtime {@link CodeConfig} (rotor IDs, positions, reflector)</li>
  *   <li>Build runtime {@link Code} using {@link CodeFactory}</li>
  *   <li>Assign code to internal {@link Machine} instance</li>
- *   <li>Process messages and return {@link DebugTrace} DTOs</li>
+ *   <li>Process messages and return {@link processTrace} DTOs</li>
  * </ul>
  *
  * <h2>Configuration Flow</h2>
@@ -58,7 +58,7 @@ import java.util.*;
  *
  * <h2>What Engine Does NOT Do</h2>
  * <ul>
- *   <li>Does not perform I/O or printing (except machineData for diagnostics)</li>
+ *   <li>Does not perform I/O or printing (except getState for diagnostics)</li>
  *   <li>Does not expose internal machine or component objects</li>
  *   <li>Does not revalidate spec contents (loader responsibility)</li>
  * </ul>
@@ -74,7 +74,7 @@ public class EngineImpl implements Engine {
     private final CodeFactory codeFactory;
 
     private MachineSpec spec;
-    private CodeConfig originalConfig;
+    private CodeState ogCodeState;
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
@@ -121,10 +121,11 @@ public class EngineImpl implements Engine {
      * reflector pairs, rotor wirings, and keyboard mapping.</p>
      */
     @Override
-    public MachineState machineData() {
+    public MachineState getState() {
         int rotors = spec == null ? 0 : spec.rotorsById().size();
         int reflectors = spec == null ? 0 : spec.reflectorsById().size();
-        return new MachineState(rotors, reflectors, stringsProcessed, originalConfig, machine.getConfig());
+        CodeState currCodeState = machine.getCodeState();
+        return new MachineState(rotors, reflectors, stringsProcessed, this.ogCodeState, currCodeState );
     }
 
     /**
@@ -143,8 +144,8 @@ public class EngineImpl implements Engine {
     public void configManual(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
-        originalConfig = config;
         machine.setCode(code);
+        ogCodeState = machine.getCodeState();
     }
 
 

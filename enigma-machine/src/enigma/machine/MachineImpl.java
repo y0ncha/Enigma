@@ -10,6 +10,7 @@ import enigma.machine.component.rotor.Rotor;
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.dto.tracer.RotorTrace;
 import enigma.shared.dto.tracer.ReflectorTrace;
+import enigma.shared.state.CodeState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,19 +105,17 @@ public class MachineImpl implements Machine {
     public SignalTrace process(char input) {
         ensureConfigured();
 
-        List<Rotor> rotors = code.getRotors();
-
         // Window before stepping (left→right as user sees it)
-        String windowBefore = buildWindowString(rotors);
+        String windowBefore = buildWindowString();
 
         // Step rotors (same timing as in process) and record which advanced
-        List<Integer> advancedIndices = advance(rotors);
+        List<Integer> advancedIndices = advance();
 
         // Keyboard encoding
         int intermediate = keyboard.toIdx(input);
 
         // Forward pass (right→left)
-        List<RotorTrace> forwardSteps = forwardTransform(rotors, intermediate);
+        List<RotorTrace> forwardSteps = forwardTransform(intermediate);
         if (!forwardSteps.isEmpty()) {
             intermediate = forwardSteps.getLast().exitIndex();
         }
@@ -131,7 +130,7 @@ public class MachineImpl implements Machine {
         intermediate = reflectExit;
 
         // Backward pass (left→right)
-        List<RotorTrace> backwardSteps = backwardTransform(rotors, intermediate);
+        List<RotorTrace> backwardSteps = backwardTransform(intermediate);
         if (!backwardSteps.isEmpty()) {
             intermediate = backwardSteps.getLast().exitIndex();
         }
@@ -139,7 +138,7 @@ public class MachineImpl implements Machine {
         char outputChar = keyboard.toChar(intermediate);
 
         // Window after processing (rotors already stepped at the top)
-        String windowAfter = buildWindowString(rotors);
+        String windowAfter = buildWindowString();
 
         return new SignalTrace(
                 input,
@@ -182,6 +181,15 @@ public class MachineImpl implements Machine {
     // Helpers
     // ---------------------------------------------------------
 
+
+    @Override
+    public CodeState getCodeState() {
+        String positions = buildWindowString();
+        List<Integer> notchDist = code.getNotchDist();
+        String reflectorId = code.getReflector().getId();
+        return new CodeState(code.getRotorIds(), positions, notchDist, reflectorId);
+    }
+
     /**
      * Advance rotors starting from the rightmost rotor and record which rotors moved.
      *
@@ -192,12 +200,12 @@ public class MachineImpl implements Machine {
      *   <li>Propagation continues leftward until a rotor does not reach its notch</li>
      * </ul>
      *
-     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @return immutable list of rotor indices that advanced (using same indexing: 0 = leftmost)
      */
-    private List<Integer> advance(List<Rotor> rotors) {
+    private List<Integer> advance() {
 
         List<Integer> advanced = new ArrayList<>();
+        List<Rotor> rotors = code.getRotors();
 
         int index = rotors.size() - 1; // start at RIGHTMOST (last index)
         boolean shouldAdvance;
@@ -218,13 +226,13 @@ public class MachineImpl implements Machine {
      * <p>Forward direction processes signal from keyboard (right side) toward
      * reflector (left side). Rotors are traversed from rightmost to leftmost.</p>
      *
-     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @param entryIndex initial index from keyboard (0..alphabetSize-1)
      * @return immutable list of RotorTrace (rightmost first, in iteration order)
      */
-    private List<RotorTrace> forwardTransform(List<Rotor> rotors, int entryIndex) {
+    private List<RotorTrace> forwardTransform(int entryIndex) {
 
         List<RotorTrace> steps = new ArrayList<>();
+        List<Rotor> rotors = code.getRotors();
 
         // iterate from RIGHTMOST (last index) → LEFTMOST (0)
         for (int i = rotors.size() - 1; i >= 0; i--) {
@@ -250,13 +258,13 @@ public class MachineImpl implements Machine {
      * <p>Backward direction processes signal from reflector (left side) back
      * toward keyboard (right side). Rotors are traversed from leftmost to rightmost.</p>
      *
-     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @param value input index from reflector (0..alphabetSize-1)
      * @return immutable list of RotorTrace (leftmost first, in iteration order)
      */
-    private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
+    private List<RotorTrace> backwardTransform(int value) {
 
         List<RotorTrace> steps = new ArrayList<>();
+        List<Rotor> rotors = code.getRotors();
 
         // iterate from LEFTMOST (0) → RIGHTMOST (last index)
         for (int i = 0; i < rotors.size(); i++) {
@@ -285,10 +293,10 @@ public class MachineImpl implements Machine {
      * <p>Positions are represented as characters from the alphabet (e.g., "ODX").
      * The string is built in left→right order matching user's visual perspective.</p>
      *
-     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @return window string in left→right format
      */
-    private String buildWindowString(List<Rotor> rotors) {
+    private String buildWindowString() {
+
 
         if (keyboard == null) {
             throw new IllegalStateException("Machine is not configured with a keyboard");
@@ -297,11 +305,10 @@ public class MachineImpl implements Machine {
         StringBuilder sb = new StringBuilder();
 
         // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
-        for (Rotor rotor : rotors) {
+        for (Rotor rotor : code.getRotors()) {
             char c = rotor.getPosition();   // window position character
             sb.append(c);
         }
-
         return sb.toString();
     }
 

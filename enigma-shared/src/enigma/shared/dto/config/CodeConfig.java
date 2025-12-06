@@ -54,22 +54,4 @@ public record CodeConfig(
                         reflectorId
                 );
     }
-
-    public String toString(List<Integer> notchDist) {
-        // Rotor IDs: <1,2,3>
-        String ids = rotorIds.toString().replaceAll("[\\[\\] ]", "");
-        String pos = "";
-        if (positions != null && notchDist != null && positions.size() == notchDist.size()) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < positions.size(); i++) {
-                char windowChar = positions.get(i);
-                int dist = notchDist.get(i);
-                sb.append(windowChar).append("(").append(dist).append(")");
-                if (i < positions.size() - 1) sb.append(",");
-            }
-            pos = sb.toString();
-        }
-
-        return "<%s><%s><%s>".formatted(ids, pos, reflectorId);
-    }
 }

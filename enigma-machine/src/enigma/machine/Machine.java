@@ -3,6 +3,7 @@ package enigma.machine;
 import enigma.machine.component.code.Code;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.SignalTrace;
+import enigma.shared.state.CodeState;
 
 /**
  * Core Enigma machine API: configure code and process characters.
@@ -40,4 +41,6 @@ public interface Machine {
     boolean isConfigured();
 
     CodeConfig getConfig();
+
+    CodeState getCodeState();
 }

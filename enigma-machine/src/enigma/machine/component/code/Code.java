@@ -70,4 +70,6 @@ public interface Code {
      * @return {@link CodeConfig} describing the active code
      */
     CodeConfig getConfig();
+
+    List<Integer> getNotchDist();
 }
