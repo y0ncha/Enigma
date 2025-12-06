@@ -3,7 +3,7 @@ package test.enigma.engine.sanitypaper;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.processTrace;
 
 import java.nio.file.Paths;
 
@@ -63,7 +63,7 @@ public class PaperlMultiWordTester {
             engine.configManual(config);
 
             String input = inputs[i];
-            DebugTrace debug = engine.process(input);
+            processTrace debug = engine.process(input);
 
             boolean ok = debug.output().equals(expectedOutputs[i]);
             if (ok) passed++; else failed++;

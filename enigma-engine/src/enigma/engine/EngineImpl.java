@@ -9,8 +9,9 @@ import enigma.machine.MachineImpl;
 import enigma.machine.component.code.Code;
 import enigma.machine.Machine;
 import enigma.machine.component.rotor.RotorImpl;
+import enigma.shared.dto.MachineState;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.processTrace;
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.spec.MachineSpec;
 
@@ -50,7 +51,8 @@ public class EngineImpl implements Engine {
     private final CodeFactory codeFactory;
 
     private MachineSpec spec;
-    private CodeConfig origConfig;
+    private CodeConfig originalConfig;
+    private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
      * Construct an Engine that uses the default XML {@link Loader} and
@@ -66,6 +68,20 @@ public class EngineImpl implements Engine {
         this.codeFactory = new CodeFactoryImpl();
     }
 
+    /**
+     * Load and validate a machine specification from an XML file and store it in the engine.
+     *
+     * <p>Example:
+     * <pre>engine.loadMachine("enigma-loader/src/test/resources/xml/ex1-sanity-paper-enigma.xml");</pre>
+     *
+     * Important (concise):
+     * - Does NOT configure the runtime {@link Machine}; call {@link #configManual(CodeConfig)} or {@link #configRandom()} to apply a {@link Code}.
+     * - The {@link Loader} performs schema and structural validation (alphabet, rotors, reflector pairs).
+     * - Caller must handle concurrency; the last successful load overwrites the engine spec.
+     *
+     * @param path absolute or relative path to the Enigma XML file
+     * @throws RuntimeException if parsing or validation fails (loader error wrapped)
+     */
     @Override
     public void loadMachine(String path) {
         try {
@@ -77,8 +93,10 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void machineData() {
-        System.out.println(machine);
+    public MachineState machineData() {
+        int rotors = spec == null ? 0 : spec.rotorsById().size();
+        int reflectors = spec == null ? 0 : spec.reflectorsById().size();
+        return new MachineState(rotors, reflectors, stringsProcessed, originalConfig, machine.getConfig());
     }
 
     /**
@@ -91,7 +109,7 @@ public class EngineImpl implements Engine {
     public void configManual(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
-        if (origConfig == null) origConfig = config;
+        originalConfig = config;
         machine.setCode(code);
     }
 
@@ -109,7 +127,7 @@ public class EngineImpl implements Engine {
      */
     @Override
     public void configRandom() {
-        CodeConfig config = randomCodeConfig(spec);
+        CodeConfig config = generateRandomConfig(spec);
         configManual(config);
     }
 
@@ -121,7 +139,7 @@ public class EngineImpl implements Engine {
      * @return detailed debug trace of the processing steps
      */
     @Override
-    public DebugTrace process(String input) {
+    public processTrace process(String input) {
         if (!machine.isConfigured()) {
             throw new IllegalStateException("Machine is not configured");
         }
@@ -137,7 +155,8 @@ public class EngineImpl implements Engine {
             traces.add(trace);
             output.append(trace.outputChar());
         }
-        return new DebugTrace(output.toString(), List.copyOf(traces));
+        this.stringsProcessed++;
+        return new processTrace(output.toString(), List.copyOf(traces));
     }
 
     /**
@@ -168,7 +187,7 @@ public class EngineImpl implements Engine {
      * @return randomly sampled {@link CodeConfig}
      * @throws IllegalStateException when {@code spec} is null
      */
-    private CodeConfig randomCodeConfig(MachineSpec spec) {
+    private CodeConfig generateRandomConfig(MachineSpec spec) {
         if (spec == null) {
             throw new IllegalStateException(
                     "Machine is not loaded. Load an XML file before generating a random code.");
@@ -216,11 +235,11 @@ public class EngineImpl implements Engine {
         if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
 
         List<Integer> rotorIds = config.rotorIds();
-        List<Character> positions = config.initialPositions();
+        List<Character> positions = config.positions();
         String reflectorId = config.reflectorId();
 
         if (rotorIds == null) throw new IllegalArgumentException("rotorIds must not be null");
-        if (positions == null) throw new IllegalArgumentException("initialPositions must not be null");
+        if (positions == null) throw new IllegalArgumentException("positions must not be null");
         if (reflectorId == null) throw new IllegalArgumentException("reflectorId must not be null");
 
         if (rotorIds.size() != ROTORS_IN_USE) throw new IllegalArgumentException("Exactly " + ROTORS_IN_USE + " rotors must be selected");

@@ -1,5 +1,7 @@
-# Java
+# Java build artifacts
 target/
+build/
+out/
 *.class
 *.jar
 *.war
@@ -12,36 +14,36 @@ target/
 mvnw
 mvnw.cmd
 
-# IDE
+# IDE & project metadata
 .idea/
+.vscode/
 *.iws
 *.ipr
-out/
-.vscode/
 *.classpath
 *.project
 .settings/
 
-# Logs
+# Gradle
+.gradle/
+
+# Logs & crash reports
 *.log
+*.log.*
 *.tmp
 *.temp
 hs_err_pid*
 logs/
-*.log.*
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Build / distribution
+# Distribution artifacts
 enigma-machine-server-ex3.jar
 ex-machine-enigma2.jar
-build/
-.gradle/
 
-# Local config and secrets
+# Local configuration and secrets
 .env
 .env.*
 local.properties
@@ -50,10 +52,12 @@ secrets.properties
 *.jks
 todo.md
 
-# Test artifacts & editor swap files
+# Test artifacts and temp files
 test-machines/
 *.xml
 *.xsd
 *.bak
+
+# Editor swap files
 *.swp
 *.swo

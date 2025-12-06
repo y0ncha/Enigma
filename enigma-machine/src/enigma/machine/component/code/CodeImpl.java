@@ -3,6 +3,7 @@ package enigma.machine.component.code;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
+import enigma.shared.dto.config.CodeConfig;
 
 import java.util.List;
 
@@ -10,7 +11,8 @@ import java.util.List;
  * Immutable implementation of {@link Code} that stores active components
  * and configuration metadata.
  *
- * @since 1.0
+ * <p>Exposes rotors in left→right order and supplies a {@link CodeConfig}
+ * describing the configuration for external consumers.</p>
  */
 public class CodeImpl implements Code {
 
@@ -27,12 +29,12 @@ public class CodeImpl implements Code {
     /**
      * Create a new immutable code instance.
      *
-     * @param rotors active rotors in left→right order (index 0 = leftmost)
+     * @param alphabet machine alphabet used by rotors and reflector
+     * @param rotors active rotors in left→right order
      * @param reflector active reflector
-     * @param rotorIds rotor numeric ids in left→right order (index 0 = leftmost)
+     * @param rotorIds rotor numeric ids in left→right order
      * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
-     * @since 1.0
      */
     public CodeImpl(Alphabet alphabet, List<Rotor> rotors,
                     Reflector reflector,
@@ -48,21 +50,31 @@ public class CodeImpl implements Code {
         this.reflectorId = reflectorId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Rotor> getRotors() {
         return rotors;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Reflector getReflector() {
         return reflector;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Integer> getRotorIds() {
         return rotorIds;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Alphabet getAlphabet() { return alphabet; }
+
+    /** {@inheritDoc} */
+    @Override
+    public CodeConfig getConfig() {
+        return new CodeConfig(rotorIds, positions, reflectorId);
+    }
 }
