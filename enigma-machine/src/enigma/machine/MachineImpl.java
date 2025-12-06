@@ -233,18 +233,40 @@ public class MachineImpl implements Machine {
         List<Rotor> rotors = code.getRotors(); // right → left internally
         Keyboard kb = keyboard;
 
-        // Convert to left→right for user-facing display
-        List<Rotor> leftToRight = new ArrayList<>(rotors);
-        java.util.Collections.reverse(leftToRight);
+        // Convert to left→right for user-facing display.
+        // `code.getRotors()` returns rotors in right→left order, so copy
+        // and reverse to produce left→right for rendering (index 0 = leftmost).
+        // Build left-to-right rotor rendering order based on configured rotor IDs
+        // The Code may store rotors in either order; to guarantee the printed
+        // leftmost rotor matches the configured first rotor id, map config ids
+        // to rotor instances and render according to that sequence.
+        List<Rotor> leftToRight = new ArrayList<>();
+        try {
+            List<Integer> configuredIds = code.getRotorIds(); // expected left->right
+            // Map rotor id -> Rotor instance
+            java.util.Map<Integer, Rotor> idToRotor = new java.util.HashMap<>();
+            for (Rotor r : rotors) idToRotor.put(r.getId(), r);
+
+            boolean allFound = true;
+            for (Integer id : configuredIds) {
+                Rotor r = idToRotor.get(id);
+                if (r == null) { allFound = false; break; }
+                leftToRight.add(r);
+            }
+            if (!allFound) {
+                // Fallback: use rotor objects order as provided
+                leftToRight = new ArrayList<>(rotors);
+            }
+        } catch (Exception e) {
+            // Any unexpected error: fallback to raw rotor list
+            leftToRight = new ArrayList<>(rotors);
+        }
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n+----------------------------------------------------------+\n");
         sb.append("|                      ENIGMA MACHINE                      |\n");
         sb.append("+----------------------------------------------------------+\n\n");
-
-        // Reflector
-        sb.append("Reflector: ").append(code.getReflector().getId()).append("\n\n");
 
         // Header for wiring table
         sb.append("Detailed Wiring (Right Column → Left Column)\n\n");
@@ -290,7 +312,7 @@ public class MachineImpl implements Machine {
         idMid.append("│").append(center.apply("Ref " + (refl.getId() == null ? "" : refl.getId()), colInner)).append("│");
         idBot.append("└").append("─".repeat(colInner)).append("┘");
 
-        // Rotor boxes
+        // Rotor boxes (use the same left-to-right order we will render the data rows in)
         for (Rotor r : leftToRight) {
             idTop.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
             idMid.append(gap).append("│").append(center.apply("Rotor " + r.getId(), colInner)).append("│");
@@ -301,28 +323,38 @@ public class MachineImpl implements Machine {
         sb.append(idMid).append("\n");
         sb.append(idBot).append("\n");
 
-        // Top border line for all columns
-        StringBuilder topLine = new StringBuilder();
-        topLine.append("  ").append("┌").append("─".repeat(idxInner)).append("┐").append(gap)
-               .append("┌").append("─".repeat(colInner)).append("┐");
-        for (int i = 0; i < leftToRight.size(); i++) {
-            topLine.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
-        }
-        sb.append(topLine).append("\n");
-
-        // (no inner label/separator row; boxed IDs above are sufficient)
-
-        // Data rows: index, reflector char, then each rotor R|L
+        // IMPORTANT: wiring table must match the XML spec and the configured code.
+        //
+        // - Row index `row` is the 0-based contact on the RIGHT column (Idx = row+1).
+        // - For the reflector we show the numeric pair label taken from the XML
+        //   `<BTE-Reflect input="X" output="Y"/>`. Because the reflector is symmetric
+        //   and the XML always stores the smaller index as `input`, we label each pair
+        //   with `pairLabel = min(row, refl.process(row)) + 1` so both ends of a wire
+        //   (e.g. 1 and 25) show the same number.
+        //
+        // - For rotors, `leftToRight` is built from `code.getRotorIds()` (left→right),
+        //   so the printed columns "Rotor <id>" match the configured rotor order.
+        //   `getWireRight(i)` / `getWireLeft(i)` must return the static XML wiring
+        //   (0-based indices into the keyboard alphabet), and we render them as
+        //   `rightLetter | leftLetter` using `keyboard.lightKey(...)`.
+        //
+        // If you change how rotors / reflector are stored, keep these invariants so
+        // the table stays compatible with the XML and the active code configuration.
         for (int row = 0; row < numRows; row++) {
             StringBuilder rowLine = new StringBuilder();
+
             // index column (1-based)
             rowLine.append("  │").append(center.apply(String.valueOf(row + 1), idxInner)).append("│").append(gap);
 
-            // reflector value
-            char rc = kb.lightKey(refl.process(row));
-            rowLine.append("│").append(center.apply(String.valueOf(rc), colInner)).append("│");
+            // reflector cell: show the wired pair label (use the XML 'input' label)
+            // compute partner index and use the smaller index as the pair id (1-based)
+            int a = row;                    // 0-based index entering on right side
+            int b = refl.process(row);      // partner index (0-based)
+            int pairLabel = Math.min(a, b) + 1; // 1-based label matching XML input
+            String reflCell = String.valueOf(pairLabel);
+            rowLine.append("│").append(center.apply(reflCell, colInner)).append("│");
 
-            // rotor columns
+            // rotor columns (leftmost -> rightmost)
             for (Rotor rotor : leftToRight) {
                 int rightVal = rotor.getWireRight(row);
                 int leftVal = rotor.getWireLeft(row);
@@ -344,4 +376,4 @@ public class MachineImpl implements Machine {
 
         return sb.toString();
     }
- }
+}

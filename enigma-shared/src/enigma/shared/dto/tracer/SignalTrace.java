@@ -42,7 +42,7 @@ public record SignalTrace(
         sb.append("\nForward path (right → left):\n");
         for (RotorTrace r : forwardSteps) {
             sb.append("  rotor ")
-                    .append(r.rotorIndex())
+                    .append(r.rotorIndex()).append(" (id=").append(r.id()).append(")")
                     .append(": ")
                     .append(r.entryIndex())
                     .append(" -> ")
@@ -59,7 +59,7 @@ public record SignalTrace(
         sb.append("\nBackward path (left → right):\n");
         for (RotorTrace r : backwardSteps) {
             sb.append("  rotor ")
-                    .append(r.rotorIndex())
+                    .append(r.rotorIndex()).append(" (id=").append(r.id()).append(")")
                     .append(": ")
                     .append(r.entryIndex())
                     .append(" -> ")
