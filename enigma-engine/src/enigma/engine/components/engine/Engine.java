@@ -4,7 +4,7 @@ import enigma.shared.dto.MachineState;
 
 public interface Engine {
     void loadXml(String path);
-    MachineState machineData();
+    MachineState getState();
     void codeManual(/*Args*/);
     void codeRandom();
     String process(String input);

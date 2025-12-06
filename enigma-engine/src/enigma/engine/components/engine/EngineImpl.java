@@ -15,33 +15,30 @@ public class EngineImpl implements Engine {
 
     private Machine machine;
     private Loader loader;
-    private int processedMessagesCount;
-    private List<Integer> originalRotorIds;
-    private List<Character> originalRotorPositions;
-    private String originalReflectorId;
+    private int messagesCount;
+    private Code originalCode;
 
     @Override
     public void loadXml(String path) {
-        processedMessagesCount = 0;
-        originalRotorIds = null;
-        originalRotorPositions = null;
-        originalReflectorId = null;
+        messagesCount = 0;
+        originalCode = null;
     }
 
     @Override
-    public MachineState machineData() {
-        int availableRotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
-        int availableReflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
+    public MachineState getState() {
+        int rotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
+        int reflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
         
+        CodeData originalData = extractCodeData(originalCode);
         CodeData currentData = extractCodeData(machine != null ? machine.getCode() : null);
         
         return new MachineState(
-            availableRotorsCount,
-            availableReflectorsCount,
-            processedMessagesCount,
-            copyList(originalRotorIds),
-            copyList(originalRotorPositions),
-            originalReflectorId,
+            rotorsCount,
+            reflectorsCount,
+            messagesCount,
+            copyList(originalData.rotorIds),
+            copyList(originalData.rotorPositions),
+            originalData.reflectorId,
             copyList(currentData.rotorIds),
             copyList(currentData.rotorPositions),
             currentData.reflectorId
@@ -67,7 +64,7 @@ public class EngineImpl implements Engine {
         for(char c : input.toCharArray()) {
             output.append(machine.process(c));
         }
-        processedMessagesCount++;
+        messagesCount++;
         return output.toString();
     }
 
@@ -78,10 +75,7 @@ public class EngineImpl implements Engine {
 
     private void setCodeAndTrackOriginal(Code code) {
         machine.setCode(code);
-        CodeData data = extractCodeData(code);
-        originalRotorIds = data.rotorIds;
-        originalRotorPositions = data.rotorPositions;
-        originalReflectorId = data.reflectorId;
+        originalCode = code;
     }
 
     private CodeData extractCodeData(Code code) {
