@@ -214,7 +214,7 @@ public class MachineImpl implements Machine {
 
         // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
         for (Rotor rotor : rotors) {
-            char c = rotor.getPosition();   // numeric window index (0-based)
+            char c = rotor.getPosition();   // window position character
             sb.append(c);
         }
 

@@ -21,7 +21,7 @@ public class CodeImpl implements Code {
 
     // metadata (config)
     private final List<Integer> rotorIds;    // right → left
-    private final List<Character> positions;   // numeric positions (0..|ABC|-1)
+    private final List<Character> positions;   // rotor window positions as characters (e.g., 'A', 'B', 'C')
     private final String reflectorId;        // "I", "II", ...
 
     /**
@@ -30,7 +30,7 @@ public class CodeImpl implements Code {
      * @param rotors active rotors in right→left order
      * @param reflector active reflector
      * @param rotorIds rotor numeric ids in right→left order
-     * @param positions rotor start positions (0-based)
+     * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
      * @since 1.0
      */
