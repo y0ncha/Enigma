@@ -97,7 +97,7 @@ public class RotorImpl implements Rotor {
     @Override
     public boolean advance() {
         rotate();
-        int pos = getPosition();
+        char pos = getPosition();
         return pos == notch;
     }
 

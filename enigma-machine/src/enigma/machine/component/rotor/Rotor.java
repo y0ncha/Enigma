@@ -72,9 +72,9 @@ public interface Rotor {
      * Set the rotor to a specific position.
      *
      * <p>This method rotates the rotor until the window shows the desired
-     * letter index. Used during machine configuration to set initial positions.</p>
+     * character. Used during machine configuration to set initial positions.</p>
      *
-     * @param position target position (0..alphabetSize-1)
+     * @param position target position character from the alphabet
      */
     void setPosition(char position);
 

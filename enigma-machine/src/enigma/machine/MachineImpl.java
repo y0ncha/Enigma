@@ -125,20 +125,20 @@ public class MachineImpl implements Machine {
     /**
      * Advance rotors starting from the rightmost rotor and record which rotors moved.
      *
-     * @param rotors list of rotors in right→left order
-     * @return immutable list of rotor indices that advanced (0 = rightmost)
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
+     * @return immutable list of rotor indices that advanced (using same indexing: 0 = leftmost)
      */
     private List<Integer> advance(List<Rotor> rotors) {
 
         List<Integer> advanced = new ArrayList<>();
 
-        int index = rotors.size() - 1; // start at RIGHTMOST
+        int index = rotors.size() - 1; // start at RIGHTMOST (last index)
         boolean shouldAdvance;
 
         do {
             Rotor rotor = rotors.get(index);
             shouldAdvance = rotor.advance();
-            advanced.add(index);        // record natural index (left→right convention)
+            advanced.add(index);        // record index (0 = leftmost per standard indexing)
             index--;                    // move leftward
         } while (shouldAdvance && index >= 0);
 
@@ -170,9 +170,9 @@ public class MachineImpl implements Machine {
     /**
      * Apply backward transformation through rotors while recording traces.
      *
-     * @param rotors list of rotors from right to left
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @param value input index to transform
-     * @return immutable list of RotorTrace (rightmost first)
+     * @return immutable list of RotorTrace (leftmost first, in iteration order)
      */
     private List<RotorTrace> backwardTransform(List<Rotor> rotors, int value) {
 
@@ -201,7 +201,7 @@ public class MachineImpl implements Machine {
 
     /**
      * Build the window string representing the current rotor positions.
-     * @param rotors list of rotors from right to left
+     * @param rotors list of rotors in left→right order (index 0 = leftmost)
      * @return window string by format
      */
     private String buildWindowString(List<Rotor> rotors) {
@@ -214,7 +214,7 @@ public class MachineImpl implements Machine {
 
         // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
         for (Rotor rotor : rotors) {
-            char c = rotor.getPosition();   // numeric window index (0-based)
+            char c = rotor.getPosition();   // window position character
             sb.append(c);
         }
 
@@ -227,16 +227,13 @@ public class MachineImpl implements Machine {
             return "Machine not configured";
         }
 
-        List<Rotor> rotors = code.getRotors(); // right → left internally
+        List<Rotor> rotors = code.getRotors(); // left → right (index 0 = leftmost)
         Keyboard kb = keyboard;
 
-        // Convert to left→right for user-facing display.
-        // `code.getRotors()` returns rotors in right→left order, so copy
-        // and reverse to produce left→right for rendering (index 0 = leftmost).
-        // Build left-to-right rotor rendering order based on configured rotor IDs
-        // The Code may store rotors in either order; to guarantee the printed
-        // leftmost rotor matches the configured first rotor id, map config ids
-        // to rotor instances and render according to that sequence.
+        // Build left-to-right rotor rendering order based on configured rotor IDs.
+        // The Code stores rotors in left→right order matching the config ids.
+        // To guarantee the printed leftmost rotor matches the configured first rotor id,
+        // map config ids to rotor instances and render according to that sequence.
         List<Rotor> leftToRight = new ArrayList<>();
         try {
             List<Integer> configuredIds = code.getRotorIds(); // expected left->right

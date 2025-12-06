@@ -13,7 +13,7 @@ import java.util.List;
  * @param outputChar final output character
  * @param windowBefore rotor window before stepping (left→right)
  * @param windowAfter rotor window after processing (left→right)
- * @param advancedIndices rotors that advanced (0 = rightmost)
+ * @param advancedIndices rotors that advanced (index 0 = leftmost)
  * @param forwardSteps rotor traces for forward pass (right→left)
  * @param reflectorStep reflector transformation trace
  * @param backwardSteps rotor traces for backward pass (left→right)
@@ -24,7 +24,7 @@ public record SignalTrace(
         char outputChar,                 // final output char
         String windowBefore,             // rotor window before stepping (left→right)
         String windowAfter,              // rotor window after processing (left→right)
-        List<Integer> advancedIndices,   // rotors that advanced this step (0 = rightmost)
+        List<Integer> advancedIndices,   // rotors that advanced this step (index 0 = leftmost)
         List<RotorTrace> forwardSteps,   // rotor steps, right→left
         ReflectorTrace reflectorStep,    // reflector step
         List<RotorTrace> backwardSteps   // rotor steps, left→right
