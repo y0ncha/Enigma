@@ -51,7 +51,7 @@ public class PaperlMultiWordTester {
                 "DLTBBQVPQV",
                 "QMJIDORMMYQBJDVSBR",
                 "CVRDIZWDAWQKUKBVHJILPKRNDXWIY",
-                "MRUHRFZZR"
+                "MRUHFRZZR"
         };
 
         int passed = 0;
