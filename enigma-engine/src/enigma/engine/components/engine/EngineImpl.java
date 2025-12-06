@@ -5,9 +5,10 @@ import enigma.machine.component.code.Code;
 import enigma.machine.component.machine.Machine;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
-import enigma.shared.dto.MachineDataDTO;
+import enigma.shared.dto.MachineState;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class EngineImpl implements Engine {
@@ -28,21 +29,21 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public MachineDataDTO machineData() {
+    public MachineState machineData() {
         int availableRotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
         int availableReflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
         
         CodeData currentData = extractCodeData(machine != null ? machine.getCode() : null);
         
-        return new MachineDataDTO(
+        return new MachineState(
             availableRotorsCount,
             availableReflectorsCount,
             processedMessagesCount,
-            originalRotorIds,
-            originalRotorPositions,
+            copyList(originalRotorIds),
+            copyList(originalRotorPositions),
             originalReflectorId,
-            currentData.rotorIds,
-            currentData.rotorPositions,
+            copyList(currentData.rotorIds),
+            copyList(currentData.rotorPositions),
             currentData.reflectorId
         );
     }
@@ -100,6 +101,10 @@ public class EngineImpl implements Engine {
         String reflectorId = reflector != null ? reflector.getId() : null;
         
         return new CodeData(rotorIds, rotorPositions, reflectorId);
+    }
+
+    private <T> List<T> copyList(List<T> list) {
+        return list != null ? Collections.unmodifiableList(new ArrayList<>(list)) : null;
     }
 
     private static class CodeData {

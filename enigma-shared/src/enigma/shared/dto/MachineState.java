@@ -3,9 +3,9 @@ package enigma.shared.dto;
 import java.util.List;
 
 /**
- * Machine state snapshot.
+ * Immutable machine state snapshot.
  */
-public record MachineDataDTO(
+public record MachineState(
         int availableRotorsCount,
         int availableReflectorsCount,
         int processedMessagesCount,

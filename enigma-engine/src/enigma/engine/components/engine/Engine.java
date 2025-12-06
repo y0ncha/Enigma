@@ -1,10 +1,10 @@
 package enigma.engine.components.engine;
 
-import enigma.shared.dto.MachineDataDTO;
+import enigma.shared.dto.MachineState;
 
 public interface Engine {
     void loadXml(String path);
-    MachineDataDTO machineData();
+    MachineState machineData();
     void codeManual(/*Args*/);
     void codeRandom();
     String process(String input);
