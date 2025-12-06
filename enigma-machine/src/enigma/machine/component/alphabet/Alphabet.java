@@ -2,9 +2,23 @@ package enigma.machine.component.alphabet;
 
 /**
  * Immutable representation of the machine alphabet.
- * <p>
- * The alphabet is stored as a sequence of characters and provides
- * helper methods to query size and map between characters and indices.
+ *
+ * <p><b>Module:</b> enigma-machine</p>
+ *
+ * <p>The alphabet is stored as a sequence of characters and provides
+ * helper methods to query size and map between characters and indices.</p>
+ *
+ * <h2>Invariants</h2>
+ * <ul>
+ *   <li>Alphabet must be non-null and non-empty</li>
+ *   <li>All characters must be unique</li>
+ *   <li>Length must be even (loader validation)</li>
+ * </ul>
+ *
+ * <h2>Index Mapping</h2>
+ * <p>Characters are mapped to 0-based indices in the order they appear
+ * in the alphabet string. The {@link enigma.machine.component.keyboard.Keyboard}
+ * uses this mapping for all char ↔ index conversions.</p>
  *
  * @since 1.0
  */
@@ -38,7 +52,7 @@ public class Alphabet {
     /**
      * Return the underlying letters string.
      *
-     * @return the letters string
+     * @return the letters string (immutable)
      * @since 1.0
      */
     public String getLetters() {
@@ -46,9 +60,9 @@ public class Alphabet {
     }
 
     /**
-     * Return number of characters in the alphabet.
+     * Return the number of characters in the alphabet.
      *
-     * @return alphabet length
+     * @return alphabet length (always even per loader validation)
      * @since 1.0
      */
     public int size() {
@@ -56,10 +70,10 @@ public class Alphabet {
     }
 
     /**
-     * Return zero-based index of the given character.
+     * Return the zero-based index of the given character.
      *
      * @param c character to look up
-     * @return index of the character or -1 if not present
+     * @return index of the character (0..size-1), or -1 if not present
      * @since 1.0
      */
     public int indexOf(char c) {
@@ -67,10 +81,11 @@ public class Alphabet {
     }
 
     /**
-     * Return character at the given zero-based index.
+     * Return the character at the given zero-based index.
      *
-     * @param index zero-based index
+     * @param index zero-based index (0..size-1)
      * @return character at index
+     * @throws IndexOutOfBoundsException if index is out of range
      * @since 1.0
      */
     public char charAt(int index) {
