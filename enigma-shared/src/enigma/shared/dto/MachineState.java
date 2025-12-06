@@ -6,9 +6,9 @@ import java.util.List;
  * Immutable machine state snapshot.
  */
 public record MachineState(
-        int availableRotorsCount,
-        int availableReflectorsCount,
-        int processedMessagesCount,
+        int rotorsCount,
+        int reflectorsCount,
+        int messagesCount,
         List<Integer> originalRotorIds,
         List<Character> originalRotorPositions,
         String originalReflectorId,
