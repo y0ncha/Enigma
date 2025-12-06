@@ -110,7 +110,7 @@ public class LoaderXml implements Loader {
      */
     private Map<Integer, RotorSpec> extractRotors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
-        Map<Integer, RotorSpec> result = new HashMap<>();
+        Map<Integer, RotorSpec> result = new java.util.LinkedHashMap<>();
 
         BTERotors bteRotors = root.getBTERotors();
         validateRotorsHeader(bteRotors);
@@ -125,18 +125,17 @@ public class LoaderXml implements Loader {
             validateNotch(id, notch, alphabetSize);
             int notchIndex = notch - 1; // XML notch is 1-based; internal spec uses 0-based
 
-            int[] forward = new int[alphabetSize];
-            int[] backward = new int[alphabetSize];
+            // Build row-ordered right/left char arrays according to XML ordering
+            char[] rightColumn = new char[alphabetSize];
+            char[] leftColumn = new char[alphabetSize];
             Set<Integer> seenRight = new HashSet<>();
             Set<Integer> seenLeft = new HashSet<>();
 
+            int rowIdx = 0;
             for (BTEPositioning pos : rotorXml.getBTEPositioning()) {
-
-                // Raw string values from XML, e.g. "E", "K", "M"...
                 String rightStr = pos.getRight();
                 String leftStr  = pos.getLeft();
 
-                // Basic validation: both sides must be a single character
                 if (rightStr == null || rightStr.length() != 1 ||
                         leftStr  == null || leftStr.length()  != 1) {
                     throw new EnigmaLoadingException(
@@ -146,47 +145,47 @@ public class LoaderXml implements Loader {
                                     " (must be single letters from alphabet)");
                 }
 
-                // Convert characters to numeric indices according to alphabet
                 char rightChar = rightStr.charAt(0);
                 char leftChar  = leftStr.charAt(0);
 
-                int right = alphabet.indexOf(rightChar);
-                int left  = alphabet.indexOf(leftChar);
+                int rightIdx = alphabet.indexOf(rightChar);
+                int leftIdx  = alphabet.indexOf(leftChar);
 
-                // indexOf returns -1 when the character is not in the alphabet
-                if (right == -1 || left == -1) {
+                if (rightIdx == -1 || leftIdx == -1) {
                     throw new EnigmaLoadingException(
                             "Rotor " + rotorXml.getId() +
                                     " uses letters not in alphabet: right=" + rightChar +
                                     " left=" + leftChar);
                 }
 
-                // Ensure permutation: each index must appear exactly once on both sides
-                if (!seenRight.add(right)) {
+                if (!seenRight.add(rightIdx)) {
                     throw new EnigmaLoadingException(
                             "Rotor " + id +
                                     " has duplicate mapping for right index " +
-                                    (right + 1) + " (letter: " + rightChar + ")");
+                                    (rightIdx + 1) + " (letter: " + rightChar + ")");
                 }
-                if (!seenLeft.add(left)) {
+                if (!seenLeft.add(leftIdx)) {
                     throw new EnigmaLoadingException(
                             "Rotor " + id +
                                     " has duplicate mapping for left index " +
-                                    (left + 1) + " (letter: " + leftChar + ")");
+                                    (leftIdx + 1) + " (letter: " + leftChar + ")");
                 }
 
-                // Fill forward/backward mapping arrays (right->left and left->right)
-                forward[right] = left;
-                backward[left] = right;
-            }
+                if (rowIdx >= alphabetSize) {
+                    throw new EnigmaLoadingException("Rotor " + id + " defines more positions than alphabet size");
+                }
 
+                rightColumn[rowIdx] = rightChar;
+                leftColumn[rowIdx] = leftChar;
+                rowIdx++;
+            }
 
             if (seenRight.size() != alphabetSize || seenLeft.size() != alphabetSize) {
                 throw new EnigmaLoadingException("Rotor " + id +
                         " does not define a full permutation of the alphabet");
             }
 
-            result.put(id, new RotorSpec(id, notchIndex, forward, backward));
+            result.put(id, new RotorSpec(id, notchIndex, rightColumn, leftColumn));
         }
 
         // Validate the rotor id set forms 1..N contiguous sequence
@@ -205,7 +204,7 @@ public class LoaderXml implements Loader {
      */
     private Map<String, ReflectorSpec> extractReflectors(BTEEnigma root, Alphabet alphabet) throws EnigmaLoadingException {
 
-        Map<String, ReflectorSpec> result = new HashMap<>();
+        Map<String, ReflectorSpec> result = new java.util.LinkedHashMap<>();
 
         BTEReflectors bteReflectors = root.getBTEReflectors();
         validateReflectorsHeader(bteReflectors);

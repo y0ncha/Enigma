@@ -37,8 +37,7 @@ public interface RotorFactory {
      * is set to the specified initial position.</p>
      *
      * @param spec          rotor specification containing id, notch index, and mappings
-     * @param startPosition initial window position (0-based index into alphabet)
      * @return a runtime rotor instance ready for use in the machine
      */
-    Rotor create(RotorSpec spec, int startPosition);
+    Rotor create(RotorSpec spec);
 }

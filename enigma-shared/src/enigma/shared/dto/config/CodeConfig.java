@@ -1,19 +1,20 @@
 package enigma.shared.dto.config;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Configuration for creating a Code: chosen rotor ids (left→right), initial positions
- * as numeric indices (left→right), and reflector id.
+ * as characters (left→right), and reflector id.
  *
  * @param rotorIds rotor IDs in user-selected order (left→right)
- * @param initialPositions numeric positions left→right (0-based indices)
+ * @param initialPositions starting positions as characters (left→right), e.g. ['O','D','X']
  * @param reflectorId reflector identifier (e.g. "I")
  * @since 1.0
  */
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
-        List<Integer> initialPositions, // numeric positions left→right (0-based indices)
+        List<Character> initialPositions, // starting positions as characters (left→right), e.g. ['O','D','X']
         String reflectorId            // e.g. "I"
 ) {
     /**
@@ -24,9 +25,9 @@ public record CodeConfig(
         return "<%s><%s><%s>"
                 .formatted(
                         rotorIds.toString().replaceAll("[\\[\\] ]", ""),
-                        initialPositions.stream()
-                                .map(i -> String.valueOf((char)('A' + i)))
-                                .reduce("", String::concat),
+                        initialPositions == null ? "" : initialPositions.stream()
+                                .map(String::valueOf)
+                                .collect(Collectors.joining()),
                         reflectorId
                 );
     }

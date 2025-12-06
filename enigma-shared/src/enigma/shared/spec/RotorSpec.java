@@ -18,55 +18,37 @@ import java.util.stream.IntStream;
 public record RotorSpec(
         int id,
         int notchIndex,
-        int[] forwardMapping,
-        int[] backwardMapping
+        char[] rightColumn,
+        char[] leftColumn
 ) {
     /**
      * Canonical constructor with validation and defensive copy.
-     *
-     * @param id rotor identifier
-     * @param notchIndex notch position index (0-based)
-     * @param forwardMapping forward mapping array (right→left)
-     * @param backwardMapping backward mapping array (left→right)
+     * The right/left column arrays represent the rotor rows in the same order
+     * as they appear in the XML <BTE-Positioning> sequence (top→bottom). Each
+     * entry is the character from the XML alphabet.
      */
     public RotorSpec {
-        Objects.requireNonNull(forwardMapping);
-        Objects.requireNonNull(backwardMapping);
-        // Defensive copy to preserve immutability semantics for callers
-        forwardMapping = forwardMapping.clone();
-        backwardMapping = backwardMapping.clone();
+        Objects.requireNonNull(rightColumn);
+        Objects.requireNonNull(leftColumn);
+        rightColumn = rightColumn.clone();
+        leftColumn = leftColumn.clone();
     }
 
-    /**
-     * Return a defensive copy of the forward mapping array.
-     *
-     * @return copy of forward mapping (right→left)
-     */
-    public int[] getForwardMapping() {
-        return forwardMapping.clone();
-    }
+    /** Return a defensive copy of the right-column char array (row order). */
+    public char[] getRightColumn() { return rightColumn.clone(); }
 
-    /**
-     * Return a defensive copy of the backward mapping array.
-     *
-     * @return copy of backward mapping (left→right)
-     */
-    public int[] getBackwardMapping() {
-        return backwardMapping.clone();
-    }
+    /** Return a defensive copy of the left-column char array (row order). */
+    public char[] getLeftColumn() { return leftColumn.clone(); }
 
-    private String mappingToString(int[] mapping) {
-        return IntStream.range(0, mapping.length)
-                .mapToObj(i -> (char)('A' + i) + "->" + (char)('A' + mapping[i]))
+    private String rowsToString() {
+        int n = Math.min(rightColumn.length, leftColumn.length);
+        return IntStream.range(0, n)
+                .mapToObj(i -> rightColumn[i] + "->" + leftColumn[i])
                 .collect(Collectors.joining(", "));
     }
 
-    /**
-     * @inheritDoc
-     */
     @Override
     public String toString() {
-        return String.format("Rotor ID: %d, Notch: %d, Forward: [%s], Backward: [%s]",
-                id, notchIndex + 1, mappingToString(forwardMapping), mappingToString(backwardMapping));
+        return String.format("Rotor ID: %d, Notch: %d, Rows: [%s]", id, notchIndex + 1, rowsToString());
     }
 }

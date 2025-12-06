@@ -57,6 +57,9 @@ import java.util.*;
  */
 public class CodeFactoryImpl implements CodeFactory {
 
+    private RotorFactory rotorFactory;
+    private ReflectorFactory reflectorFactory;
+
     /**
      * {@inheritDoc}
      *
@@ -66,14 +69,14 @@ public class CodeFactoryImpl implements CodeFactory {
     @Override
     public Code create(MachineSpec spec, CodeConfig config) {
         Alphabet alphabet = spec.alphabet();
-        RotorFactory rotorFactory = new RotorFactoryImpl(alphabet);
-        ReflectorFactory reflectorFactory = new ReflectorFactoryImpl(alphabet);
+        this.rotorFactory = new RotorFactoryImpl(alphabet);
+        this.reflectorFactory = new ReflectorFactoryImpl(alphabet);
 
         // Build rotors in left→right order
-        List<Rotor> rotors = buildRotors(spec, config, rotorFactory);
+        List<Rotor> rotors = buildRotors(spec, config);
 
         // Build reflector
-        Reflector reflector = buildReflector(spec, config, reflectorFactory);
+        Reflector reflector = buildReflector(spec, config);
 
         // Assemble code (preserving left→right order)
         return new CodeImpl(
@@ -95,20 +98,20 @@ public class CodeFactoryImpl implements CodeFactory {
      *
      * @param spec machine specification
      * @param config code configuration
-     * @param rotorFactory factory for creating rotors
      * @return list of rotors in left→right order
      */
-    private List<Rotor> buildRotors(MachineSpec spec, CodeConfig config, RotorFactory rotorFactory) {
+    private List<Rotor> buildRotors(MachineSpec spec, CodeConfig config) {
         List<Integer> rotorIds = config.rotorIds();
-        List<Integer> positions = config.initialPositions();
+        List<Character> positions = config.initialPositions();
         List<Rotor> rotors = new ArrayList<>(rotorIds.size());
 
         for (int i = 0; i < rotorIds.size(); i++) {
             int rotorId = rotorIds.get(i);
             RotorSpec rotorSpec = spec.getRotorById(rotorId);
-            int targetPosition = positions.get(i);
+            char targetPosition = positions.get(i);
 
-            Rotor rotor = rotorFactory.create(rotorSpec, targetPosition);
+            Rotor rotor = this.rotorFactory.create(rotorSpec);
+            rotor.setPosition(targetPosition);
             rotors.add(rotor);
         }
 
@@ -120,11 +123,10 @@ public class CodeFactoryImpl implements CodeFactory {
      *
      * @param spec machine specification
      * @param config code configuration
-     * @param reflectorFactory factory for creating reflectors
      * @return reflector instance
      */
-    private Reflector buildReflector(MachineSpec spec, CodeConfig config, ReflectorFactory reflectorFactory) {
+    private Reflector buildReflector(MachineSpec spec, CodeConfig config) {
         ReflectorSpec reflectorSpec = spec.getReflectorById(config.reflectorId());
-        return reflectorFactory.create(reflectorSpec);
+        return this.reflectorFactory.create(reflectorSpec);
     }
 }

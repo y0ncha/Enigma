@@ -5,8 +5,6 @@ import enigma.shared.spec.RotorSpec;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.machine.component.rotor.Rotor;
 
-import java.util.Objects;
-
 /**
  * Default {@link RotorFactory} implementation producing {@link RotorImpl} instances.
  *
@@ -17,7 +15,6 @@ import java.util.Objects;
  *   <li>Extracts the forward mapping from the specification</li>
  *   <li>Builds the notch index from the specification</li>
  *   <li>Constructs the mechanical rotor</li>
- *   <li>Sets the initial position via {@link RotorImpl#setPosition(int)}</li>
  * </ul>
  *
  * <h2>Mapping Conventions</h2>
@@ -57,52 +54,19 @@ public class RotorFactoryImpl implements RotorFactory {
      * mechanical column-rotation model ({@link RotorImpl}).</p>
      */
     @Override
-    public Rotor create(RotorSpec spec, int startPosition) {
-        validateInputs(spec, startPosition);
-
-        RotorImpl rotor = buildMechanicalRotor(spec);
-        rotor.setPosition(startPosition);
-        return rotor;
-    }
-
-    // ---------------------------------------------------------
-    // Helper methods
-    // ---------------------------------------------------------
-
-    /**
-     * Validate the specification and start position.
-     *
-     * @param spec rotor specification to validate
-     * @param startPosition initial position to validate
-     * @throws NullPointerException if spec is null
-     * @throws IllegalArgumentException if startPosition is out of range
-     */
-    private void validateInputs(RotorSpec spec, int startPosition) {
-        Objects.requireNonNull(spec, "spec must not be null");
-
-        if (startPosition < 0 || startPosition >= alphabet.size()) {
-            throw new IllegalArgumentException(
-                    "startPosition out of range: " + startPosition +
-                            " (alphabet size=" + alphabet.size() + ")"
-            );
+    public Rotor create(RotorSpec spec) {
+        // Pass char[] columns directly (preserve XML character rows). RotorImpl handles chars.
+        char[] rightChars = spec.getRightColumn();
+        char[] leftChars = spec.getLeftColumn();
+        if (rightChars.length != leftChars.length || rightChars.length != alphabet.size()) {
+            throw new IllegalStateException("RotorSpec column length mismatch or not equal to alphabet size");
         }
-    }
 
-    /**
-     * Build a mechanical rotor from the specification.
-     *
-     * <p>Extracts the forward mapping, backward mapping, and notch index
-     * from the spec and constructs a new {@link RotorImpl}.</p>
-     *
-     * @param spec rotor specification
-     * @return new RotorImpl instance (position not yet set)
-     */
-    private RotorImpl buildMechanicalRotor(RotorSpec spec) {
         return new RotorImpl(
-                spec.getForwardMapping(),
-                spec.getBackwardMapping(),
+                rightChars,
+                leftChars,
                 spec.notchIndex(),
-                alphabet.size(),
+                this.alphabet.size(),
                 spec.id()
         );
     }
