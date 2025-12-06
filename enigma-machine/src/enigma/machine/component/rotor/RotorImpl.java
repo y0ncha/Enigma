@@ -1,7 +1,6 @@
 package enigma.machine.component.rotor;
 
 import java.util.LinkedList;
-import enigma.machine.component.alphabet.Alphabet;
 
 /**
  * Canonical runtime rotor implementation using the mechanical column-rotation model.
@@ -43,11 +42,9 @@ import enigma.machine.component.alphabet.Alphabet;
  */
 public class RotorImpl implements Rotor {
 
-    private final LinkedList<Wire> wires;  // rows in top → bottom order
-    private final Alphabet alphabet;       // machine alphabet for rendering
+    private final LinkedList<Wire> wires;  // rows in top → bottom order (chars)
     private final int alphabetSize;
-
-    private final int notchIndex; // which row triggers stepping of next rotor
+    private final char notch;
     private final int id;
 
     /**
@@ -61,26 +58,25 @@ public class RotorImpl implements Rotor {
      * @param rightColumn row-ordered right-column symbols (0-based indices)
      * @param leftColumn row-ordered left-column symbols (0-based indices)
      * @param notchIndex index at which the rotor triggers stepping of the next rotor (0..N-1)
-     * @param alphabet machine alphabet used for bounds
+     * @param alphabetSize machine alphabet size used for bounds
      * @param id rotor identifier for debugging/tracing
      */
-    public RotorImpl(int[] rightColumn, int[] leftColumn, int notchIndex, Alphabet alphabet, int id) {
-        if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
-        this.alphabet = alphabet;
-        this.alphabetSize = alphabet.size();
+    public RotorImpl(char[] rightColumn, char[] leftColumn, int notchIndex, int alphabetSize, int id) {
+
+        this.alphabetSize = alphabetSize;
 
         if (rightColumn == null || leftColumn == null) throw new IllegalArgumentException("right/left column must not be null");
         if (rightColumn.length != this.alphabetSize || leftColumn.length != this.alphabetSize)
             throw new IllegalArgumentException("Rotor column lengths must equal alphabet size");
 
         this.wires = new LinkedList<>();
-        // Build wires list using provided row-ordered columns (top->bottom)
+        // Build wires list using provided row-ordered char columns (top->bottom)
         for (int i = 0; i < this.alphabetSize; i++) {
             wires.add(new Wire(rightColumn[i], leftColumn[i]));
         }
 
         // Store notch (bounded)
-        this.notchIndex = makeInBounds(notchIndex);
+        this.notch = wires.get(notchIndex).right();
         this.id = id;
     }
 
@@ -102,7 +98,7 @@ public class RotorImpl implements Rotor {
     public boolean advance() {
         rotate();
         int pos = getPosition();
-        return pos == notchIndex;
+        return pos == notch;
     }
 
     /**
@@ -121,7 +117,8 @@ public class RotorImpl implements Rotor {
      * <p>The position is defined as the right value of the top wire.</p>
      */
     @Override
-    public int getPosition() {
+    public char getPosition() {
+        // return numeric index for the right-side char at the top row
         return wires.getFirst().right();
     }
 
@@ -129,23 +126,14 @@ public class RotorImpl implements Rotor {
      * Set the rotor to a specific position by rotating until the top right matches.
      */
     @Override
-    public void setPosition(int pos) {
-        pos = makeInBounds(pos);
+    public void setPosition(char pos) {
         int safety = alphabetSize;
         while (getPosition() != pos && safety-- > 0) {
             rotate();
         }
         if (getPosition() != pos) {
-            throw new IllegalStateException("Failed to reach position " + pos + " in RotorImpl");
+            throw new IllegalStateException("Failed to reach position " + pos + " in rotor: " + id);
         }
-    }
-
-    /**
-     * Get the notch index that triggers stepping of the next rotor.
-     */
-    @Override
-    public int getNotchInd() {
-        return notchIndex;
     }
 
     /**
@@ -161,19 +149,35 @@ public class RotorImpl implements Rotor {
     // ---------------------------------------------------------
 
     private int encodeForward(int entryIndex) {
-        int sym = wires.get(entryIndex).right();
-        for (int i = 0; i < wires.size(); i++) {
-            if (wires.get(i).left() == sym) return i;
+        if (entryIndex < 0 || entryIndex >= alphabetSize) {
+            throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
         }
-        throw new IllegalStateException("Forward encoding: symbol not found in left column: " + sym);
+
+        // Forward path: RIGHT value at row → find its location in LEFT column
+        char inChar = wires.get(entryIndex).right();
+
+        for (int i = 0; i < wires.size(); i++) {
+            if (wires.get(i).left() == inChar) {
+                return i;
+            }
+        }
+        throw new IllegalStateException("Forward encoding: symbol not found in left column: " + inChar);
     }
 
     private int encodeBackward(int entryIndex) {
-        int sym = wires.get(entryIndex).left();
-        for (int i = 0; i < wires.size(); i++) {
-            if (wires.get(i).right() == sym) return i;
+        if (entryIndex < 0 || entryIndex >= alphabetSize) {
+            throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
         }
-        throw new IllegalStateException("Backward encoding: symbol not found in right column: " + sym);
+
+        // Backward path: LEFT value at row → find its location in RIGHT column
+        char inChar = wires.get(entryIndex).left();
+
+        for (int i = 0; i < wires.size(); i++) {
+            if (wires.get(i).right() == inChar) {
+                return i;
+            }
+        }
+        throw new IllegalStateException("Backward encoding: symbol not found in right column: " + inChar);
     }
 
     private void rotate() {
@@ -181,43 +185,9 @@ public class RotorImpl implements Rotor {
         wires.addLast(top);
     }
 
-    private int makeInBounds(int x) {
-        if (alphabetSize <= 0) {
-            throw new IllegalStateException("alphabetSize must be > 0");
-        }
-        x %= alphabetSize;
-        return x < 0 ? x + alphabetSize : x;
-    }
-
     @Override
-    public int getWireRight(int row) {
-        // Accept either 0-based (0..N-1) or 1-based (1..N) row indices.
-        // Normalize to 0-based internal index and validate.
-        int idx;
-        if (row >= 0 && row < wires.size()) {
-            // already 0-based
-            idx = row;
-        } else if (row >= 1 && row <= wires.size()) {
-            // 1-based passed in; convert to 0-based
-            idx = row - 1;
-        } else {
-            throw new IllegalArgumentException("Invalid row index: " + row);
-        }
-        return wires.get(idx).right();
-    }
-
-    @Override
-    public int getWireLeft(int row) {
-        // Mirror of getWireRight: accept 0-based or 1-based indices.
-        int idx;
-        if (row >= 0 && row < wires.size()) {
-            idx = row;
-        } else if (row >= 1 && row <= wires.size()) {
-            idx = row - 1;
-        } else {
-            throw new IllegalArgumentException("Invalid row index: " + row);
-        }
-        return wires.get(idx).left();
+    public Wire getWire(int row) {
+            return wires.get(row);
     }
 
     @Override
@@ -250,10 +220,10 @@ public class RotorImpl implements Rotor {
         // main tall box top
         sb.append(rpad.apply("  ┌" + "─".repeat(colInner) + "┐", colWidth)).append('\n');
 
-        // data rows: render using the machine alphabet (left | right characters)
+        // data rows: render using the stored chars in wires (left | right)
         for (Wire w : wires) {
-            char leftChar = alphabet.charAt(w.left());
-            char rightChar = alphabet.charAt(w.right());
+            char leftChar = w.left();
+            char rightChar = w.right();
             String row = String.format("%c | %c", leftChar, rightChar);
             String line = "  │" + center.apply(row, colInner) + "│";
             sb.append(rpad.apply(line, colWidth)).append('\n');

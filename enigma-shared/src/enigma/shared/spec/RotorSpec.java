@@ -18,37 +18,32 @@ import java.util.stream.IntStream;
 public record RotorSpec(
         int id,
         int notchIndex,
-        int[] rightColumn,
-        int[] leftColumn
+        char[] rightColumn,
+        char[] leftColumn
 ) {
     /**
      * Canonical constructor with validation and defensive copy.
      * The right/left column arrays represent the rotor rows in the same order
      * as they appear in the XML <BTE-Positioning> sequence (top→bottom). Each
-     * entry is a numeric alphabet index (0-based).
+     * entry is the character from the XML alphabet.
      */
     public RotorSpec {
         Objects.requireNonNull(rightColumn);
         Objects.requireNonNull(leftColumn);
-        // Defensive copies
         rightColumn = rightColumn.clone();
         leftColumn = leftColumn.clone();
     }
 
-    /**
-     * Return a defensive copy of the right-column array (row order).
-     */
-    public int[] getRightColumn() { return rightColumn.clone(); }
+    /** Return a defensive copy of the right-column char array (row order). */
+    public char[] getRightColumn() { return rightColumn.clone(); }
 
-    /**
-     * Return a defensive copy of the left-column array (row order).
-     */
-    public int[] getLeftColumn() { return leftColumn.clone(); }
+    /** Return a defensive copy of the left-column char array (row order). */
+    public char[] getLeftColumn() { return leftColumn.clone(); }
 
     private String rowsToString() {
-        // Represent rows as R->L using A+index (best-effort display)
-        return IntStream.range(0, Math.min(rightColumn.length, leftColumn.length))
-                .mapToObj(i -> (char)('A' + rightColumn[i]) + "->" + (char)('A' + leftColumn[i]))
+        int n = Math.min(rightColumn.length, leftColumn.length);
+        return IntStream.range(0, n)
+                .mapToObj(i -> rightColumn[i] + "->" + leftColumn[i])
                 .collect(Collectors.joining(", "));
     }
 

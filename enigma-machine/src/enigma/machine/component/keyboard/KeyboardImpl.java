@@ -22,25 +22,32 @@ public class KeyboardImpl implements Keyboard {
         this.alphabet = alphabet;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public int process(char input) {
-        int index = alphabet.indexOf(input);
-        if (index < 0) {
-            throw new IllegalArgumentException("Invalid character for this machine: " + input);
+    public char toChar(int idx) {
+        if (!idxInbound(idx)) {
+            throw new IllegalArgumentException("Invalid index for this machine: " + idx);
         }
-        return index;
+        return alphabet.charAt(idx);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public char lightKey(int input) {
-        return alphabet.charAt(input);
+    public int toIdx(char ch) {
+        if (!charInbound(ch)) {
+            throw new IllegalArgumentException("Invalid character for this machine: " + ch);
+        }
+        return alphabet.indexOf(ch);
     }
+
+    @Override
+    public boolean charInbound(char ch) {
+        return alphabet.contains(ch);
+    }
+
+    @Override
+    public boolean idxInbound(int idx) {
+        return 0 <= idx && idx < alphabet.size();
+    }
+
 
     @Override
     public int size() {return alphabet.size(); }

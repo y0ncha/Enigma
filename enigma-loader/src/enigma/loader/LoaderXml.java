@@ -125,9 +125,9 @@ public class LoaderXml implements Loader {
             validateNotch(id, notch, alphabetSize);
             int notchIndex = notch - 1; // XML notch is 1-based; internal spec uses 0-based
 
-            // Build row-ordered right/left arrays according to XML ordering
-            int[] rightColumn = new int[alphabetSize];
-            int[] leftColumn = new int[alphabetSize];
+            // Build row-ordered right/left char arrays according to XML ordering
+            char[] rightColumn = new char[alphabetSize];
+            char[] leftColumn = new char[alphabetSize];
             Set<Integer> seenRight = new HashSet<>();
             Set<Integer> seenLeft = new HashSet<>();
 
@@ -148,35 +148,35 @@ public class LoaderXml implements Loader {
                 char rightChar = rightStr.charAt(0);
                 char leftChar  = leftStr.charAt(0);
 
-                int right = alphabet.indexOf(rightChar);
-                int left  = alphabet.indexOf(leftChar);
+                int rightIdx = alphabet.indexOf(rightChar);
+                int leftIdx  = alphabet.indexOf(leftChar);
 
-                if (right == -1 || left == -1) {
+                if (rightIdx == -1 || leftIdx == -1) {
                     throw new EnigmaLoadingException(
                             "Rotor " + rotorXml.getId() +
                                     " uses letters not in alphabet: right=" + rightChar +
                                     " left=" + leftChar);
                 }
 
-                if (!seenRight.add(right)) {
+                if (!seenRight.add(rightIdx)) {
                     throw new EnigmaLoadingException(
                             "Rotor " + id +
                                     " has duplicate mapping for right index " +
-                                    (right + 1) + " (letter: " + rightChar + ")");
+                                    (rightIdx + 1) + " (letter: " + rightChar + ")");
                 }
-                if (!seenLeft.add(left)) {
+                if (!seenLeft.add(leftIdx)) {
                     throw new EnigmaLoadingException(
                             "Rotor " + id +
                                     " has duplicate mapping for left index " +
-                                    (left + 1) + " (letter: " + leftChar + ")");
+                                    (leftIdx + 1) + " (letter: " + leftChar + ")");
                 }
 
                 if (rowIdx >= alphabetSize) {
                     throw new EnigmaLoadingException("Rotor " + id + " defines more positions than alphabet size");
                 }
 
-                rightColumn[rowIdx] = right;
-                leftColumn[rowIdx] = left;
+                rightColumn[rowIdx] = rightChar;
+                leftColumn[rowIdx] = leftChar;
                 rowIdx++;
             }
 

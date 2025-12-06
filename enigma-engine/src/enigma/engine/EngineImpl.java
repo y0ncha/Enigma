@@ -181,18 +181,20 @@ public class EngineImpl implements Engine {
         Collections.shuffle(rotorPool, random);
         List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, ROTORS_IN_USE)); // left→right
 
-        // Generate random starting positions (left → right)
+        // Generate random starting positions as characters (left → right)
         int alphaSize = spec.alphabet().size();
-        List<Integer> positions = new ArrayList<>(ROTORS_IN_USE);
+        List<Character> positions = new ArrayList<>(ROTORS_IN_USE);
         for (int i = 0; i < ROTORS_IN_USE; i++) {
-            positions.add(random.nextInt(alphaSize));
+            int randIndex = random.nextInt(alphaSize);        // 0 .. alphaSize-1
+            char posChar = spec.alphabet().charAt(randIndex); // map index → symbol
+            positions.add(posChar);
         }
 
         // Pick a random reflector
         List<String> reflectorIds = new ArrayList<>(spec.reflectorsById().keySet());
         String reflectorId = reflectorIds.get(random.nextInt(reflectorIds.size()));
 
-        // rotorIds (left→right), positions (left→right), reflectorId
+        // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
 
@@ -214,7 +216,7 @@ public class EngineImpl implements Engine {
         if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
 
         List<Integer> rotorIds = config.rotorIds();
-        List<Integer> positions = config.initialPositions();
+        List<Character> positions = config.initialPositions();
         String reflectorId = config.reflectorId();
 
         if (rotorIds == null) throw new IllegalArgumentException("rotorIds must not be null");
@@ -235,11 +237,8 @@ public class EngineImpl implements Engine {
         if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
         if (spec.getReflectorById(reflectorId) == null) throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
 
-        int alphaSize = spec.alphabet().size();
-        for (int i = 0; i < positions.size(); i++) {
-            Integer p = positions.get(i);
-            if (p == null || p < 0 || p >= alphaSize)
-                throw new IllegalArgumentException("Invalid position at index " + i + ": " + p);
+        for (char c : positions) {
+            if (!spec.alphabet().contains(c)) throw new IllegalArgumentException(c + " is not a valid position");
         }
     }
 }

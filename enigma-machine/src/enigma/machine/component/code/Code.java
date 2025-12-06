@@ -30,13 +30,6 @@ public interface Code {
      */
     Reflector getReflector();
 
-    // Metadata
-    /**
-     * Rotor start positions (0-based) for each rotor (right→left).
-     *
-     * @return list of numeric rotor positions
-     */
-    List<Integer> getPositions();
 
     /**
      * Rotor ids corresponding to the rotors list (right→left).
@@ -45,12 +38,6 @@ public interface Code {
      */
     List<Integer> getRotorIds();
 
-    /**
-     * Reflector identifier (e.g. "I", "II").
-     *
-     * @return reflector id string
-     */
-    String getReflectorId();
 
     Alphabet getAlphabet();
 }

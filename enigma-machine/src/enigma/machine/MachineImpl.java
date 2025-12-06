@@ -65,7 +65,7 @@ public class MachineImpl implements Machine {
         List<Integer> advancedIndices = advance(rotors);
 
         // Keyboard encoding
-        int intermediate = keyboard.process(input);
+        int intermediate = keyboard.toIdx(input);
 
         // Forward pass (right→left)
         List<RotorTrace> forwardSteps = forwardTransform(rotors, intermediate);
@@ -78,9 +78,7 @@ public class MachineImpl implements Machine {
         int reflectExit = code.getReflector().process(reflectEntry);
         ReflectorTrace reflectorStep = new ReflectorTrace(
                 reflectEntry,
-                reflectExit,
-                keyboard.lightKey(reflectEntry),
-                keyboard.lightKey(reflectExit)
+                reflectExit
         );
         intermediate = reflectExit;
 
@@ -90,7 +88,7 @@ public class MachineImpl implements Machine {
             intermediate = backwardSteps.getLast().exitIndex();
         }
 
-        char outputChar = keyboard.lightKey(intermediate);
+        char outputChar = keyboard.toChar(intermediate);
 
         // Window after processing (rotors already stepped at the top)
         String windowAfter = buildWindowString(rotors);
@@ -161,8 +159,8 @@ public class MachineImpl implements Machine {
                     i,
                     entryIndex,
                     exitIndex,
-                    keyboard.lightKey(entryIndex),
-                    keyboard.lightKey(exitIndex)
+                    keyboard.toChar(entryIndex),
+                    keyboard.toChar(exitIndex)
             ));
             entryIndex = exitIndex;
         }
@@ -191,8 +189,8 @@ public class MachineImpl implements Machine {
                     i,
                     entryIndex,
                     exitIndex,
-                    keyboard.lightKey(entryIndex),
-                    keyboard.lightKey(exitIndex)
+                    keyboard.toChar(entryIndex),
+                    keyboard.toChar(exitIndex)
             ));
 
             value = exitIndex;
@@ -216,8 +214,7 @@ public class MachineImpl implements Machine {
 
         // user-facing left→right view: iterate rotors from leftmost (index 0) to rightmost
         for (Rotor rotor : rotors) {
-            int pos = rotor.getPosition();   // numeric window index (0-based)
-            char c = keyboard.lightKey(pos);         // convert index -> alphabet char
+            char c = rotor.getPosition();   // numeric window index (0-based)
             sb.append(c);
         }
 
@@ -262,27 +259,31 @@ public class MachineImpl implements Machine {
             leftToRight = new ArrayList<>(rotors);
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder out = new StringBuilder();
 
-        sb.append("\n+----------------------------------------------------------+\n");
-        sb.append("|                      ENIGMA MACHINE                      |\n");
-        sb.append("+----------------------------------------------------------+\n\n");
+        out.append("\n+----------------------------------------------------------+\n");
+        out.append("|                      ENIGMA MACHINE                      |\n");
+        out.append("+----------------------------------------------------------+\n\n");
 
         // Header for wiring table
-        sb.append("Detailed Wiring (Right Column → Left Column)\n\n");
+        out.append("Detailed Wiring (Right Column → Left Column)\n\n");
 
         int numRows = kb.size();
 
         // Prepare reflector display (left of rotors)
         enigma.machine.component.reflector.Reflector refl = code.getReflector();
 
-        // Column inner widths
-        final int idxInner = 5;     // index column inner width (e.g. '  1  ')
-        final int colInner = 9;     // reflector and rotor inner width
-        final String gap = "  ";   // gap between columns
+        // Use component toString() outputs for columns
+        String reflCol = refl.toString();
 
-        // helpers for centering text inside a fixed-width cell
-        // center a string to width w
+        List<String> rotorCols = new ArrayList<>();
+        for (Rotor r : leftToRight) rotorCols.add(r.toString());
+
+        // Build idx column (matches rotor column height)
+        final int colInner = 9;
+        final int idxInner = 5;
+        final String gap = "  ";
+
         java.util.function.BiFunction<String,Integer,String> center = (s,w) -> {
             if (s == null) s = "";
             if (s.length() >= w) return s.substring(0,w);
@@ -291,101 +292,78 @@ public class MachineImpl implements Machine {
             return " ".repeat(left) + s + " ".repeat(right);
         };
 
-        // Draw small ID boxes above each column (Idx, Ref, Rotor N)
-        // Box widths equal the column inner widths so they align perfectly
-        StringBuilder idTop = new StringBuilder();
-        StringBuilder idMid = new StringBuilder();
-        StringBuilder idBot = new StringBuilder();
+        // Compose idx column using same visual style as rotor.toString()
+        StringBuilder idxSb = new StringBuilder();
+        // for rotor/ref columns
+        int colWidth = colInner + 4; // total width per column
+        // leading padding to match other columns which start with two spaces
+        String lead = "  ";
 
-        // start padding
-        idTop.append("  ");
-        idMid.append("  ");
-        idBot.append("  ");
+        // small ID box for Idx - use same inner width as other columns so header aligns
+        idxSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        idxSb.append(lead).append("│").append(center.apply("Idx", colInner)).append("│").append('\n');
+        idxSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
 
-        // Idx box
-        idTop.append("┌").append("─".repeat(idxInner)).append("┐").append(gap);
-        idMid.append("│").append(center.apply("Idx", idxInner)).append("│").append(gap);
-        idBot.append("└").append("─".repeat(idxInner)).append("┘").append(gap);
+        // main tall box top
+        idxSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
 
-        // Reflector box
-        idTop.append("┌").append("─".repeat(colInner)).append("┐");
-        idMid.append("│").append(center.apply("Ref " + (refl.getId() == null ? "" : refl.getId()), colInner)).append("│");
-        idBot.append("└").append("─".repeat(colInner)).append("┘");
-
-        // Rotor boxes (use the same left-to-right order we will render the data rows in)
-        for (Rotor r : leftToRight) {
-            idTop.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
-            idMid.append(gap).append("│").append(center.apply("Rotor " + r.getId(), colInner)).append("│");
-            idBot.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+        // data rows: numbers (0-based) as requested by you
+        for (int r = 0; r < numRows; r++) {
+            String num = String.valueOf(r);
+            idxSb.append(lead).append("│").append(center.apply(num, colInner)).append("│").append('\n');
         }
 
-        // Alphabet box (rightmost column) - shows the machine alphabet from start->end
-        idTop.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
-        idMid.append(gap).append("│").append(center.apply("Alpha", colInner)).append("│");
-        idBot.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+        // bottom
+        idxSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
 
-        sb.append(idTop).append("\n");
-        sb.append(idMid).append("\n");
-        sb.append(idBot).append("\n");
+        // Alphabet column (rightmost) build
+        StringBuilder alphaSb = new StringBuilder();
+        alphaSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        alphaSb.append(lead).append("│").append(center.apply("KB", colInner)).append("│").append('\n');
+        alphaSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
+        alphaSb.append(lead).append("┌").append("─".repeat(colInner)).append("┐").append('\n');
+        for (int r = 0; r < numRows; r++) {
+            char c = kb.toChar(r);
+            alphaSb.append(lead).append("│").append(center.apply(String.valueOf(c), colInner)).append("│").append('\n');
+        }
+        alphaSb.append(lead).append("└").append("─".repeat(colInner)).append("┘").append('\n');
 
-        // IMPORTANT: wiring table must match the XML spec and the configured code.
-        //
-        // - Row index `row` is the 0-based contact on the RIGHT column (Idx = row+1).
-        // - For the reflector we show the numeric pair label taken from the XML
-        //   `<BTE-Reflect input="X" output="Y"/>`. Because the reflector is symmetric
-        //   and the XML always stores the smaller index as `input`, we label each pair
-        //   with `pairLabel = min(row, refl.process(row)) + 1` so both ends of a wire
-        //   (e.g. 1 and 25) show the same number.
-        //
-        // - For rotors, `leftToRight` is built from `code.getRotorIds()` (left→right),
-        //   so the printed columns "Rotor <id>" match the configured rotor order.
-        //   `getWireRight(i)` / `getWireLeft(i)` must return the static XML wiring
-        //   (0-based indices into the keyboard alphabet), and we render them as
-        //   `rightLetter | leftLetter` using `keyboard.lightKey(...)`.
-        //
-        // If you change how rotors / reflector are stored, keep these invariants so
-        // the table stays compatible with the XML and the active code configuration.
-        for (int row = 0; row < numRows; row++) {
-            StringBuilder rowLine = new StringBuilder();
+        // Now split columns into lines
+        java.util.List<String[]> cols = new ArrayList<>();
+        cols.add(idxSb.toString().split("\\R", -1));
+        cols.add(reflCol.split("\\R", -1));
+        for (String s : rotorCols) cols.add(s.split("\\R", -1));
+        cols.add(alphaSb.toString().split("\\R", -1));
 
-            // index column (0-based)
-            rowLine.append("  │").append(center.apply(String.valueOf(row), idxInner)).append("│").append(gap);
-
-            // reflector cell: show the wired pair label (use the XML 'input' label)
-            // compute partner index and use the smaller index as the pair id (1-based)
-            int a = row;                    // 0-based index entering on right side
-            int b = refl.process(row);      // partner index (0-based)
-            int pairLabel = Math.min(a, b) + 1; // 1-based label matching XML input
-            String reflCell = String.valueOf(pairLabel);
-            rowLine.append("│").append(center.apply(reflCell, colInner)).append("│");
-
-            // rotor columns (leftmost -> rightmost)
-            for (Rotor rotor : leftToRight) {
-                int rightVal = rotor.getWireRight(row);
-                int leftVal = rotor.getWireLeft(row);
-                // print left-side wiring on the left and right-side wiring on the right
-                String cell = center.apply(kb.lightKey(leftVal) + " | " + kb.lightKey(rightVal), colInner);
-                rowLine.append(gap).append("│").append(cell).append("│");
+        // compute max lines and widths (use max line length per column)
+        int maxLines = 0;
+        int[] widths = new int[cols.size()];
+        for (int i = 0; i < cols.size(); i++) {
+            String[] arr = cols.get(i);
+            int w = 0;
+            for (String lineStr : arr) {
+                if (lineStr != null) w = Math.max(w, lineStr.length());
             }
-
-            // alphabet column (rightmost) - show the alphabet letter for this index
-            char alphaChar = kb.lightKey(row);
-            rowLine.append(gap).append("│").append(center.apply(String.valueOf(alphaChar), colInner)).append("│");
-
-            sb.append(rowLine).append("\n");
+            widths[i] = w;
+            maxLines = Math.max(maxLines, arr.length);
         }
 
-        // Bottom border line
-        StringBuilder bottomLine = new StringBuilder();
-        bottomLine.append("  └").append("─".repeat(idxInner)).append("┘").append(gap)
-                  .append("└").append("─".repeat(colInner)).append("┘");
-        for (int i = 0; i < leftToRight.size(); i++) {
-            bottomLine.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+        // Stitch lines together, right-pad pieces to column width for alignment
+        for (int line = 0; line < maxLines; line++) {
+            StringBuilder row = new StringBuilder();
+            for (int c = 0; c < cols.size(); c++) {
+                String[] arr = cols.get(c);
+                String piece = line < arr.length ? arr[line] : "";
+                int pad = widths[c] - piece.length();
+                row.append(piece);
+                if (pad > 0) row.append(" ".repeat(pad));
+                if (c < cols.size() - 1) row.append(gap);
+            }
+            out.append(row).append('\n');
         }
-        // bottom for alphabet column
-        bottomLine.append(gap).append("└").append("─".repeat(colInner)).append("┘");
-         sb.append(bottomLine).append("\n\n");
 
-        return sb.toString();
+        out.append('\n');
+
+        return out.toString();
     }
  }

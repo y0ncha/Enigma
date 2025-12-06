@@ -21,7 +21,7 @@ public class CodeImpl implements Code {
 
     // metadata (config)
     private final List<Integer> rotorIds;    // right → left
-    private final List<Integer> positions;   // numeric positions (0..|ABC|-1)
+    private final List<Character> positions;   // numeric positions (0..|ABC|-1)
     private final String reflectorId;        // "I", "II", ...
 
     /**
@@ -37,7 +37,7 @@ public class CodeImpl implements Code {
     public CodeImpl(Alphabet alphabet, List<Rotor> rotors,
                     Reflector reflector,
                     List<Integer> rotorIds,
-                    List<Integer> positions,
+                    List<Character> positions,
                     String reflectorId) {
         this.alphabet = alphabet;
 
@@ -61,16 +61,6 @@ public class CodeImpl implements Code {
     @Override
     public List<Integer> getRotorIds() {
         return rotorIds;
-    }
-
-    @Override
-    public List<Integer> getPositions() {
-        return positions;
-    }
-
-    @Override
-    public String getReflectorId() {
-        return reflectorId;
     }
 
     @Override
