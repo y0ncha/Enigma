@@ -8,8 +8,19 @@ import java.util.List;
 
 /**
  * Represents a machine code configuration: rotors, reflector and metadata.
- * Implementations are expected to provide ordered rotor instances (left→right)
- * together with their configuration metadata.
+ *
+ * <p><b>Module:</b> enigma-machine</p>
+ *
+ * <p>A Code bundles the active components (rotors, reflector) with their
+ * configuration metadata (IDs, positions, alphabet). Rotors are ordered
+ * left→right with index 0 representing the leftmost rotor.</p>
+ *
+ * <h2>Invariants</h2>
+ * <ul>
+ *   <li>Rotors list order matches configuration order (left→right)</li>
+ *   <li>All components share the same alphabet</li>
+ *   <li>Rotor IDs and positions lists must match rotors list size</li>
+ * </ul>
  *
  * @since 1.0
  */
@@ -17,9 +28,9 @@ public interface Code {
 
     // Components
     /**
-     * Active rotors in left-to-right order (index 0 = leftmost).
+     * Active rotors in left→right order (index 0 = leftmost).
      *
-     * @return ordered list of {@link Rotor}
+     * @return immutable ordered list of {@link Rotor}
      */
     List<Rotor> getRotors();
 
@@ -30,15 +41,18 @@ public interface Code {
      */
     Reflector getReflector();
 
-
     /**
-     * Rotor ids corresponding to the rotors list (left→right, index 0 = leftmost).
+     * Rotor IDs corresponding to the rotors list (left→right, index 0 = leftmost).
      *
-     * @return list of rotor ids
+     * @return immutable list of rotor IDs
      */
     List<Integer> getRotorIds();
 
-
+    /**
+     * Machine alphabet used by all components in this code.
+     *
+     * @return alphabet instance
+     */
     Alphabet getAlphabet();
 }
 

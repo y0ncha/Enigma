@@ -10,6 +10,12 @@ import java.util.List;
  * Immutable implementation of {@link Code} that stores active components
  * and configuration metadata.
  *
+ * <p><b>Module:</b> enigma-machine</p>
+ *
+ * <p>This class is a simple immutable container for runtime code configuration.
+ * Construction is handled by the engine's {@link enigma.engine.factory.CodeFactory}.
+ * All lists are defensively copied to ensure immutability.</p>
+ *
  * @since 1.0
  */
 public class CodeImpl implements Code {
@@ -27,9 +33,13 @@ public class CodeImpl implements Code {
     /**
      * Create a new immutable code instance.
      *
+     * <p>All list parameters are defensively copied. Lists must not be null
+     * and sizes must be consistent.</p>
+     *
+     * @param alphabet shared alphabet for all components
      * @param rotors active rotors in left→right order (index 0 = leftmost)
      * @param reflector active reflector
-     * @param rotorIds rotor numeric ids in left→right order (index 0 = leftmost)
+     * @param rotorIds rotor numeric IDs in left→right order (index 0 = leftmost)
      * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
      * @since 1.0
