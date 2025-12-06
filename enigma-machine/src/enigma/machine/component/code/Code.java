@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Represents a machine code configuration: rotors, reflector and metadata.
- * Implementations are expected to provide ordered rotor instances (right→left)
+ * Implementations are expected to provide ordered rotor instances (left→right)
  * together with their configuration metadata.
  *
  * @since 1.0
@@ -17,7 +17,7 @@ public interface Code {
 
     // Components
     /**
-     * Active rotors in right-to-left order.
+     * Active rotors in left-to-right order (index 0 = leftmost).
      *
      * @return ordered list of {@link Rotor}
      */
@@ -32,7 +32,7 @@ public interface Code {
 
 
     /**
-     * Rotor ids corresponding to the rotors list (right→left).
+     * Rotor ids corresponding to the rotors list (left→right, index 0 = leftmost).
      *
      * @return list of rotor ids
      */

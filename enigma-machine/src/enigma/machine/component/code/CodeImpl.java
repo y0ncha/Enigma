@@ -16,20 +16,20 @@ public class CodeImpl implements Code {
 
     // active components
     private final Alphabet alphabet;
-    private final List<Rotor> rotors;        // right → left
+    private final List<Rotor> rotors;        // left → right (index 0 = leftmost)
     private final Reflector reflector;
 
     // metadata (config)
-    private final List<Integer> rotorIds;    // right → left
+    private final List<Integer> rotorIds;    // left → right (index 0 = leftmost)
     private final List<Character> positions;   // rotor window positions as characters (e.g., 'A', 'B', 'C')
     private final String reflectorId;        // "I", "II", ...
 
     /**
      * Create a new immutable code instance.
      *
-     * @param rotors active rotors in right→left order
+     * @param rotors active rotors in left→right order (index 0 = leftmost)
      * @param reflector active reflector
-     * @param rotorIds rotor numeric ids in right→left order
+     * @param rotorIds rotor numeric ids in left→right order (index 0 = leftmost)
      * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
      * @since 1.0
