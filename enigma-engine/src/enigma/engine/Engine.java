@@ -3,6 +3,7 @@ package enigma.engine;
 import enigma.machine.Machine;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.tracer.processTrace;
 
 /**
@@ -100,4 +101,39 @@ public interface Engine {
      * Currently a placeholder for future implementation.</p>
      */
     void statistics();
-}
+
+    /**
+     * Returns the current machine specification loaded by the engine.
+     *
+     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
+     */
+    MachineSpec getMachineSpec();
+
+    /**
+     * Returns the current code configuration applied to the machine.
+     *
+     * @return the current {@link CodeConfig}, or {@code null} if not configured
+     */
+    CodeConfig getCurrentCodeConfig();
+
+    /**
+    /**
+     * Returns the current machine specification loaded by the engine.
+     *
+     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
+     */
+    MachineSpec getMachineSpec();
+
+    /**
+     * Returns the current code configuration applied to the machine.
+     *
+     * @return the current {@link CodeConfig}, or {@code null} if not configured
+     */
+    CodeConfig getCurrentCodeConfig();
+
+    /**
+     * Returns the total number of messages processed by the engine since initialization.
+     *
+     * @return the total count of processed messages (non-negative)
+     */
+    long getTotalProcessedMessages();

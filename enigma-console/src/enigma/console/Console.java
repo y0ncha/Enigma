@@ -24,4 +24,13 @@ package enigma.console;
  * @since 1.0
  */
 public interface Console {
+
+    /**
+     * Starts the main console loop:
+     * - show menu
+     * - read user command
+     * - execute command
+     * - repeat until Exit is chosen
+     */
+    void run();
 }
