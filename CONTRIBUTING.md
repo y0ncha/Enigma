@@ -1,83 +1,132 @@
-# CONTRIBUTING — documentation & code comment style
+# CONTRIBUTING — Code Style, Formatting & Documentation Rules
+### Applies to All Project Modules
 
-## Goal
+This document defines the mandatory conventions contributors must follow.  
+It is strict by design to maintain alignment with course requirements.
 
-Keep public documentation and inline comments minimal, consistent and actionable.
-This file codifies the short style we use in this repository so contributors write
-uniform, useful docs without over-explaining implementation details.
+---
 
-## High-level rules
+# 1. General Coding Rules
 
-- Be concise. One-line summaries for types; short paragraphs for behavior.
-- Prefer short inline comments (//) for *why* or non-obvious decisions — not for
-  describing what the code literally does.
-- Put detailed design rationale in the README or a short design doc; keep
-  Javadoc focused on API contract (inputs/outputs/preconditions).
-- Use the next format to separate sections (i.e., helpers, constants, etc.)
+- **Java 21**
+- Class names — `UpperCamelCase`
+- Methods & variables — `lowerCamelCase`
+- Constants — `UPPER_SNAKE_CASE`
+- Avoid long methods; keep logic readable
+- Prefer immutability (Alphabet, Mapping, CodeConfiguration, DTOs)
+- Keep classes small with clear responsibility
+- No "god classes"
+- Avoid unnecessary static utility classes
+- No unused imports
+
+---
+
+# 2. Architecture Rules (Mandatory)
+
+### 2.1 Layer Separation
+- `machine` — core logic
+- `engine` — validation, orchestration, history
+- `loader` — XML parsing + structural validation
+- `console` — UI printing only
+- `server` — controllers + services only
+
+### 2.2 Forbidden
+- No printing in machine / engine / loader
+- No Hebrew output
+- No exposure of internal machine objects
+- No business logic in UI
+- No hardcoding XML paths
+- No global shared mutable state
+
+---
+
+# 3. Javadoc Rules (Strict)
+
+### 3.1 Class-Level
+- One–two sentences describing responsibility
+- State direction conventions (left→right vs right→left) only where strictly relevant
+
+### 3.2 Method-Level
+- One-line functional summary
+- Tags: `@param`, `@return`, `@throws` (short descriptions only)
+- Document preconditions clearly
+
+### 3.3 Inline Comments
+- Use `//` for *why*, not for *what*
+- Never leave commented-out code
+- Keep all sentences short, clear, direct
+
+---
+
+# 4. Validation Rules (Must Match Engine Behavior)
+
+All validation logic must reside in the engine and loader:
+
+### XML Validation
+- Even alphabet size
+- Rotor IDs consecutive
+- Rotor mappings bijective
+- No reflector maps X→X
+- Roman reflector IDs unique
+- `rotors-count` <= available rotors
+- Forbidden chars: newline, tab, ESC
+- Invalid XML leaves current machine untouched
+
+### Code Configuration Validation
+- Rotor count must match spec
+- Rotor IDs must exist
+- Initial positions valid in alphabet
+- Reflector must exist
+- Plugboard: even length, no duplicates, no self-mapping
+
+### Input Validation
+- All characters must be in alphabet
+
+---
+
+# 5. DTO Rules
+- DTOs are immutable containers
+- They encapsulate engine output for UI/server layers
+- Must not expose internal machine objects
+- Must contain only what external layers need
+- Engine never returns domain objects — only DTOs
+
+---
+
+# 6. Exceptions & Error Handling
+
+- Internal methods may throw exceptions
+- Engine and server surfaces must catch them and convert to clean, human-readable messages
+- Never propagate internal stack traces
+- Error messages must:
+    - Explain what is wrong
+    - Where it occurred
+    - How to fix
+
+---
+
+# 7. Formatting Rules (Strict)
+
+- 100-column soft wrap
+- Consistent indentation
+- Blank lines between logical sections
+- Use section dividers only in this style:
+
+```java
+// ---------------------------------------------------------
+// Section Title
+// ---------------------------------------------------------
 ```
-  // ---------------------------------------------------------
-  // Rotor interface implementation
-  // ---------------------------------------------------------
-```
-## JavaDoc guidelines
 
-- Class summary: 1–2 short sentences describing responsibility.
-- Method summary: 1 short sentence describing effect.
-- Use these tags where applicable: @param, @return, @throws. Keep descriptions short.
-- For public API methods include short preconditions (caller responsibility). Use a
-  bullet list inside the method Javadoc when necessary.
-- Avoid long history notes, long examples, or language other than English.
-- Ordering convention: document left→right vs right→left only where it matters
-  (e.g. CodeConfig vs runtime Code). Put that note in class-level JavaDoc for
-  the factory/engine that relies on it.
+---
 
-## Inline comment guidelines
+# 8. Pull Request Checklist
 
-- Use // comments for small clarifications:
-  - Explain the reason ("why") not the mechanics ("what").
-  - Keep to one line when possible; two short lines max.
-- Use block comments (/* ... */) only for short file headers or license blocks.
-- Do NOT leave commented-out code; remove it or add a short note in git history.
+Before submitting:
 
-## Examples (good)
-
-// reverse because runtime expects right->left ordering
-Collections.reverse(list);
-
-/**
- * Create a Code from a validated MachineSpec and CodeConfig.
- * Preconditions: spec != null, config contains exactly 3 rotor ids (left->right).
- */
-public Code create(MachineSpec spec, CodeConfig config) { ... }
-
-## Examples (avoid)
-
-// this loops over the items and adds them to the result
-for (...) { ... }
-/* old implementation kept for debugging */
-
-## Formatting and tone
-
-- Use plain, neutral English.
-- Keep sentences short and imperative when giving instructions.
-- Keep line length reasonable (wrap at ~100 columns).
-
-## Validation and where it lives
-
-- Validation of XML/Specs/configs belongs to the Engine layer (EngineImpl).
-  Factories should assume inputs are valid and only construct runtime objects.
-  Document this responsibility in both Engine and factory JavaDoc.
-
-## Pull requests & review checklist
-
-- Include 1–2 sentence summary of the change and why.
-- Add/modify JavaDoc only where behavior or API changed.
-- Run the project's checks (IDE/build) and ensure no new compile errors.
-- Reviewers: verify the public contract (Javadoc) matches implementation.
-
-If you want stricter automated checks (Javadoc style linter, commit hooks) we can
-add them; open an issue or a PR proposing specifics.
-
-Thank you for keeping docs short and useful — concise comments are more likely
-to be read and maintained.
-
+- Code compiles
+- Javadoc updated
+- No redundant logic
+- No UI or printing in engine/loader
+- All validations enforced
+- Tests (manual or automated) run successfully  

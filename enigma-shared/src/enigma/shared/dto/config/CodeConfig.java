@@ -31,13 +31,13 @@ import java.util.stream.Collectors;
  * </ul>
  *
  * @param rotorIds rotor IDs in left→right order (e.g., [1, 2, 3])
- * @param initialPositions starting positions as characters in left→right order (e.g., ['O','D','X'])
+ * @param positions starting positions as characters in left→right order (e.g., ['O','D','X'])
  * @param reflectorId reflector identifier (e.g., "I", "II")
  * @since 1.0
  */
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
-        List<Character> initialPositions, // starting positions as characters (left→right), e.g. ['O','D','X']
+        List<Character> positions, // starting positions as characters (left→right), e.g. ['O','D','X']
         String reflectorId            // e.g. "I"
 ) {
     /**
@@ -48,7 +48,7 @@ public record CodeConfig(
         return "<%s><%s><%s>"
                 .formatted(
                         rotorIds.toString().replaceAll("[\\[\\] ]", ""),
-                        initialPositions == null ? "" : initialPositions.stream()
+                        positions == null ? "" : positions.stream()
                                 .map(String::valueOf)
                                 .collect(Collectors.joining()),
                         reflectorId

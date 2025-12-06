@@ -1,8 +1,9 @@
 package enigma.engine;
 
 import enigma.machine.component.rotor.RotorImpl;
+import enigma.shared.dto.MachineState;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.processTrace;
 
 /**
  * Engine API for coordinating machine loading, configuration and processing.
@@ -51,7 +52,7 @@ public interface Engine {
      * <p>The exact output format and destination are implementation-specific.
      * Typically delegates to {@code machine.toString()} for detailed wiring display.</p>
      */
-    void machineData();
+    MachineState machineData();
 
     /**
      * Configure the machine with a manual code configuration.
@@ -90,7 +91,7 @@ public interface Engine {
      * @throws IllegalStateException if machine is not configured
      * @throws IllegalArgumentException if input contains invalid characters
      */
-    DebugTrace process(String input);
+    processTrace process(String input);
 
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).

@@ -3,7 +3,7 @@ package test.enigma.engine.sanitysamll;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.processTrace;
 
 import java.nio.file.Paths;
 
@@ -44,8 +44,6 @@ public class SmallMultiWordTester {
         System.out.println("Code configuration: " + config + "\n");
         engine.configManual(config);
 
-        engine.machineData();
-
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {
                 "AABBCCDDEEFF",
@@ -72,7 +70,7 @@ public class SmallMultiWordTester {
             engine.configManual(config);
 
             String input = inputs[i];
-            DebugTrace debug = engine.process(input);
+            processTrace debug = engine.process(input);
 
             boolean ok = debug.output().equals(expectedOutputs[i]);
             if (ok) passed++; else failed++;

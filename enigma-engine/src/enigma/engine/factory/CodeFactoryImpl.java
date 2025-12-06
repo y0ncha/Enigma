@@ -84,7 +84,7 @@ public class CodeFactoryImpl implements CodeFactory {
                 rotors,
                 reflector,
                 new ArrayList<>(config.rotorIds()),
-                new ArrayList<>(config.initialPositions()),
+                new ArrayList<>(config.positions()),
                 config.reflectorId()
         );
     }
@@ -102,7 +102,7 @@ public class CodeFactoryImpl implements CodeFactory {
      */
     private List<Rotor> buildRotors(MachineSpec spec, CodeConfig config) {
         List<Integer> rotorIds = config.rotorIds();
-        List<Character> positions = config.initialPositions();
+        List<Character> positions = config.positions();
         List<Rotor> rotors = new ArrayList<>(rotorIds.size());
 
         for (int i = 0; i < rotorIds.size(); i++) {

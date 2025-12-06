@@ -1,6 +1,7 @@
 package enigma.machine;
 
 import enigma.machine.component.code.Code;
+import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.dto.tracer.SignalTrace;
 
 /**
@@ -37,4 +38,6 @@ public interface Machine {
      * @since 1.0
      */
     boolean isConfigured();
+
+    CodeConfig getConfig();
 }

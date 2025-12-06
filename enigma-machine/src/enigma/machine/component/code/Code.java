@@ -3,6 +3,7 @@ package enigma.machine.component.code;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
+import enigma.shared.dto.config.CodeConfig;
 
 import java.util.List;
 
@@ -49,10 +50,24 @@ public interface Code {
     List<Integer> getRotorIds();
 
     /**
-     * Machine alphabet used by all components in this code.
+     * The machine alphabet used by this code.
      *
-     * @return alphabet instance
+     * <p>This alphabet defines the valid character set and the mapping
+     * between characters and internal indices used by rotors/reflector.</p>
+     *
+     * @return {@link Alphabet} instance for this code
      */
     Alphabet getAlphabet();
-}
 
+    /**
+     * Configuration metadata describing this code.
+     *
+     * <p>Returns a {@link CodeConfig} record containing the rotor id list
+     * (left→right), the starting positions as characters, and the
+     * reflector identifier. The returned object is intended for external
+     * consumers and should be treated as immutable.</p>
+     *
+     * @return {@link CodeConfig} describing the active code
+     */
+    CodeConfig getConfig();
+}
