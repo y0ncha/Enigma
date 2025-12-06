@@ -477,7 +477,7 @@ public class ConsoleImpl implements Console {
         // Get the current configuration from the engine
         CodeConfig current = engine.getCurrentCodeConfig();
         if (current == null) {
-            Utilities.printError("No Last configuration was found. Cannot reset.");
+            Utilities.printError("No last configuration was found. Cannot reset.");
             return;
         }
         try {
