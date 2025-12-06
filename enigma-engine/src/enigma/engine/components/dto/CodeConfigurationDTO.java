@@ -1,5 +1,7 @@
 package enigma.engine.components.dto;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,17 +13,20 @@ public class CodeConfigurationDTO {
     private final String reflectorId;
 
     public CodeConfigurationDTO(List<Integer> rotorIds, List<Character> rotorPositions, String reflectorId) {
-        this.rotorIds = rotorIds;
-        this.rotorPositions = rotorPositions;
+        if (rotorIds.size() != rotorPositions.size()) {
+            throw new IllegalArgumentException("Rotor IDs and positions must have the same size");
+        }
+        this.rotorIds = new ArrayList<>(rotorIds);
+        this.rotorPositions = new ArrayList<>(rotorPositions);
         this.reflectorId = reflectorId;
     }
 
     public List<Integer> getRotorIds() {
-        return rotorIds;
+        return Collections.unmodifiableList(rotorIds);
     }
 
     public List<Character> getRotorPositions() {
-        return rotorPositions;
+        return Collections.unmodifiableList(rotorPositions);
     }
 
     public String getReflectorId() {

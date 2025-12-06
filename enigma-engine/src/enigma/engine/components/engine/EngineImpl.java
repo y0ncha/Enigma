@@ -74,6 +74,8 @@ public class EngineImpl implements Engine {
         machine.setCode(code);
         if (code != null) {
             originalCodeConfiguration = createCodeConfigurationDTO(code);
+        } else {
+            originalCodeConfiguration = null;
         }
     }
 
