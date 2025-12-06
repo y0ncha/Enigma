@@ -118,7 +118,7 @@ public class RotorImpl implements Rotor {
      */
     @Override
     public char getPosition() {
-        // return numeric index for the right-side char at the top row
+        // return the right-side character at the top row
         return wires.getFirst().right();
     }
 
