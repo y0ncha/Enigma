@@ -67,7 +67,7 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void loadmachime(String path) {
+    public void loadMachine(String path) {
         try {
             spec = loader.loadSpecs(path);
         }
@@ -88,7 +88,7 @@ public class EngineImpl implements Engine {
      * the mechanical rotor model for accurate Enigma simulation.</p>
      */
     @Override
-    public void configmanual(CodeConfig config) {
+    public void configManual(CodeConfig config) {
         validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
         if (origConfig == null) origConfig = config;
@@ -102,15 +102,15 @@ public class EngineImpl implements Engine {
      *
      * <p>This method samples rotor ids, starting positions and a reflector
      * id using a local {@link SecureRandom} instance, validates the sampled
-     * configuration and delegates to {@link #configmanual(CodeConfig)} so the
+     * configuration and delegates to {@link #configManual(CodeConfig)} so the
      * same creation path is used for manual and random flows.</p>
      *
      * @throws IllegalStateException when the machine spec is not loaded
      */
     @Override
-    public void configrandom() {
+    public void configRandom() {
         CodeConfig config = randomCodeConfig(spec);
-        configmanual(config);
+        configManual(config);
     }
 
     /**

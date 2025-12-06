@@ -32,7 +32,7 @@ public class MultiWordTester {
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
 
-        engine.loadmachime(XML_PATH);
+        engine.loadMachine(XML_PATH);
 
         // Code: <3,2,1><CCC><I>
         CodeConfig config = new CodeConfig(
@@ -42,7 +42,7 @@ public class MultiWordTester {
         );
 
         System.out.println("Code configuration: " + config + "\n");
-        engine.configmanual(config);
+        engine.configManual(config);
 
         // Sanity-small inputs & expected outputs from the appendix table
         String[] inputs = {
@@ -67,7 +67,7 @@ public class MultiWordTester {
         for (int i = 0; i < inputs.length; i++) {
 
             // Re-apply the code before each test so the rotors start at CCC for every case
-            engine.configmanual(config);
+            engine.configManual(config);
 
             String input = inputs[i];
             DebugTrace debug = engine.process(input);

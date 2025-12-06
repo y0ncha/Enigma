@@ -29,7 +29,7 @@ public class MultiWordTester {
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
 
-        engine.loadmachime(XML_PATH);
+        engine.loadMachine(XML_PATH);
 
         // Code: <1,2,3><ODX><I>
         CodeConfig config = new CodeConfig(
@@ -39,7 +39,7 @@ public class MultiWordTester {
         );
 
         System.out.println("Code configuration: " + config + "\n");
-        engine.configmanual(config);
+        engine.configManual(config);
 
         // Sanity-paper inputs & expected outputs from the paper appendix
         String[] inputs = {
@@ -56,7 +56,7 @@ public class MultiWordTester {
         for (int i = 0; i < inputs.length; i++) {
 
             // Re-apply the code before each test so the rotors start at ODX for every case
-            engine.configmanual(config);
+            engine.configManual(config);
 
             String input = inputs[i];
             DebugTrace debug = engine.process(input);
