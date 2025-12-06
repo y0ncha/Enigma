@@ -32,23 +32,7 @@ public class EngineImpl implements Engine {
         int availableRotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
         int availableReflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
         
-        List<Integer> currentRotorIds = null;
-        List<Character> currentRotorPositions = null;
-        String currentReflectorId = null;
-        
-        if (machine != null && machine.getCode() != null) {
-            Code currentCode = machine.getCode();
-            currentRotorIds = new ArrayList<>();
-            currentRotorPositions = new ArrayList<>();
-            
-            for (Rotor rotor : currentCode.getRotors()) {
-                currentRotorIds.add(rotor.getId());
-                currentRotorPositions.add(rotor.getPosition());
-            }
-            
-            Reflector reflector = currentCode.getReflector();
-            currentReflectorId = reflector != null ? reflector.getId() : null;
-        }
+        CodeData currentData = extractCodeData(machine != null ? machine.getCode() : null);
         
         return new MachineDataDTO(
             availableRotorsCount,
@@ -57,9 +41,9 @@ public class EngineImpl implements Engine {
             originalRotorIds,
             originalRotorPositions,
             originalReflectorId,
-            currentRotorIds,
-            currentRotorPositions,
-            currentReflectorId
+            currentData.rotorIds,
+            currentData.rotorPositions,
+            currentData.reflectorId
         );
     }
 
@@ -93,21 +77,40 @@ public class EngineImpl implements Engine {
 
     private void setCodeAndTrackOriginal(Code code) {
         machine.setCode(code);
-        if (code != null) {
-            originalRotorIds = new ArrayList<>();
-            originalRotorPositions = new ArrayList<>();
-            
-            for (Rotor rotor : code.getRotors()) {
-                originalRotorIds.add(rotor.getId());
-                originalRotorPositions.add(rotor.getPosition());
-            }
-            
-            Reflector reflector = code.getReflector();
-            originalReflectorId = reflector != null ? reflector.getId() : null;
-        } else {
-            originalRotorIds = null;
-            originalRotorPositions = null;
-            originalReflectorId = null;
+        CodeData data = extractCodeData(code);
+        originalRotorIds = data.rotorIds;
+        originalRotorPositions = data.rotorPositions;
+        originalReflectorId = data.reflectorId;
+    }
+
+    private CodeData extractCodeData(Code code) {
+        if (code == null) {
+            return new CodeData(null, null, null);
+        }
+        
+        List<Integer> rotorIds = new ArrayList<>();
+        List<Character> rotorPositions = new ArrayList<>();
+        
+        for (Rotor rotor : code.getRotors()) {
+            rotorIds.add(rotor.getId());
+            rotorPositions.add(rotor.getPosition());
+        }
+        
+        Reflector reflector = code.getReflector();
+        String reflectorId = reflector != null ? reflector.getId() : null;
+        
+        return new CodeData(rotorIds, rotorPositions, reflectorId);
+    }
+
+    private static class CodeData {
+        final List<Integer> rotorIds;
+        final List<Character> rotorPositions;
+        final String reflectorId;
+
+        CodeData(List<Integer> rotorIds, List<Character> rotorPositions, String reflectorId) {
+            this.rotorIds = rotorIds;
+            this.rotorPositions = rotorPositions;
+            this.reflectorId = reflectorId;
         }
     }
 }
