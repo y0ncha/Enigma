@@ -319,6 +319,11 @@ public class MachineImpl implements Machine {
             idBot.append(gap).append("└").append("─".repeat(colInner)).append("┘");
         }
 
+        // Alphabet box (rightmost column) - shows the machine alphabet from start->end
+        idTop.append(gap).append("┌").append("─".repeat(colInner)).append("┐");
+        idMid.append(gap).append("│").append(center.apply("Alpha", colInner)).append("│");
+        idBot.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+
         sb.append(idTop).append("\n");
         sb.append(idMid).append("\n");
         sb.append(idBot).append("\n");
@@ -362,6 +367,10 @@ public class MachineImpl implements Machine {
                 rowLine.append(gap).append("│").append(cell).append("│");
             }
 
+            // alphabet column (rightmost) - show the alphabet letter for this index
+            char alphaChar = kb.lightKey(row);
+            rowLine.append(gap).append("│").append(center.apply(String.valueOf(alphaChar), colInner)).append("│");
+
             sb.append(rowLine).append("\n");
         }
 
@@ -372,8 +381,10 @@ public class MachineImpl implements Machine {
         for (int i = 0; i < leftToRight.size(); i++) {
             bottomLine.append(gap).append("└").append("─".repeat(colInner)).append("┘");
         }
-        sb.append(bottomLine).append("\n\n");
+        // bottom for alphabet column
+        bottomLine.append(gap).append("└").append("─".repeat(colInner)).append("┘");
+         sb.append(bottomLine).append("\n\n");
 
         return sb.toString();
     }
-}
+ }
