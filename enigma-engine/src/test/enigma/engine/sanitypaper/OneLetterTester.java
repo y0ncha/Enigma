@@ -20,7 +20,8 @@ public class OneLetterTester {
     private static final String XML_PATH     = Paths.get(XML_BASE_DIR, "ex1-sanity-paper-enigma.xml").toString();
 
     // ---- Configure the single-letter test case here ----
-    private static final String INPUT    = "A"; // single letter input
+    private static final String INPUT    = "T"; // single letter input
+    private static final String EXPECTED = "A";
 
     // Code: <1,2,3><ODX><I>
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
@@ -33,16 +34,25 @@ public class OneLetterTester {
         Engine engine = new EngineImpl();
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
-        engine.loadMachime(XML_PATH); // keep the current Engine API as-is
+        engine.loadmachime(XML_PATH); // keep the current Engine API as-is
 
         System.out.println("Code configuration: " + CODE_CONFIG);
-        engine.codeManual(CODE_CONFIG);
+        engine.configmanual(CODE_CONFIG);
 
         DebugTrace debug = engine.process(INPUT);
+        System.out.println();
+
+        // Print a concise result summary similar to the other sanity testers
+        String actual = debug.output();
+        boolean ok = EXPECTED.equals(actual);
+
+        System.out.println("Input   : " + INPUT);
+        System.out.println("Expected: " + EXPECTED);
+        System.out.println("Actual  : " + actual);
+        System.out.println("Result  : " + (ok ? "PASSED ✔" : "FAILED ✘"));
         System.out.println();
 
         System.out.println(debug); // relies on DebugTrace.toString() / pretty formatting
         System.out.println("------------------------");
     }
 }
-

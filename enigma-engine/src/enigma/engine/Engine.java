@@ -25,7 +25,7 @@ public interface Engine {
      *
      * @param path file-system path to machine XML
      */
-    void loadMachime(String path);
+    void loadmachime(String path);
 
     /**
      * Supply or update machine data (for example wiring/config inputs) from
@@ -44,14 +44,14 @@ public interface Engine {
      *
      * @param config code configuration specifying rotor IDs, positions, and reflector ID
      */
-    void codeManual(CodeConfig config);
+    void configmanual(CodeConfig config);
 
     /**
      * Generate or assign a random code configuration and apply it to the machine.
      * The engine should ensure the selected configuration is valid for the
      * current machine specification.
      */
-    void codeRandom();
+    void configrandom();
 
     /**
      * Process the provided input string through the currently configured
