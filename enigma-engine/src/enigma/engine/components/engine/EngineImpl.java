@@ -1,5 +1,6 @@
 package enigma.engine.components.engine;
 
+import enigma.engine.components.config.CodeConfig;
 import enigma.engine.components.loader.Loader;
 import enigma.machine.component.code.Code;
 import enigma.machine.component.machine.Machine;
@@ -16,12 +17,12 @@ public class EngineImpl implements Engine {
     private Machine machine;
     private Loader loader;
     private int messagesCount;
-    private Code originalCode;
+    private CodeConfig originalCodeConfig;
 
     @Override
     public void loadXml(String path) {
         messagesCount = 0;
-        originalCode = null;
+        originalCodeConfig = null;
     }
 
     @Override
@@ -29,19 +30,18 @@ public class EngineImpl implements Engine {
         int rotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
         int reflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
         
-        CodeData originalData = extractCodeData(originalCode);
-        CodeData currentData = extractCodeData(machine != null ? machine.getCode() : null);
+        CodeConfig currentCodeConfig = extractCodeConfig(machine != null ? machine.getCode() : null);
         
         return new MachineState(
             rotorsCount,
             reflectorsCount,
             messagesCount,
-            copyList(originalData.rotorIds),
-            copyList(originalData.rotorPositions),
-            originalData.reflectorId,
-            copyList(currentData.rotorIds),
-            copyList(currentData.rotorPositions),
-            currentData.reflectorId
+            copyList(originalCodeConfig != null ? originalCodeConfig.rotorIds() : null),
+            copyList(originalCodeConfig != null ? originalCodeConfig.rotorPositions() : null),
+            originalCodeConfig != null ? originalCodeConfig.reflectorId() : null,
+            copyList(currentCodeConfig != null ? currentCodeConfig.rotorIds() : null),
+            copyList(currentCodeConfig != null ? currentCodeConfig.rotorPositions() : null),
+            currentCodeConfig != null ? currentCodeConfig.reflectorId() : null
         );
     }
 
@@ -75,12 +75,12 @@ public class EngineImpl implements Engine {
 
     private void setCodeAndTrackOriginal(Code code) {
         machine.setCode(code);
-        originalCode = code;
+        originalCodeConfig = extractCodeConfig(code);
     }
 
-    private CodeData extractCodeData(Code code) {
+    private CodeConfig extractCodeConfig(Code code) {
         if (code == null) {
-            return new CodeData(null, null, null);
+            return null;
         }
         
         List<Integer> rotorIds = new ArrayList<>();
@@ -94,22 +94,10 @@ public class EngineImpl implements Engine {
         Reflector reflector = code.getReflector();
         String reflectorId = reflector != null ? reflector.getId() : null;
         
-        return new CodeData(rotorIds, rotorPositions, reflectorId);
+        return new CodeConfig(rotorIds, rotorPositions, reflectorId);
     }
 
     private <T> List<T> copyList(List<T> list) {
         return list != null ? Collections.unmodifiableList(new ArrayList<>(list)) : null;
-    }
-
-    private static class CodeData {
-        final List<Integer> rotorIds;
-        final List<Character> rotorPositions;
-        final String reflectorId;
-
-        CodeData(List<Integer> rotorIds, List<Character> rotorPositions, String reflectorId) {
-            this.rotorIds = rotorIds;
-            this.rotorPositions = rotorPositions;
-            this.reflectorId = reflectorId;
-        }
     }
 }
