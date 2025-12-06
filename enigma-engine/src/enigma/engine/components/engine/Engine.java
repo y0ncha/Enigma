@@ -1,6 +1,6 @@
 package enigma.engine.components.engine;
 
-import enigma.engine.components.dto.MachineDataDTO;
+import enigma.shared.dto.MachineDataDTO;
 
 public interface Engine {
     void loadXml(String path);

@@ -1,12 +1,11 @@
 package enigma.engine.components.engine;
 
-import enigma.engine.components.dto.CodeConfigurationDTO;
-import enigma.engine.components.dto.MachineDataDTO;
 import enigma.engine.components.loader.Loader;
 import enigma.machine.component.code.Code;
 import enigma.machine.component.machine.Machine;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
+import enigma.shared.dto.MachineDataDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +15,16 @@ public class EngineImpl implements Engine {
     private Machine machine;
     private Loader loader;
     private int processedMessagesCount;
-    private CodeConfigurationDTO originalCodeConfiguration;
+    private List<Integer> originalRotorIds;
+    private List<Character> originalRotorPositions;
+    private String originalReflectorId;
 
     @Override
     public void loadXml(String path) {
         processedMessagesCount = 0;
-        originalCodeConfiguration = null;
+        originalRotorIds = null;
+        originalRotorPositions = null;
+        originalReflectorId = null;
     }
 
     @Override
@@ -29,17 +32,34 @@ public class EngineImpl implements Engine {
         int availableRotorsCount = loader != null ? loader.getAvailableRotorsCount() : 0;
         int availableReflectorsCount = loader != null ? loader.getAvailableReflectorsCount() : 0;
         
-        CodeConfigurationDTO currentConfig = null;
+        List<Integer> currentRotorIds = null;
+        List<Character> currentRotorPositions = null;
+        String currentReflectorId = null;
+        
         if (machine != null && machine.getCode() != null) {
-            currentConfig = createCodeConfigurationDTO(machine.getCode());
+            Code currentCode = machine.getCode();
+            currentRotorIds = new ArrayList<>();
+            currentRotorPositions = new ArrayList<>();
+            
+            for (Rotor rotor : currentCode.getRotors()) {
+                currentRotorIds.add(rotor.getId());
+                currentRotorPositions.add(rotor.getPosition());
+            }
+            
+            Reflector reflector = currentCode.getReflector();
+            currentReflectorId = reflector != null ? reflector.getId() : null;
         }
         
         return new MachineDataDTO(
             availableRotorsCount,
             availableReflectorsCount,
             processedMessagesCount,
-            originalCodeConfiguration,
-            currentConfig
+            originalRotorIds,
+            originalRotorPositions,
+            originalReflectorId,
+            currentRotorIds,
+            currentRotorPositions,
+            currentReflectorId
         );
     }
 
@@ -74,25 +94,20 @@ public class EngineImpl implements Engine {
     private void setCodeAndTrackOriginal(Code code) {
         machine.setCode(code);
         if (code != null) {
-            originalCodeConfiguration = createCodeConfigurationDTO(code);
+            originalRotorIds = new ArrayList<>();
+            originalRotorPositions = new ArrayList<>();
+            
+            for (Rotor rotor : code.getRotors()) {
+                originalRotorIds.add(rotor.getId());
+                originalRotorPositions.add(rotor.getPosition());
+            }
+            
+            Reflector reflector = code.getReflector();
+            originalReflectorId = reflector != null ? reflector.getId() : null;
         } else {
-            originalCodeConfiguration = null;
+            originalRotorIds = null;
+            originalRotorPositions = null;
+            originalReflectorId = null;
         }
-    }
-
-    private CodeConfigurationDTO createCodeConfigurationDTO(Code code) {
-        List<Rotor> rotors = code.getRotors();
-        List<Integer> rotorIds = new ArrayList<>();
-        List<Character> rotorPositions = new ArrayList<>();
-        
-        for (Rotor rotor : rotors) {
-            rotorIds.add(rotor.getId());
-            rotorPositions.add(rotor.getPosition());
-        }
-        
-        Reflector reflector = code.getReflector();
-        String reflectorId = reflector != null ? reflector.getId() : null;
-        
-        return new CodeConfigurationDTO(rotorIds, rotorPositions, reflectorId);
     }
 }
