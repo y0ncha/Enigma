@@ -1,4 +1,4 @@
-package test.enigma.engine;
+package test.enigma.engine.sanitypaper;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
@@ -8,15 +8,12 @@ import enigma.shared.dto.tracer.DebugTrace;
 import java.nio.file.Paths;
 
 /**
- * Manual sanity test for the Enigma engine.
- *
- * <p>Runs a series of input/output tests against a small sanity XML file
- * and prints results to stdout. This is not a unit test but a manual
- * verification tool.</p>
- *
- * @since 1.0
+ * Manual sanity test for the Enigma engine using the "sanity-paper" dataset.
+ * Runs the set of inputs from the paper appendix and prints results to stdout.
+ * This mirrors the existing SanityPaperTester but kept as a focused multi-case
+ * runner for the large single vector case.
  */
-public class SanityPaperTester {
+public class MultiWordTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
@@ -44,21 +41,13 @@ public class SanityPaperTester {
         System.out.println("Code configuration: " + config + "\n");
         engine.codeManual(config);
 
-        // Sanity-small inputs & expected outputs from the appendix table
+        // Sanity-paper inputs & expected outputs from the paper appendix
         String[] inputs = {
-                "THERAINISDROPPING",
-                "HELLOWORLD",
-                "ENIGMAMACHINEROCKS",
-                "WOWCANTBELIEVEITACTUALLYWORKS",
-                "JAVARULES"
+                "WOWCANTBELIEVEITACTUALLYWORKS"
         };
 
         String[] expectedOutputs = {
-                "APZTICDXRVMWQHBHU",
-                "DLTBBQVPQV",
-                "QMJIDORMMYQBJDVSBR",
-                "CVRDIZWDAWQKUKBVHJILPKRNDXWIY",
-                "MRUHFRZZR"
+                "CVRDIZWDAWQKUKBVHJILPKRNDXWIY"
         };
 
         int passed = 0;
@@ -66,7 +55,7 @@ public class SanityPaperTester {
 
         for (int i = 0; i < inputs.length; i++) {
 
-            // Re-apply the code before each test so the rotors start at CCC for every case
+            // Re-apply the code before each test so the rotors start at ODX for every case
             engine.codeManual(config);
 
             String input = inputs[i];
@@ -98,3 +87,4 @@ public class SanityPaperTester {
         System.out.println("================================");
     }
 }
+

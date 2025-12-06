@@ -183,6 +183,9 @@ public class RotorImpl implements Rotor {
     }
 
     private int makeInBounds(int x) {
+        if (alphabetSize <= 0) {
+            throw new IllegalStateException("alphabetSize must be > 0");
+        }
         x %= alphabetSize;
         return x < 0 ? x + alphabetSize : x;
     }

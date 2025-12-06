@@ -1,4 +1,4 @@
-package test.enigma.engine;
+package test.enigma.engine.sanitysamll;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  *
  * @since 1.0
  */
-public class SmallSanityTester {
+public class MultiWordTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";

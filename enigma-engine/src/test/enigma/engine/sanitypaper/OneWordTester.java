@@ -1,4 +1,4 @@
-package test.enigma.engine;
+package test.enigma.engine.sanitypaper;
 
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
@@ -8,29 +8,25 @@ import enigma.shared.dto.tracer.DebugTrace;
 import java.nio.file.Paths;
 
 /**
- * Single-case sanity tester for the Enigma engine.
- *
- * <p>Loads the small sanity XML, applies a single code configuration
+ * Single-case sanity tester for the "sanity-paper" dataset.
+ * Loads the sanity-paper XML, applies a single code configuration
  * and processes one input string, printing both the output and the
- * detailed {@link DebugTrace}.</p>
- *
- * <p>Use this when you are debugging a specific mismatch (for example,
- * why "AABBCCDDEEFF" does not match the expected reference output).</p>
+ * detailed {@link DebugTrace}.
  */
-public class EngineSingleTester {
+public class OneWordTester {
 
     // Use the same test resources directory as the loader tests
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
-    private static final String XML_PATH     = Paths.get(XML_BASE_DIR, "ex1-sanity-small.xml").toString();
+    private static final String XML_PATH     = Paths.get(XML_BASE_DIR, "ex1-sanity-paper-enigma.xml").toString();
 
     // ---- Configure the single test case here ----
-    private static final String INPUT          = "FEDCBADDEF";
-    private static final String EXPECTED       = "ADEBCFEEDA";
+    private static final String INPUT          = "THERAINISDROPPING";
+    private static final String EXPECTED       = "APZTICDXRVMWQHBHU";
 
-    // Code: <3,2,1><CCC><I>
+    // Code: <1,2,3><ODX><I>
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
-            java.util.List.of(3, 2, 1),   // rotors left→right
-            java.util.List.of(2, 2, 2),   // "CCC" (A=0,B=1,C=2)
+            java.util.List.of(1, 2, 3),   // rotors left→right
+            java.util.List.of(14, 3, 23), // "ODX" (O=14, D=3, X=23)
             "I"                           // reflector
     );
 
@@ -65,3 +61,4 @@ public class EngineSingleTester {
         System.out.println("------------------------");
     }
 }
+
