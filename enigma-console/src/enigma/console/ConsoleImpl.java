@@ -1,6 +1,7 @@
 package enigma.console;
 import enigma.console.helper.InputParsers;
 import enigma.console.helper.Utilities;
+import enigma.console.helper.ConsoleValidator;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.config.CodeConfig;
@@ -101,42 +102,23 @@ public class ConsoleImpl implements Console {
     private ConsoleCommand readCommandFromUser() {
         while (true) {
             String input = scanner.nextLine().trim();
-            // 1. Ensure user typed something
-            if (input.isEmpty()) {
-                Utilities.printError("No input provided. Please enter a number.");
-                System.out.print("> ");
-                continue;
-            }
-            // 2. Attempt parsing the number
-            int commandId;
             try {
-                commandId = Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                Utilities.printError("Invalid input. Please enter a number between 1 and 8.");
-                System.out.print("> ");
-                continue;
-            }
-
-            // 3. Get command enum
-            ConsoleCommand command = ConsoleCommand.fromId(commandId);
-            if (command == null) {
-                Utilities.printError("Unknown command number. Please choose a number between 1 and 8.");
-                System.out.print("> ");
-                continue;
-            }
-
-            // 4. Check whether this command is enabled at the moment
-            if (!isCommandEnabled(command)) {
-                String reason = getDisabledReason(command);
-                if (reason == null) {
-                    reason = "This command is currently disabled.";
+                ConsoleCommand command = ConsoleValidator.parseCommand(input);
+                // 4. Check whether this command is enabled at the moment
+                if (!isCommandEnabled(command)) {
+                    String reason = getDisabledReason(command);
+                    if (reason == null) {
+                        reason = "This command is currently disabled.";
+                    }
+                    Utilities.printError(reason);
+                    System.out.print("> ");
+                    continue;
                 }
-                Utilities.printError(reason);
+                return command;
+            } catch (IllegalArgumentException e) {
+                Utilities.printError(e.getMessage());
                 System.out.print("> ");
-                continue;
             }
-            // If everything is valid → return it
-            return command;
         }
     }
 
@@ -248,7 +230,7 @@ public class ConsoleImpl implements Console {
      *  - read rotors list as comma-separated decimal ids (e.g. "23,542,231,545")
      *  - read initial positions as continuous string (e.g. "ABCD")
      *  - show reflectors as numeric menu (1..N) and read decimal choice
-     *  - perform basic input validation (numbers where expected, lengths match, etc.)
+     *  *  - perform basic input validation (numbers where expected, lengths match, etc.)
      *  - delegate deeper validation to the engine
      *  - on error: print clear message and let the user decide whether to retry or return to main menu
      *  - on success: update engine with new code and print compact format
@@ -288,15 +270,26 @@ public class ConsoleImpl implements Console {
             while (true) {
                 String positions = Utilities.readNonEmptyLine(scanner,
                         "Enter initial positions as a continuous sequence of characters (e.g. ABCD):");
-                if (positions.length() != rotorIds.size()) {
-                    Utilities.printError("Number of positions (" + positions.length()
-                            + ") must match number of rotors (" + rotorIds.size() + ").");
+                try {
+                    ConsoleValidator.ensurePositionsLengthMatches(positions, rotorIds.size());
+                } catch (IllegalArgumentException e) {
+                    Utilities.printError(e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
                         return;
                     }
                     continue;
                 }
                 initialPositions = InputParsers.buildInitialPositions(positions);
+                // Validate that positions characters belong to machine alphabet (format-level)
+                try {
+                    ConsoleValidator.validatePositionsInAlphabet(enigma.getMachineSpec(), initialPositions);
+                } catch (IllegalArgumentException e) {
+                    Utilities.printError(e.getMessage());
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
+                        return;
+                    }
+                    continue;
+                }
                 // Format conversion completed → move to next stage
                 break;
             }
@@ -315,9 +308,10 @@ public class ConsoleImpl implements Console {
                 }
                 int reflectorChoice = Utilities.readInt(scanner,
                         "Choose reflector by number (1-" + reflectorsCount + "): ");
-                // Format-level check: ensure choice is in displayed range
-                if (reflectorChoice < 1 || reflectorChoice > reflectorsCount) {
-                    Utilities.printError("Reflector choice must be between 1 and " + reflectorsCount + ".");
+                try {
+                    ConsoleValidator.ensureReflectorChoiceInRange(reflectorChoice, reflectorsCount);
+                } catch (IllegalArgumentException e) {
+                    Utilities.printError(e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N): ")) {
                         return;
                     }
@@ -400,6 +394,9 @@ public class ConsoleImpl implements Console {
 
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
+
+                // Validate input characters belong to machine alphabet before processing
+                ConsoleValidator.validateInputInAlphabet(enigma.getMachineSpec(), normalizedInput);
 
                 // 2. Process input via engine and measure duration
                 //    Engine will validate that characters are in the machine alphabet
