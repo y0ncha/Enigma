@@ -308,4 +308,9 @@ public class EngineImpl implements Engine {
         EngineValidator.validateInputInAlphabet(spec, input);
     }
 
+    @Override
+    public void validatePlugboard(MachineSpec spec, String plugboard) {
+        EngineValidator.validatePlugboard(spec, plugboard);
+    }
+
 }
