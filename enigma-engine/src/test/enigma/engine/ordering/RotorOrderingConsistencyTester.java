@@ -172,15 +172,17 @@ public class RotorOrderingConsistencyTester {
         System.out.println();
 
         // Get initial state
-        CodeState initialState = engine.machineData().currentCodeState();
+        // MachineState record exposes curCodeState() accessor (not currentCodeState())
+        CodeState initialState = engine.machineData().curCodeState();
         String initialPositions = initialState.positions();
         System.out.println("  Initial positions (left→right): " + initialPositions);
         
         // Process a single character
         String testInput = "A";
         ProcessTrace trace = engine.process(testInput);
-        SignalTrace signalTrace = trace.traces().get(0);
-        
+        // ProcessTrace uses signalTraces() accessor (not traces())
+        SignalTrace signalTrace = trace.signalTraces().getFirst();
+
         String positionsAfter = signalTrace.windowAfter();
         System.out.println("  Positions after 'A' (left→right): " + positionsAfter);
         

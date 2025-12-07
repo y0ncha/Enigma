@@ -264,6 +264,7 @@ public class InputMessageValidationTester {
         reflectors.put("I", new ReflectorSpec("I", new int[]{1, 0, 3, 2}));
         reflectors.put("II", new ReflectorSpec("II", new int[]{2, 3, 0, 1}));
 
-        return new MachineSpec(alphabet, rotors, reflectors);
+        // include rotorsInUse (3) to match MachineSpec record constructor
+        return new MachineSpec(alphabet, rotors, reflectors, 3);
     }
 }
