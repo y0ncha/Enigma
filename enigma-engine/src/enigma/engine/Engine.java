@@ -76,12 +76,6 @@ public interface Engine {
      */
     ProcessTrace process(String input);
 
-    void reset();
-
-    String history();
-
-    void terminate();
-
     /**
      * Returns the current machine specification loaded by the engine.
      *
@@ -182,9 +176,9 @@ public interface Engine {
      *
      * <p><b>What This Does NOT Do:</b></p>
      * <ul>
-     *   <li>❌ Terminate the application</li>
-     *   <li>❌ Close resources (no resources to close)</li>
-     *   <li>❌ Prevent further use (engine can be reused after terminate)</li>
+     *   <li> Terminate the application</li>
+     *   <li> Close resources (no resources to close)</li>
+     *   <li> Prevent further use (engine can be reused after terminate)</li>
      * </ul>
      *
      * <p><b>Name Origin:</b> The name is historical and somewhat misleading.

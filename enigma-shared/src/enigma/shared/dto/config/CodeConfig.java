@@ -73,14 +73,13 @@ import java.util.stream.Collectors;
  * @param rotorIds rotor IDs in left→right order (e.g., [1, 2, 3])
  * @param positions starting positions as characters in left→right order (e.g., ['O','D','X'])
  * @param reflectorId reflector identifier (e.g., "I", "II")
- * @param plugboard plugboard pairs as even-length string (e.g., "ABCD" for A↔B, C↔D)
  * @since 1.0
  */
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
         List<Character> positions,    // starting positions as characters (left→right), e.g. ['O','D','X']
-        String reflectorId,           // e.g. "I"
-        String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
+        String reflectorId           // e.g. "I"
+        // String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
 ) {
     /**
      * Returns a compact string representation of the configuration.
