@@ -150,12 +150,7 @@ public class EngineImpl implements Engine {
         }
 
         // Validate all characters are in the machine alphabet
-        for (char c : input.toCharArray()) {
-            if (!spec.alphabet().contains(c)) {
-                throw new IllegalArgumentException(
-                    "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());
-            }
-        }
+        EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
         StringBuilder output = new StringBuilder();
@@ -306,6 +301,11 @@ public class EngineImpl implements Engine {
     @Override
     public void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         EngineValidator.validatePositionsInAlphabet(spec, positions);
+    }
+
+    @Override
+    public void validateInputInAlphabet(MachineSpec spec, String input) {
+        EngineValidator.validateInputInAlphabet(spec, input);
     }
 
 }

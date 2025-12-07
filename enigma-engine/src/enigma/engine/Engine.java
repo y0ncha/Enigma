@@ -125,4 +125,6 @@ public interface Engine {
     void validateReflectorExists(MachineSpec spec, String reflectorId);
 
     void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions);
+
+    void validateInputInAlphabet(MachineSpec spec, String input);
 }

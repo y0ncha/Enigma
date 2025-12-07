@@ -76,7 +76,7 @@ public class InputParsers {
             // Format-level check: ensure it's a letter (A-Z)
             if (c < 'A' || c > 'Z') {
                 throw new IllegalArgumentException(
-                        "Initial position '" + c + "' is not a valid letter. Use only letters A-Z.");
+                        "Initial position '" + c + "' isn't valid alphabet letter.");
             }
             // Pass characters in the same order as input (left→right)
             initialPositions.add(c);
