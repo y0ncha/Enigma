@@ -127,29 +127,29 @@ public class InputParsersTester {
         System.out.println("========== Test: buildInitialPositions ==========");
         boolean allPassed = true;
 
-        // Test case 1: "ABC" -> [0, 1, 2] (left to right)
-        // Note: first char corresponds to RIGHTMOST rotor
+        // Test case 1: "ABC" -> ['A', 'B', 'C'] (left to right)
+        // First char 'A' corresponds to LEFTMOST rotor, 'C' to rightmost
         List<Character> result1 = InputParsers.buildInitialPositions("ABC");
-        boolean test1 = result1.equals(List.of(2, 1, 0));
-        System.out.println("Input: \"ABC\" -> Expected: [2, 1, 0], Actual: " + result1 + " " + (test1 ? "✔" : "✘"));
+        boolean test1 = result1.equals(List.of('A', 'B', 'C'));
+        System.out.println("Input: \"ABC\" -> Expected: ['A', 'B', 'C'], Actual: " + result1 + " " + (test1 ? "✔" : "✘"));
         allPassed &= test1;
 
         // Test case 2: "CCC"
         List<Character> result2 = InputParsers.buildInitialPositions("CCC");
-        boolean test2 = result2.equals(List.of(2, 2, 2));
-        System.out.println("Input: \"CCC\" -> Expected: [2, 2, 2], Actual: " + result2 + " " + (test2 ? "✔" : "✘"));
+        boolean test2 = result2.equals(List.of('C', 'C', 'C'));
+        System.out.println("Input: \"CCC\" -> Expected: ['C', 'C', 'C'], Actual: " + result2 + " " + (test2 ? "✔" : "✘"));
         allPassed &= test2;
 
         // Test case 3: single letter
         List<Character> result3 = InputParsers.buildInitialPositions("Z");
-        boolean test3 = result3.equals(List.of(25));
-        System.out.println("Input: \"Z\" -> Expected: [25], Actual: " + result3 + " " + (test3 ? "✔" : "✘"));
+        boolean test3 = result3.equals(List.of('Z'));
+        System.out.println("Input: \"Z\" -> Expected: ['Z'], Actual: " + result3 + " " + (test3 ? "✔" : "✘"));
         allPassed &= test3;
 
         // Test case 4: lowercase should work (case-insensitive)
         List<Character> result4 = InputParsers.buildInitialPositions("abc");
-        boolean test4 = result4.equals(List.of(2, 1, 0));
-        System.out.println("Input: \"abc\" -> Expected: [2, 1, 0], Actual: " + result4 + " " + (test4 ? "✔" : "✘"));
+        boolean test4 = result4.equals(List.of('A', 'B', 'C'));
+        System.out.println("Input: \"abc\" -> Expected: ['A', 'B', 'C'], Actual: " + result4 + " " + (test4 ? "✔" : "✘"));
         allPassed &= test4;
 
         System.out.println("Result: " + (allPassed ? "PASSED ✔" : "FAILED ✘"));
