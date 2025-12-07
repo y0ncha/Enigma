@@ -12,8 +12,9 @@ import java.util.Scanner;
  * Concrete console implementation for Exercise 1.
  * Responsible for:
  * - Showing the main menu
- * - Validating user input (numbers / strings)
- * - Calling the engine for each command
+ * - Format-level input validation (parsing, empty checks, basic type conversion)
+ * - Calling the engine for each command (engine performs semantic validation)
+ * - Catching and displaying user-friendly error messages from engine
  * - Printing user-friendly messages
  */
 public class ConsoleImpl implements Console {

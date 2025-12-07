@@ -260,14 +260,14 @@ This is documented in the architecture as a future feature. The command is prope
 **Console Validation (Format-only):**
 - ✅ Checks for numeric input where expected
 - ✅ Validates position string length matches rotor count
-- ✅ Ensures reflector selection is in valid range
 - ✅ Checks input characters are alphabetic (A-Z)
 
 **Engine Validation (Semantic):**
-- ✅ Validates rotor IDs exist in spec
-- ✅ Checks for duplicate rotors
-- ✅ Verifies reflector exists
+- ✅ Validates rotor IDs exist in spec and are unique
+- ✅ Verifies reflector exists in machine spec
 - ✅ Validates positions are in machine alphabet
+- ✅ Validates rotor count matches machine requirements
+- ✅ Validates input characters are in machine alphabet
 
 **Finding:** Validation boundary is correctly enforced.
 
