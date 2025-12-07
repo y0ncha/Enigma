@@ -12,8 +12,9 @@ import java.util.Scanner;
  * Concrete console implementation for Exercise 1.
  * Responsible for:
  * - Showing the main menu
- * - Validating user input (numbers / strings)
- * - Calling the engine for each command
+ * - Format-level input validation (parsing, empty checks, basic type conversion)
+ * - Calling the engine for each command (engine performs semantic validation)
+ * - Catching and displaying user-friendly error messages from engine
  * - Printing user-friendly messages
  */
 public class ConsoleImpl implements Console {
@@ -272,22 +273,14 @@ public class ConsoleImpl implements Console {
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545):");
                 try {
                     rotorIds = InputParsers.parseRotorIds(rotorsLine);
+                    // Parsing validation passed → move to next stage
+                    break;
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different rotor list? (Y/N): ")) {
                         return; // back to main menu
                     }
-                    continue;
                 }
-                if (rotorIds.isEmpty()) {
-                    Utilities.printError("You must specify at least one rotor id.");
-                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different rotor list? (Y/N): ")) {
-                        return;
-                    }
-                    continue;
-                }
-                // basic check passed → move to next stage
-                break;
             }
             // =========================
             // 2) Initial positions (loop until valid or user exits)
@@ -303,16 +296,9 @@ public class ConsoleImpl implements Console {
                     }
                     continue;
                 }
-                try {
-                    initialPositions = InputParsers.buildInitialPositions(positions);
-                    // if buildInitialPositions throws, we handle in catch below
-                    break;
-                } catch (IllegalArgumentException e) {
-                    Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
-                        return;
-                    }
-                }
+                initialPositions = InputParsers.buildInitialPositions(positions);
+                // Format conversion completed → move to next stage
+                break;
             }
             // =========================
             // 3) Reflector choice (loop until valid or user exits)
@@ -329,14 +315,16 @@ public class ConsoleImpl implements Console {
                 }
                 int reflectorChoice = Utilities.readInt(scanner,
                         "Choose reflector by number (1-" + reflectorsCount + "): ");
+                // Format-level check: ensure choice is in displayed range
                 if (reflectorChoice < 1 || reflectorChoice > reflectorsCount) {
-                    Utilities.printError("Reflector index must be between 1 and " + reflectorsCount + ".");
+                    Utilities.printError("Reflector choice must be between 1 and " + reflectorsCount + ".");
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N): ")) {
                         return;
                     }
                     continue;
                 }
                 reflectorId = InputParsers.toRoman(reflectorChoice);
+                // Format validation passed → move to next stage
                 break;
             }
             // =========================
@@ -403,49 +391,27 @@ public class ConsoleImpl implements Console {
      * - note: rotors remain in their new positions (no auto reset)
      */
     private void handleProcessInput() {
-        // 1. Ensure we have a machine specification and alphabet
-        String alphabetUpper = enigma.getMachineSpec().getLetters().toUpperCase();
         boolean keepTrying = true;
         while (keepTrying) {
             try {
-                // 2. Read input from user
+                // 1. Read input from user
                 String originalInput = Utilities.readNonEmptyLine(scanner,
                         "Enter the text you want to process (only characters from the machine alphabet):");
 
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
 
-                // 3. Validate characters against machine alphabet (case-insensitive)
-                boolean valid = true;
-                for (int i = 0; i < normalizedInput.length(); i++) {
-                    char c = normalizedInput.charAt(i);
-
-                    // You can decide whether to allow spaces or other separators.
-                    // Here we require every character to be part of the alphabet.
-                    if (alphabetUpper.indexOf(c) < 0) {
-                        Utilities.printError("Invalid character '" + c
-                                + "'. All characters must belong to the machine alphabet: " + alphabetUpper);
-                        valid = false;
-                        break;
-                    }
-                }
-                if (!valid) {
-                    if (!Utilities.askUserToRetry(scanner,
-                            "Do you want to try again with a different input string? (Y/N): ")) {
-                        return; // back to main menu
-                    }
-                    continue; // restart the while(keepTrying) loop
-                }
-                // 4. Process input via engine and measure duration
+                // 2. Process input via engine and measure duration
+                //    Engine will validate that characters are in the machine alphabet
                 long startNano = System.nanoTime();
-                // Process input
                 ProcessTrace trace = enigma.process(normalizedInput);
                 long endNano = System.nanoTime();
                 long duration = endNano - startNano;
                 // Convert to milliseconds
                 double millis = duration / 1_000_000.0;
                 String processedOutput = trace.output();
-                // 5. Print results
+                
+                // 3. Print results
                 System.out.println("Original input : <" + originalInput + ">");
                 System.out.println("Processed output: <" + processedOutput + ">");
                 System.out.println("Processing time: " + duration + " nanoseconds"

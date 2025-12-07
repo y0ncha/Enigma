@@ -173,4 +173,6 @@ public interface Engine {
      * @throws IllegalArgumentException when a position char is not part of the alphabet
      */
     void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions);
+
+    void validateInputInAlphabet(MachineSpec spec, String input);
 }

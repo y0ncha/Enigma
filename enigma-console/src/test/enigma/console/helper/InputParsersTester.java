@@ -188,22 +188,29 @@ public class InputParsersTester {
         System.out.println("========== Test: buildInitialPositions Error Cases ==========");
         boolean allPassed = true;
 
-        // Test case 1: non-letter character should throw IllegalArgumentException
+        // Note: buildInitialPositions() now only performs format conversion (string to character list)
+        // Validation of characters against the machine alphabet is done by Engine layer
+        
+        // Test case 1: non-letter character is now accepted (Engine will validate later)
         try {
-            InputParsers.buildInitialPositions("A1C");
-            System.out.println("Input: \"A1C\" -> Expected: IllegalArgumentException, Actual: no exception ✘");
-            allPassed = false;
+            List<Character> result = InputParsers.buildInitialPositions("A1C");
+            boolean test1 = result.equals(List.of('A', '1', 'C'));
+            System.out.println("Input: \"A1C\" -> Expected: ['A', '1', 'C'], Actual: " + result + " " + (test1 ? "✔" : "✘"));
+            allPassed &= test1;
         } catch (IllegalArgumentException e) {
-            System.out.println("Input: \"A1C\" -> Expected: IllegalArgumentException, Actual: IllegalArgumentException ✔");
+            System.out.println("Input: \"A1C\" -> Expected: no exception, Actual: IllegalArgumentException ✘");
+            allPassed = false;
         }
 
-        // Test case 2: special characters
+        // Test case 2: special characters are also accepted (Engine will validate later)
         try {
-            InputParsers.buildInitialPositions("A@C");
-            System.out.println("Input: \"A@C\" -> Expected: IllegalArgumentException, Actual: no exception ✘");
-            allPassed = false;
+            List<Character> result = InputParsers.buildInitialPositions("A@C");
+            boolean test2 = result.equals(List.of('A', '@', 'C'));
+            System.out.println("Input: \"A@C\" -> Expected: ['A', '@', 'C'], Actual: " + result + " " + (test2 ? "✔" : "✘"));
+            allPassed &= test2;
         } catch (IllegalArgumentException e) {
-            System.out.println("Input: \"A@C\" -> Expected: IllegalArgumentException, Actual: IllegalArgumentException ✔");
+            System.out.println("Input: \"A@C\" -> Expected: no exception, Actual: IllegalArgumentException ✘");
+            allPassed = false;
         }
 
         System.out.println("Result: " + (allPassed ? "PASSED ✔" : "FAILED ✘"));

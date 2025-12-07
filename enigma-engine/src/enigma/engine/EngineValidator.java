@@ -75,5 +75,14 @@ public final class EngineValidator {
             if (!spec.alphabet().contains(c)) throw new IllegalArgumentException(c + " is not a valid position");
         }
     }
+
+    public static void validateInputInAlphabet(MachineSpec spec, String input) {
+        for (char c : input.toCharArray()) {
+            if (!spec.alphabet().contains(c)) {
+                throw new IllegalArgumentException(
+                    "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());
+            }
+        }
+    }
 }
 
