@@ -150,8 +150,7 @@ public class EngineImpl implements Engine {
         }
 
         // Validate all characters are in the machine alphabet
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
+        for (char c : input.toCharArray()) {
             if (!spec.alphabet().contains(c)) {
                 throw new IllegalArgumentException(
                     "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());
