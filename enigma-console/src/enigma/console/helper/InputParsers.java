@@ -33,7 +33,9 @@ public class InputParsers {
         for (String part : parts) {
             String trimmed = part.trim();
             if (trimmed.isEmpty()) {
-                continue;
+                throw new IllegalArgumentException(
+                        "Rotor ids must be decimal numbers separated by commas. "
+                                + "Empty values are not allowed.");
             }
             try {
                 result.add(Integer.parseInt(trimmed));

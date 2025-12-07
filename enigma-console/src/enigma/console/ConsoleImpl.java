@@ -197,29 +197,33 @@ public class ConsoleImpl implements Console {
             Utilities.printError("No machine is currently loaded. Please load an XML file first (Command 1).");
             return;
         }
-        MachineSpec machineSpec = enigma.getMachineSpec();
-        System.out.println("========================================");
-        System.out.println(" Enigma Machine - Specification");
-        System.out.println("========================================");
-        System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
-        System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
+        try {
+            MachineSpec machineSpec = enigma.getMachineSpec();
+            System.out.println("========================================");
+            System.out.println(" Enigma Machine - Specification");
+            System.out.println("========================================");
+            System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
+            System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
 
-        long totalProcessedMessages = enigma.getTotalProcessedMessages();
-        System.out.println("Total processed messages     : " + totalProcessedMessages);
+            long totalProcessedMessages = enigma.getTotalProcessedMessages();
+            System.out.println("Total processed messages     : " + totalProcessedMessages);
 
-        // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
-        CodeConfig originalCode = enigma.getCurrentCodeConfig();
-        if (originalCode != null) {
-            System.out.println("Original code configuration  : " + originalCode);
-        } else{
-            System.out.println("Original code configuration  : <not set yet>");
-        }
-        // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
-        CodeConfig currentCode = enigma.getCurrentCodeConfig();
-        if (currentCode != null) {
-            System.out.println("Current code configuration   : " + currentCode);
-        } else {
-            System.out.println("Current code configuration   : <not set yet>");
+            // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
+            CodeConfig originalCode = enigma.getCurrentCodeConfig();
+            if (originalCode != null) {
+                System.out.println("Original code configuration  : " + originalCode);
+            } else{
+                System.out.println("Original code configuration  : <not set yet>");
+            }
+            // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
+            CodeConfig currentCode = enigma.getCurrentCodeConfig();
+            if (currentCode != null) {
+                System.out.println("Current code configuration   : " + currentCode);
+            } else {
+                System.out.println("Current code configuration   : <not set yet>");
+            }
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            Utilities.printError("Failed to show machine specification: " + e.getMessage());
         }
     }
 

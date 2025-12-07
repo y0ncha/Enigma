@@ -83,12 +83,6 @@ public class InputParsersTester {
         System.out.println("Input: \"42\" -> Expected: [42], Actual: " + result3 + " " + (test3 ? "✔" : "✘"));
         allPassed &= test3;
 
-        // Test case 4: empty parts should be skipped
-        List<Integer> result4 = InputParsers.parseRotorIds("1,,3");
-        boolean test4 = result4.equals(List.of(1, 3));
-        System.out.println("Input: \"1,,3\" -> Expected: [1, 3], Actual: " + result4 + " " + (test4 ? "✔" : "✘"));
-        allPassed &= test4;
-
         System.out.println("Result: " + (allPassed ? "PASSED ✔" : "FAILED ✘"));
         System.out.println();
         return allPassed;
@@ -177,6 +171,24 @@ public class InputParsersTester {
             allPassed = false;
         } catch (IllegalArgumentException e) {
             System.out.println("Input: \"1,2,three\" -> Expected: IllegalArgumentException, Actual: IllegalArgumentException ✔");
+        }
+
+        // Test case 3: empty parts should throw IllegalArgumentException
+        try {
+            InputParsers.parseRotorIds("1,,3");
+            System.out.println("Input: \"1,,3\" -> Expected: IllegalArgumentException, Actual: no exception ✘");
+            allPassed = false;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Input: \"1,,3\" -> Expected: IllegalArgumentException, Actual: IllegalArgumentException ✔");
+        }
+
+        // Test case 4: multiple empty parts
+        try {
+            InputParsers.parseRotorIds("1,,2,x");
+            System.out.println("Input: \"1,,2,x\" -> Expected: IllegalArgumentException, Actual: no exception ✘");
+            allPassed = false;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Input: \"1,,2,x\" -> Expected: IllegalArgumentException, Actual: IllegalArgumentException ✔");
         }
 
         System.out.println("Result: " + (allPassed ? "PASSED ✔" : "FAILED ✘"));
