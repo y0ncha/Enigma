@@ -34,15 +34,32 @@ import java.util.List;
  * <p>The stepping logic should always step the rightmost rotor first
  * (index 2 in the internal array, which is Rotor 1).</p>
  * 
+ * <p><b>Note:</b> This is a manual test runner designed to be executed
+ * directly with {@code java} command. It follows the same pattern as other
+ * manual test runners in the project (e.g., PaperSingleCharTester).</p>
+ * 
  * @since 1.0
  */
 public class RotorOrderingConsistencyTester {
 
-    // Adjust this path based on where test XML files are located
+    // Use the same test resources directory as other test runners
     private static final String XML_BASE_DIR = "enigma-loader/src/test/resources/xml";
     private static final String XML_PATH = Paths.get(XML_BASE_DIR, "ex1-sanity-paper-enigma.xml").toString();
 
     public static void main(String[] args) {
+        boolean success = runAllTests();
+        if (!success) {
+            // Exit with error code for manual test runners
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Run all rotor ordering consistency tests.
+     * 
+     * @return true if all tests passed, false otherwise
+     */
+    private static boolean runAllTests() {
         System.out.println("=".repeat(70));
         System.out.println("ROTOR ORDERING CONSISTENCY TEST");
         System.out.println("=".repeat(70));
@@ -58,11 +75,48 @@ public class RotorOrderingConsistencyTester {
             System.out.println("  ✓ Machine loaded successfully");
         } catch (Exception e) {
             System.err.println("  ✗ Failed to load machine: " + e.getMessage());
-            System.exit(1);
+            System.err.println("  Note: This test requires XML test files to be present.");
+            return false;
         }
         System.out.println();
 
         // Test Case 1: Configuration <3,2,1><ABC><I>
+        boolean test1 = testConfiguration321(engine);
+        if (!test1) {
+            return false;
+        }
+
+        // Test Case 2: Configuration <1,2,3><ODX><I>
+        boolean test2 = testConfiguration123(engine);
+        if (!test2) {
+            return false;
+        }
+
+        // Final summary
+        System.out.println();
+        System.out.println("=".repeat(70));
+        System.out.println("SUMMARY");
+        System.out.println("=".repeat(70));
+        System.out.println();
+        System.out.println("✓ ALL TESTS PASSED");
+        System.out.println();
+        System.out.println("Rotor ordering consistency verified:");
+        System.out.println("  • Input rotor order is left→right (user perspective)");
+        System.out.println("  • Internal rotor order preserves left→right mapping");
+        System.out.println("  • Position strings match left→right convention");
+        System.out.println("  • Stepping logic correctly uses rightmost rotor (highest index)");
+        System.out.println();
+
+        return true;
+    }
+
+    /**
+     * Test configuration &lt;3,2,1&gt;&lt;ABC&gt;&lt;I&gt;.
+     * 
+     * @param engine the engine instance to test with
+     * @return true if test passed, false otherwise
+     */
+    private static boolean testConfiguration321(Engine engine) {
         System.out.println("Step 2: Testing configuration <3,2,1><ABC><I>");
         System.out.println("  Expected behavior:");
         System.out.println("    - Rotor IDs in left→right order: [3, 2, 1]");
@@ -84,7 +138,7 @@ public class RotorOrderingConsistencyTester {
             System.out.println("  ✓ Configuration applied successfully");
         } catch (Exception e) {
             System.err.println("  ✗ Failed to configure: " + e.getMessage());
-            System.exit(1);
+            return false;
         }
 
         // Verify the configuration was stored correctly
@@ -107,10 +161,10 @@ public class RotorOrderingConsistencyTester {
         if (!rotorIdsMatch || !positionsMatch || !reflectorMatches) {
             System.err.println();
             System.err.println("  ✗ Configuration mismatch detected!");
-            System.exit(1);
+            return false;
         }
 
-        // Test Case 2: Verify stepping logic
+        // Test stepping logic
         System.out.println();
         System.out.println("Step 4: Testing stepping logic");
         System.out.println("  Processing single character to observe rotor advancement");
@@ -149,7 +203,16 @@ public class RotorOrderingConsistencyTester {
         boolean rightmostInAdvanced = advancedIndices.contains(2);
         System.out.println("  Rightmost rotor (index 2) in advanced list: " + (rightmostInAdvanced ? "✓" : "✗"));
 
-        // Test Case 3: Verify configuration <1,2,3><ODX><I>
+        return rightmostAdvanced && rightmostInAdvanced;
+    }
+
+    /**
+     * Test configuration &lt;1,2,3&gt;&lt;ODX&gt;&lt;I&gt;.
+     * 
+     * @param engine the engine instance to test with
+     * @return true if test passed, false otherwise
+     */
+    private static boolean testConfiguration123(Engine engine) {
         System.out.println();
         System.out.println("=".repeat(70));
         System.out.println("Step 5: Testing alternative configuration <1,2,3><ODX><I>");
@@ -173,7 +236,7 @@ public class RotorOrderingConsistencyTester {
             System.out.println("  ✓ Configuration applied successfully");
         } catch (Exception e) {
             System.err.println("  ✗ Failed to configure: " + e.getMessage());
-            System.exit(1);
+            return false;
         }
 
         // Verify the second configuration
@@ -200,34 +263,9 @@ public class RotorOrderingConsistencyTester {
         System.out.println("    Input:    '" + input2 + "'");
         System.out.println("    Expected: '" + expected2 + "'");
         System.out.println("    Actual:   '" + actual2 + "'");
-        System.out.println("    Match: " + (expected2.equals(actual2) ? "✓" : "✗"));
+        boolean encryptionMatches = expected2.equals(actual2);
+        System.out.println("    Match: " + (encryptionMatches ? "✓" : "✗"));
 
-        // Final summary
-        System.out.println();
-        System.out.println("=".repeat(70));
-        System.out.println("SUMMARY");
-        System.out.println("=".repeat(70));
-        System.out.println();
-
-        boolean allTestsPassed = rotorIdsMatch && positionsMatch && reflectorMatches
-                && rightmostAdvanced && rightmostInAdvanced
-                && rotorIdsMatch2 && positionsMatch2
-                && expected2.equals(actual2);
-
-        if (allTestsPassed) {
-            System.out.println("✓ ALL TESTS PASSED");
-            System.out.println();
-            System.out.println("Rotor ordering consistency verified:");
-            System.out.println("  • Input rotor order is left→right (user perspective)");
-            System.out.println("  • Internal rotor order preserves left→right mapping");
-            System.out.println("  • Position strings match left→right convention");
-            System.out.println("  • Stepping logic correctly uses rightmost rotor (highest index)");
-            System.out.println();
-        } else {
-            System.err.println("✗ SOME TESTS FAILED");
-            System.err.println();
-            System.err.println("Please review the output above for details.");
-            System.exit(1);
-        }
+        return rotorIdsMatch2 && positionsMatch2 && encryptionMatches;
     }
 }
