@@ -10,14 +10,14 @@ import java.util.List;
  * <ul>
  *   <li>Parse comma-separated rotor IDs from a string ({@link #parseRotorIds(String)})</li>
  *   <li>Convert integer values to Roman numerals ({@link #toRoman(int)})</li>
- *   <li>Build initial rotor positions from a string input ({@link #buildInitialPositions(String)})</li>
+ *   <li>Build initial rotor positions as characters from a string input ({@link #buildInitialPositions(String)})</li>
  * </ul>
  * <p>
  * Usage example:
  * <pre>
  *   List&lt;Integer&gt; rotorIds = InputParsers.parseRotorIds("1,2,3");
  *   String roman = InputParsers.toRoman(2); // "II"
- *   List&lt;Integer&gt; positions = InputParsers.buildInitialPositions("ABC");
+ *   List&lt;Character&gt; positions = InputParsers.buildInitialPositions("ABC");
  * </pre>
  * <p>
  * Note: All methods are static and this class should not be instantiated.
@@ -56,28 +56,25 @@ public class InputParsers {
         };
     }
     /**
-     * Converts user input positions string into a list of 0-based numeric indices,
+     * Converts user input positions string into a list of characters
      * in left→right order, according to CodeConfig requirements.
-     * The first character in the input belongs to the RIGHTMOST rotor.
+     * The first character in the input corresponds to the LEFTMOST rotor,
+     * matching the left→right convention used throughout the architecture.
      * Case-insensitive: both uppercase and lowercase letters are accepted.
      */
     public static List<Character> buildInitialPositions(String positions) {
         positions = positions.toUpperCase();
         int n = positions.length();
         List<Character> initialPositions = new ArrayList<>(n);
-        // initialize with placeholder characters
-        for (int i = 0; i < n; i++) {
-            initialPositions.add('\0');
-        }
+        
         for (int i = 0; i < n; i++) {
             char c = positions.charAt(i);
             if (c < 'A' || c > 'Z') {
                 throw new IllegalArgumentException(
-                        "Initial position '" + c + "' is not a valid letter (A-Z, case-insensitive).");
+                        "Initial position '" + c + "' is not a valid alphabet character.");
             }
-            // The first character corresponds to the RIGHTMOST rotor
-            int leftIndex = n - 1 - i;
-            initialPositions.set(leftIndex, c);
+            // Pass characters in the same order as input (left→right)
+            initialPositions.add(c);
         }
         return initialPositions;
     }
