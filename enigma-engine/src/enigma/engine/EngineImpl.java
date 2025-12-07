@@ -5,7 +5,7 @@ import enigma.engine.exception.MachineNotLoadedException;
 import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
 import enigma.loader.Loader;
-import enigma.loader.EnigmaLoadingException;
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
