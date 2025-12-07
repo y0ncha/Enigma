@@ -296,17 +296,9 @@ public class ConsoleImpl implements Console {
                     }
                     continue;
                 }
-                try {
-                    initialPositions = InputParsers.buildInitialPositions(positions);
-                    // Character format validation (A-Z) passed → move to next stage
-                    break;
-                } catch (IllegalArgumentException e) {
-                    // Format-level validation error (non-letter character)
-                    Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
-                        return;
-                    }
-                }
+                initialPositions = InputParsers.buildInitialPositions(positions);
+                // Format conversion completed → move to next stage
+                break;
             }
             // =========================
             // 3) Reflector choice (loop until valid or user exits)
