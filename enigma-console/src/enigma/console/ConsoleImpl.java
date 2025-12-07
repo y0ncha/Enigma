@@ -31,6 +31,11 @@ public class ConsoleImpl implements Console {
         this.scanner = scanner;
     }
 
+    public ConsoleImpl(Engine engine) {
+        this.enigma = engine;
+        this.scanner = new Scanner(System.in);
+    }
+
     @Override
     public void run() {
         Utilities.printInfo("Welcome to the Enigma machine console (Exercise 1)");
