@@ -61,6 +61,10 @@ public class InputParsers {
      * The first character in the input corresponds to the LEFTMOST rotor,
      * matching the left→right convention used throughout the architecture.
      * Case-insensitive: both uppercase and lowercase letters are accepted.
+     * <p>
+     * Note: This method performs format-level validation (checks if characters are letters A-Z).
+     * Semantic validation (checking if positions are in the specific machine alphabet)
+     * is handled by the Engine layer.
      */
     public static List<Character> buildInitialPositions(String positions) {
         positions = positions.toUpperCase();
@@ -69,9 +73,10 @@ public class InputParsers {
         
         for (int i = 0; i < n; i++) {
             char c = positions.charAt(i);
+            // Format-level check: ensure it's a letter (A-Z)
             if (c < 'A' || c > 'Z') {
                 throw new IllegalArgumentException(
-                        "Initial position '" + c + "' is not a valid alphabet character.");
+                        "Initial position '" + c + "' is not a valid letter. Use only letters A-Z.");
             }
             // Pass characters in the same order as input (left→right)
             initialPositions.add(c);

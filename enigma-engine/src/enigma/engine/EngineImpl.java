@@ -137,6 +137,8 @@ public class EngineImpl implements Engine {
      *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
+     * @throws IllegalStateException if machine is not configured
+     * @throws IllegalArgumentException if input is null or contains invalid characters
      */
     @Override
     public ProcessTrace process(String input) {
@@ -145,6 +147,16 @@ public class EngineImpl implements Engine {
         }
         if (input == null) {
             throw new IllegalArgumentException("Input must not be null");
+        }
+
+        // Validate all characters are in the machine alphabet
+        String alphabet = spec.alphabet();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (alphabet.indexOf(c) < 0) {
+                throw new IllegalArgumentException(
+                    "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + alphabet);
+            }
         }
 
         List<SignalTrace> traces = new ArrayList<>();
