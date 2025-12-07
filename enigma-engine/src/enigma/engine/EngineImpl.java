@@ -208,20 +208,20 @@ public class EngineImpl implements Engine {
 
     @Override
     public MachineSpec getMachineSpec() {
-        // TODO implement
-        return null;
+        return spec;
     }
 
     @Override
     public CodeConfig getCurrentCodeConfig() {
-        // TODO implement
-        return null;
+        if (!machine.isConfigured()) {
+            return null;
+        }
+        return machine.getConfig();
     }
 
     @Override
     public long getTotalProcessedMessages() {
-        // TODO implement
-        return 0;
+        return stringsProcessed;
     }
 
     // ---------------------------------------------------------
