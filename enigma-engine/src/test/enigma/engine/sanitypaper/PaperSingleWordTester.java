@@ -45,7 +45,7 @@ public class PaperSingleWordTester {
         engine.configManual(CODE_CONFIG);
 
         // Print machine state before processing
-        MachineState before = engine.getState();
+        MachineState before = engine.machineData();
         System.out.println("MachineState (before): " + before + "\n");
 
         System.out.println("===== Single Sanity Case =====");
@@ -65,7 +65,7 @@ public class PaperSingleWordTester {
         System.out.println(debug); // relies on ProcessTrace.toString() / pretty formatting
         System.out.println("------------------------");
 
-        MachineState after = engine.getState();
+        MachineState after = engine.machineData();
         System.out.println("MachineState (after): " + after + "\n");
     }
 }

@@ -5,32 +5,19 @@ import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
 
+import java.util.List;
+
 /**
- * Engine API for coordinating machine loading, configuration and processing.
+ * Engine API — Coordinate loading, validation and processing.
  *
- * <p><b>Module:</b> enigma-engine (orchestration + validation, no UI)</p>
+ * One-line: load machine spec, validate a CodeConfig and process messages.
  *
- * <h2>Responsibilities</h2>
- * <ul>
- *   <li>Load machine specifications from XML via {@link enigma.loader.Loader}</li>
- *   <li>Validate {@link CodeConfig} against loaded {@link enigma.shared.spec.MachineSpec}</li>
- *   <li>Build runtime {@link enigma.machine.component.code.Code} via factories</li>
- *   <li>Process messages and return {@link ProcessTrace} DTOs</li>
- * </ul>
- *
- * <h2>What Engine Does NOT Do</h2>
- * <ul>
- *   <li>Does not perform I/O or UI interactions (console responsibility)</li>
- *   <li>Does not expose internal machine or component objects</li>
- *   <li>Does not modify XML or reorder wires (loader responsibility)</li>
- * </ul>
- *
- * <h2>Validation Boundary</h2>
- * <p>Engine validates runtime configuration (rotor IDs, positions, reflector ID)
- * and ensures they match the loaded spec. Factories assume inputs are valid
- * and focus on object construction.</p>
- *
- * @since 1.0
+ * Usage:
+ * <pre>
+ * engine.loadMachine(path);
+ * engine.configManual(codeConfig);
+ * ProcessTrace trace = engine.process(input);
+ * </pre>
  */
 public interface Engine {
 
@@ -52,7 +39,7 @@ public interface Engine {
      * <p>The exact output format and destination are implementation-specific.
      * Typically delegates to {@code machine.toString()} for detailed wiring display.</p>
      */
-    MachineState getState();
+    MachineState machineData();
 
     /**
      * Configure the machine with a manual code configuration.
@@ -93,6 +80,10 @@ public interface Engine {
      */
     ProcessTrace process(String input);
 
+    void reset();
+
+    void terminate();
+
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).
      *
@@ -122,4 +113,16 @@ public interface Engine {
      * @return the total count of processed messages (non-negative)
      */
     long getTotalProcessedMessages();
+
+    void validateCodeConfig(MachineSpec spec, CodeConfig config);
+
+    void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId);
+
+    void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions);
+
+    void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds);
+
+    void validateReflectorExists(MachineSpec spec, String reflectorId);
+
+    void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions);
 }
