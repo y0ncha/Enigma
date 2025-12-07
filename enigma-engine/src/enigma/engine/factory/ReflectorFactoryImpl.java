@@ -32,8 +32,8 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
     public ReflectorFactoryImpl(Alphabet alphabet) {
         if (alphabet == null) {
             throw new InvalidConfigurationException(
-                "ReflectorFactory initialization failed: alphabet must not be null. " +
-                "Fix: Provide a valid Alphabet instance.");
+                "Reflector factory initialization failed: Alphabet is missing. " +
+                "Fix: Ensure the machine specification is properly loaded.");
         }
     }
 
@@ -52,8 +52,8 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
     public Reflector create(ReflectorSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Reflector creation failed: ReflectorSpec must not be null. " +
-                "Fix: Provide a valid ReflectorSpec object.");
+                "Reflector creation failed: Reflector specification is missing. " +
+                "Fix: Ensure the machine specification is properly loaded.");
         }
         int[] mapping = spec.mapping();
         // ReflectorImpl expects the alphabet and a symmetric integer mapping

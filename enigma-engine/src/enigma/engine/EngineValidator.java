@@ -31,13 +31,13 @@ public final class EngineValidator {
     public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: MachineSpec must not be null. " +
+                "Configuration validation failed: Machine specification is missing. " +
                 "Fix: Load a machine specification before configuring.");
         }
         if (config == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: CodeConfig must not be null. " +
-                "Fix: Provide a valid CodeConfig object.");
+                "Configuration validation failed: Configuration details are missing. " +
+                "Fix: Provide complete configuration details.");
         }
 
         List<Integer> rotorIds = config.rotorIds();
@@ -56,17 +56,17 @@ public final class EngineValidator {
     public static void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         if (rotorIds == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: rotorIds must not be null. " +
+                "Configuration validation failed: Rotor IDs are missing. " +
                 "Fix: Provide a list of rotor IDs (e.g., [1, 2, 3]).");
         }
         if (positions == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: positions must not be null. " +
+                "Configuration validation failed: Initial positions are missing. " +
                 "Fix: Provide a list of initial positions (e.g., ['A', 'A', 'A']).");
         }
         if (reflectorId == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: reflectorId must not be null. " +
+                "Configuration validation failed: Reflector ID is missing. " +
                 "Fix: Provide a reflector ID (e.g., 'I', 'II', etc.).");
         }
     }
@@ -74,7 +74,7 @@ public final class EngineValidator {
     public static void validateRotorAndPositionCounts(MachineSpec spec, List<Integer> rotorIds, List<Character> positions) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: MachineSpec must not be null. " +
+                "Configuration validation failed: Machine specification is missing. " +
                 "Fix: Load a machine specification before configuring.");
         }
         int required = spec.getRotorsInUse();
@@ -178,13 +178,13 @@ public final class EngineValidator {
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
         if (spec == null) {
             throw new InvalidMessageException(
-                "Message validation failed: MachineSpec must not be null. " +
+                "Message validation failed: Machine specification is missing. " +
                 "Fix: Load a machine specification before processing messages.");
         }
         if (input == null) {
             throw new InvalidMessageException(
-                "Message validation failed: Input must not be null. " +
-                "Fix: Provide a non-null input string.");
+                "Message validation failed: Input message is missing. " +
+                "Fix: Provide a message to process.");
         }
         
         String alphabet = spec.alphabet().getLetters();
@@ -197,10 +197,10 @@ public final class EngineValidator {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
                     String.format(
-                        "Invalid character in message: Control character %s detected at position %d (codepoint: %d). " +
+                        "Invalid character in message: Control character %s detected at position %d. " +
                         "Input: \"%s\". " +
                         "Fix: Remove all control characters (newline, tab, ESC, etc.) from the message.",
-                        controlName, i, (int)c, truncateForDisplay(input, 50)));
+                        controlName, i, truncateForDisplay(input, 50)));
             }
             
             if (!spec.alphabet().contains(c)) {
@@ -259,7 +259,7 @@ public final class EngineValidator {
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Plugboard validation failed: MachineSpec must not be null. " +
+                "Plugboard validation failed: Machine specification is missing. " +
                 "Fix: Load a machine specification before configuring.");
         }
         
