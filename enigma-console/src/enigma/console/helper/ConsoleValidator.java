@@ -1,10 +1,6 @@
 package enigma.console.helper;
 
 import enigma.console.ConsoleCommand;
-import enigma.engine.EngineValidator;
-import enigma.shared.spec.MachineSpec;
-
-import java.util.List;
 
 /**
  * Console-side, format-level validation helpers.
@@ -67,27 +63,6 @@ public final class ConsoleValidator {
         if (choice < 1 || choice > reflectorsCount) {
             throw new IllegalArgumentException("Reflector choice must be between 1 and " + reflectorsCount + ".");
         }
-    }
-
-    // ----------------------
-    // Delegations to EngineValidator for alphabet-related checks
-    // ----------------------
-
-    /**
-     * Validate that the given input string contains only characters from the machine alphabet.
-     * Delegates to EngineValidator so the console reuses the engine's alphabet rules.
-     * Throws IllegalArgumentException with the same message EngineValidator produces.
-     */
-    public static void validateInputInAlphabet(MachineSpec spec, String input) {
-        EngineValidator.validateInputInAlphabet(spec, input);
-    }
-
-    /**
-     * Validate that the provided initial positions belong to the machine alphabet.
-     * Delegates to EngineValidator.validatePositionsInAlphabet.
-     */
-    public static void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
-        EngineValidator.validatePositionsInAlphabet(spec, positions);
     }
 
     /**
