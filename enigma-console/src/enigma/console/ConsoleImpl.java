@@ -273,7 +273,7 @@ public class ConsoleImpl implements Console {
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545):");
                 try {
                     rotorIds = InputParsers.parseRotorIds(rotorsLine);
-                    // Format-level validation passed → move to next stage
+                    // Parsing validation passed → move to next stage
                     break;
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
@@ -298,7 +298,7 @@ public class ConsoleImpl implements Console {
                 }
                 try {
                     initialPositions = InputParsers.buildInitialPositions(positions);
-                    // Format-level validation passed → move to next stage
+                    // Character format validation (A-Z) passed → move to next stage
                     break;
                 } catch (IllegalArgumentException e) {
                     // Format-level validation error (non-letter character)
@@ -332,7 +332,7 @@ public class ConsoleImpl implements Console {
                     continue;
                 }
                 reflectorId = InputParsers.toRoman(reflectorChoice);
-                // Format-level validation passed → move to next stage
+                // Format validation passed → move to next stage
                 break;
             }
             // =========================
