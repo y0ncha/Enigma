@@ -141,14 +141,22 @@ public class EngineImpl implements Engine {
      */
     @Override
     public ProcessTrace process(String input) {
-        if (!machine.isConfigured()) {
-            throw new IllegalStateException("Machine is not configured");
+        // Validate machine is loaded
+        if (spec == null) {
+            throw new IllegalStateException("Machine is not loaded. Load an XML file before processing messages.");
         }
+        
+        // Validate machine is configured
+        if (!machine.isConfigured()) {
+            throw new IllegalStateException("Machine is not configured. Configure the machine before processing messages.");
+        }
+        
+        // Validate input is not null
         if (input == null) {
             throw new IllegalArgumentException("Input must not be null");
         }
 
-        // Validate all characters are in the machine alphabet
+        // Validate all characters are in the machine alphabet and no forbidden characters
         EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();

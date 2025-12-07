@@ -76,8 +76,44 @@ public final class EngineValidator {
         }
     }
 
+    /**
+     * Validate that input message contains only valid alphabet characters.
+     * 
+     * <p>This validation ensures:</p>
+     * <ul>
+     *   <li>All characters must be in the machine alphabet</li>
+     *   <li>No forbidden characters: newline (\n), tab (\t), ESC (ASCII 27), or non-printables</li>
+     * </ul>
+     * 
+     * @param spec machine specification containing the alphabet
+     * @param input input message to validate
+     * @throws IllegalArgumentException if input contains invalid or forbidden characters
+     */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
-        for (char c : input.toCharArray()) {
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            
+            // Check for forbidden control characters
+            if (c == '\n') {
+                throw new IllegalArgumentException(
+                    "Invalid character: newline character is not allowed in input messages");
+            }
+            if (c == '\t') {
+                throw new IllegalArgumentException(
+                    "Invalid character: tab character is not allowed in input messages");
+            }
+            if (c == '\u001B') { // ESC character (ASCII 27)
+                throw new IllegalArgumentException(
+                    "Invalid character: ESC character is not allowed in input messages");
+            }
+            
+            // Check for other non-printable characters (ASCII 0-31 and 127, excluding what we already checked)
+            if (c < 32 || c == 127) {
+                throw new IllegalArgumentException(
+                    "Invalid character: non-printable character (ASCII " + (int)c + ") is not allowed in input messages");
+            }
+            
+            // Check if character is in the machine alphabet
             if (!spec.alphabet().contains(c)) {
                 throw new IllegalArgumentException(
                     "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());

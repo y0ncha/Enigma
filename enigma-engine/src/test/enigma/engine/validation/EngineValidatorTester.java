@@ -1,7 +1,6 @@
 package test.enigma.engine.validation;
 
-import enigma.engine.Engine;
-import enigma.engine.EngineImpl;
+import enigma.engine.EngineValidator;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
@@ -23,7 +22,6 @@ public class EngineValidatorTester {
 
         // Create a mock machine spec for testing
         MachineSpec mockSpec = createMockMachineSpec();
-        Engine engine = new EngineImpl();
 
         int passedTests = 0;
         int totalTests = 0;
@@ -32,7 +30,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 1: Providing 2 rotors instead of 3");
         try {
-            engine.validateRotorAndPositionCounts(List.of(1, 2), List.of('A', 'A'));
+            EngineValidator.validateRotorAndPositionCounts(List.of(1, 2), List.of('A', 'A'));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -43,7 +41,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 2: Providing 4 rotors instead of 3");
         try {
-            engine.validateRotorAndPositionCounts(List.of(1, 2, 3, 4), List.of('A', 'A', 'A', 'A'));
+            EngineValidator.validateRotorAndPositionCounts(List.of(1, 2, 3, 4), List.of('A', 'A', 'A', 'A'));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -54,7 +52,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 3: Duplicate rotor IDs (1, 2, 2)");
         try {
-            engine.validateRotorIdsExistenceAndUniqueness(mockSpec, List.of(1, 2, 2));
+            EngineValidator.validateRotorIdsExistenceAndUniqueness(mockSpec, List.of(1, 2, 2));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -65,7 +63,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 4: Rotor ID 99 does not exist");
         try {
-            engine.validateRotorIdsExistenceAndUniqueness(mockSpec, List.of(1, 2, 99));
+            EngineValidator.validateRotorIdsExistenceAndUniqueness(mockSpec, List.of(1, 2, 99));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -76,7 +74,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 5: Position string wrong length (2 positions for 3 rotors)");
         try {
-            engine.validateRotorAndPositionCounts(List.of(1, 2, 3), List.of('A', 'B'));
+            EngineValidator.validateRotorAndPositionCounts(List.of(1, 2, 3), List.of('A', 'B'));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -87,7 +85,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 6: Position character 'Z' not in alphabet (ABCD)");
         try {
-            engine.validatePositionsInAlphabet(mockSpec, List.of('A', 'B', 'Z'));
+            EngineValidator.validatePositionsInAlphabet(mockSpec, List.of('A', 'B', 'Z'));
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -98,7 +96,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 7: Invalid reflector 'III' (not in spec which has I, II)");
         try {
-            engine.validateReflectorExists(mockSpec, "III");
+            EngineValidator.validateReflectorExists(mockSpec, "III");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -109,7 +107,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 8: Invalid reflector 'INVALID' (not in spec)");
         try {
-            engine.validateReflectorExists(mockSpec, "INVALID");
+            EngineValidator.validateReflectorExists(mockSpec, "INVALID");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -120,7 +118,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 9: Plugboard odd length (ABC)");
         try {
-            engine.validatePlugboard(mockSpec, "ABC");
+            EngineValidator.validatePlugboard(mockSpec, "ABC");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -131,7 +129,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 10: Plugboard letter 'A' appears twice (ABAC)");
         try {
-            engine.validatePlugboard(mockSpec, "ABAC");
+            EngineValidator.validatePlugboard(mockSpec, "ABAC");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -142,7 +140,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 11: Plugboard self-mapping (AA)");
         try {
-            engine.validatePlugboard(mockSpec, "AA");
+            EngineValidator.validatePlugboard(mockSpec, "AA");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -153,7 +151,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 12: Plugboard character 'Z' not in alphabet (ABCD)");
         try {
-            engine.validatePlugboard(mockSpec, "AZ");
+            EngineValidator.validatePlugboard(mockSpec, "AZ");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
@@ -164,7 +162,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 13: Valid plugboard (AB)");
         try {
-            engine.validatePlugboard(mockSpec, "AB");
+            EngineValidator.validatePlugboard(mockSpec, "AB");
             System.out.println("  PASSED: Valid plugboard accepted\n");
             passedTests++;
         } catch (IllegalArgumentException e) {
@@ -175,7 +173,7 @@ public class EngineValidatorTester {
         totalTests++;
         System.out.println("Test 14: Null plugboard (no plugboard)");
         try {
-            engine.validatePlugboard(mockSpec, null);
+            EngineValidator.validatePlugboard(mockSpec, null);
             System.out.println("  PASSED: Null plugboard accepted\n");
             passedTests++;
         } catch (IllegalArgumentException e) {
@@ -191,7 +189,7 @@ public class EngineValidatorTester {
                 List.of('A', 'B', 'C'),
                 "I"
             );
-            engine.validateCodeConfig(mockSpec, validConfig);
+            EngineValidator.validateCodeConfig(mockSpec, validConfig);
             System.out.println("  PASSED: Valid configuration accepted\n");
             passedTests++;
         } catch (IllegalArgumentException e) {
@@ -220,14 +218,14 @@ public class EngineValidatorTester {
 
         // Create mock rotors (minimal spec needed for validation)
         Map<Integer, RotorSpec> rotors = new HashMap<>();
-        rotors.put(1, new RotorSpec(1, new int[]{1, 0, 3, 2}, 'A'));  // Mock rotor 1
-        rotors.put(2, new RotorSpec(2, new int[]{2, 3, 0, 1}, 'B'));  // Mock rotor 2
-        rotors.put(3, new RotorSpec(3, new int[]{3, 2, 1, 0}, 'C'));  // Mock rotor 3
+        rotors.put(1, new RotorSpec(1, 0, new char[]{'A', 'B', 'C', 'D'}, new char[]{'B', 'A', 'D', 'C'}));
+        rotors.put(2, new RotorSpec(2, 1, new char[]{'A', 'B', 'C', 'D'}, new char[]{'C', 'D', 'A', 'B'}));
+        rotors.put(3, new RotorSpec(3, 2, new char[]{'A', 'B', 'C', 'D'}, new char[]{'D', 'C', 'B', 'A'}));
 
         // Create mock reflectors (minimal spec needed for validation)
         Map<String, ReflectorSpec> reflectors = new HashMap<>();
-        reflectors.put("I", new ReflectorSpec("I", new int[]{1, 0, 3, 2}));   // Mock reflector I
-        reflectors.put("II", new ReflectorSpec("II", new int[]{2, 3, 0, 1})); // Mock reflector II
+        reflectors.put("I", new ReflectorSpec("I", new int[]{1, 0, 3, 2}));
+        reflectors.put("II", new ReflectorSpec("II", new int[]{2, 3, 0, 1}));
 
         return new MachineSpec(alphabet, rotors, reflectors);
     }
