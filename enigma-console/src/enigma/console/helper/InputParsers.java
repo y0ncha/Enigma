@@ -4,28 +4,75 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class for parsing and converting user input related to Enigma machine configuration.
- * <p>
- * Provides static methods to:
+ * Input parsing utilities for console user input.
+ *
+ * <p><b>Module:</b> enigma-console (parsing helpers)</p>
+ *
+ * <h2>Purpose</h2>
+ * <p>InputParsers provides stateless parsing methods to convert raw user input
+ * strings into structured types (lists, characters, etc.) needed for engine
+ * configuration.</p>
+ *
+ * <h2>Parsing Methods</h2>
  * <ul>
- *   <li>Parse comma-separated rotor IDs from a string ({@link #parseRotorIds(String)})</li>
- *   <li>Convert integer values to Roman numerals ({@link #toRoman(int)})</li>
- *   <li>Build initial rotor positions as characters from a string input ({@link #buildInitialPositions(String)})</li>
+ *   <li><b>parseRotorIds:</b> Parse comma-separated rotor IDs (e.g., "1,2,3" → [1, 2, 3])</li>
+ *   <li><b>buildInitialPositions:</b> Convert position string to character list (e.g., "ABC" → ['A', 'B', 'C'])</li>
+ *   <li><b>toRoman:</b> Convert integer to Roman numeral (e.g., 1 → "I", 2 → "II")</li>
  * </ul>
- * <p>
- * Usage example:
+ *
+ * <h2>Validation</h2>
+ * <p>Parsing methods perform format validation:</p>
+ * <ul>
+ *   <li>Reject empty comma parts (e.g., "1,,3" is invalid)</li>
+ *   <li>Reject non-numeric values (e.g., "1,abc,3" is invalid)</li>
+ *   <li>Throw {@link IllegalArgumentException} with user-friendly messages</li>
+ * </ul>
+ *
+ * <p>Semantic validation (rotor ID existence, position alphabet membership) is
+ * performed by the engine, not by these parsers.</p>
+ *
+ * <h2>Usage Example</h2>
  * <pre>
- *   List&lt;Integer&gt; rotorIds = InputParsers.parseRotorIds("1,2,3");
- *   String roman = InputParsers.toRoman(2); // "II"
- *   List&lt;Character&gt; positions = InputParsers.buildInitialPositions("ABC");
+ * // Parse rotor IDs from user input
+ * String input = scanner.nextLine(); // "1,2,3"
+ * List&lt;Integer&gt; rotorIds = InputParsers.parseRotorIds(input);
+ * // rotorIds = [1, 2, 3]
+ *
+ * // Parse positions
+ * String positions = scanner.nextLine(); // "ABC"
+ * List&lt;Character&gt; posList = InputParsers.buildInitialPositions(positions);
+ * // posList = ['A', 'B', 'C']
+ *
+ * // Convert to Roman numeral for display
+ * String roman = InputParsers.toRoman(2); // "II"
  * </pre>
- * <p>
- * Note: All methods are static and this class should not be instantiated.
+ *
+ * <h2>Thread Safety</h2>
+ * <p>All methods are static and stateless. Thread-safe.</p>
+ *
+ * @since 1.0
  */
 public class InputParsers {
     // Prevent instantiation
     private InputParsers() {}
 
+    /**
+     * Parse comma-separated rotor IDs from user input.
+     *
+     * <p><b>Format:</b> "1,2,3" → [1, 2, 3]</p>
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Each part must be non-empty (rejects "1,,3")</li>
+     *   <li>Each part must be a valid integer</li>
+     * </ul>
+     *
+     * <p>The returned list is in left→right order matching user input.</p>
+     *
+     * @param line raw user input (comma-separated integers)
+     * @return list of rotor IDs in left→right order
+     * @throws IllegalArgumentException if format is invalid with user-friendly message
+     */
     public static List<Integer> parseRotorIds(String line) {
         List<Integer> result = new ArrayList<>();
         String[] parts = line.split(",");
@@ -47,6 +94,22 @@ public class InputParsers {
         }
         return result;
     }
+    /**
+     * Convert integer to Roman numeral (I-V).
+     *
+     * <p><b>Mappings:</b></p>
+     * <ul>
+     *   <li>1 → "I"</li>
+     *   <li>2 → "II"</li>
+     *   <li>3 → "III"</li>
+     *   <li>4 → "IV"</li>
+     *   <li>5 → "V"</li>
+     *   <li>Other → "?{value}"</li>
+     * </ul>
+     *
+     * @param value integer to convert (typically 1-5)
+     * @return Roman numeral string
+     */
     public static String toRoman(int value) {
         return switch (value) {
             case 1 -> "I";
@@ -57,16 +120,21 @@ public class InputParsers {
             default -> "?" + value;
         };
     }
+
     /**
-     * Converts user input positions string into a list of characters
-     * in left→right order, according to CodeConfig requirements.
-     * The first character in the input corresponds to the LEFTMOST rotor,
-     * matching the left→right convention used throughout the architecture.
-     * Case-insensitive: both uppercase and lowercase letters are accepted.
-     * <p>
-     * Note: This method performs format-level conversion only (string to character list).
-     * Semantic validation (checking if positions are in the machine's alphabet)
-     * is handled by the Engine layer via EngineValidator.validatePositionsInAlphabet().
+     * Convert positions string to character list.
+     *
+     * <p><b>Format:</b> "ABC" → ['A', 'B', 'C']</p>
+     *
+     * <p>The conversion is case-insensitive (converts to uppercase).
+     * The resulting list is in left→right order matching the CodeConfig
+     * convention (first character = leftmost rotor).</p>
+     *
+     * <p><b>Format Only:</b> This method performs string to character list
+     * conversion. It does NOT validate alphabet membership (engine responsibility).</p>
+     *
+     * @param positions position string (e.g., "ABC", "abc", "ODX")
+     * @return list of uppercase characters in left→right order
      */
     public static List<Character> buildInitialPositions(String positions) {
         positions = positions.toUpperCase();

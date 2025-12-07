@@ -3,22 +3,80 @@ package enigma.console.helper;
 import enigma.console.ConsoleCommand;
 
 /**
- * Console-side, format-level validation helpers.
- * <p>
- * These methods perform only UI/input-format checks (empty, numeric, ranges,
- * lengths). They throw IllegalArgumentException with the exact user-facing
- * messages that the console prints so that the existing control-flow and
- * retry behavior can be preserved.
+ * Console-level format validation helpers.
+ *
+ * <p><b>Module:</b> enigma-console (validation helpers)</p>
+ *
+ * <h2>Purpose</h2>
+ * <p>ConsoleValidator provides stateless format-level validation methods for
+ * console input. These methods check input format and structure without
+ * performing semantic validation against the machine specification.</p>
+ *
+ * <h2>Validation Philosophy</h2>
+ * <p><b>Format Only:</b> Console validator checks:</p>
+ * <ul>
+ *   <li>✅ Input is non-empty</li>
+ *   <li>✅ Input can be parsed as expected type (integer, etc.)</li>
+ *   <li>✅ Values are in expected range (command IDs 1-8)</li>
+ *   <li>✅ Lengths match expectations (positions length = rotor count)</li>
+ *   <li>✅ Characters are A-Z (format check, not alphabet membership)</li>
+ * </ul>
+ *
+ * <p><b>NOT Semantic:</b> Console validator does NOT check:</p>
+ * <ul>
+ *   <li>❌ Rotor IDs exist in machine spec (engine responsibility)</li>
+ *   <li>❌ Rotor IDs are unique (engine responsibility)</li>
+ *   <li>❌ Reflector ID exists in machine spec (engine responsibility)</li>
+ *   <li>❌ Position characters are in alphabet (engine responsibility)</li>
+ *   <li>❌ Plugboard has no duplicates (engine responsibility)</li>
+ * </ul>
+ *
+ * <h2>Error Handling</h2>
+ * <p>All methods throw {@link IllegalArgumentException} with user-friendly
+ * error messages on validation failure. The console catches these exceptions
+ * and either retries (format errors) or returns to menu (semantic errors from engine).</p>
+ *
+ * <h2>Usage Pattern</h2>
+ * <pre>
+ * // Console reads input
+ * String input = scanner.nextLine();
+ *
+ * try {
+ *     // Format validation (console)
+ *     ConsoleValidator.ensurePositionsLengthMatches(input, 3);
+ *     // If valid, pass to engine for semantic validation
+ *     engine.configManual(config);
+ * } catch (IllegalArgumentException e) {
+ *     // Format error - retry input loop
+ *     System.err.println(e.getMessage());
+ * } catch (InvalidConfigurationException e) {
+ *     // Semantic error - return to menu
+ *     System.err.println(e.getMessage());
+ * }
+ * </pre>
+ *
+ * <h2>Thread Safety</h2>
+ * <p>All methods are static and stateless. Thread-safe.</p>
+ *
+ * @since 1.0
  */
 public final class ConsoleValidator {
 
     private ConsoleValidator() { /* utility class */ }
 
     /**
-     * Parse a raw user line into a ConsoleCommand.
-     * Validates: non-empty, numeric, maps to a known command id.
-     * Throws IllegalArgumentException containing the exact message the console
-     * used previously so callers can print it unchanged.
+     * Parse and validate a command ID from raw user input.
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Input is non-empty</li>
+     *   <li>Input can be parsed as integer</li>
+     *   <li>Integer maps to a known command</li>
+     * </ul>
+     *
+     * @param raw raw user input (may be null, empty, or invalid)
+     * @return validated ConsoleCommand
+     * @throws IllegalArgumentException if input is invalid with user-friendly message
      */
     public static ConsoleCommand parseCommand(String raw) {
         if (raw == null || raw.trim().isEmpty()) {
@@ -39,9 +97,20 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Ensure that the provided positions string length matches expected rotor count.
-     * Throws IllegalArgumentException with the exact message the console used
-     * previously when there's a mismatch.
+     * Validate that positions string length matches rotor count.
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Positions string is non-empty</li>
+     *   <li>Length equals expected rotor count</li>
+     * </ul>
+     *
+     * <p>This is a format check only. Engine validates that characters
+     * are in the machine's alphabet.</p>
+     *
+     * @param positions user-provided positions string (e.g., "ABC")
+     * @param rotorCount expected number of rotors
+     * @throws IllegalArgumentException if length doesn't match with user-friendly message
      */
     public static void ensurePositionsLengthMatches(String positions, int rotorCount) {
         if (positions == null || positions.isEmpty()) {
@@ -55,9 +124,19 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Ensure that the chosen reflector number is within the displayed range.
-     * Throws IllegalArgumentException with the same message the console used
-     * previously when the choice was out of range.
+     * Validate that reflector choice is in valid range.
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Choice is between 1 and available reflector count (1-based)</li>
+     * </ul>
+     *
+     * <p>This is a format check only. Engine validates that the chosen
+     * reflector ID actually exists in the machine specification.</p>
+     *
+     * @param choice user's reflector choice (1-based)
+     * @param reflectorsCount number of available reflectors
+     * @throws IllegalArgumentException if choice is out of range with user-friendly message
      */
     public static void ensureReflectorChoiceInRange(int choice, int reflectorsCount) {
         if (choice < 1 || choice > reflectorsCount) {
@@ -66,10 +145,23 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Validate basic format of plugboard input string.
-     * Checks: non-null (null is valid), even length.
-     * Does NOT check alphabet membership or semantic rules (engine handles that).
-     * Throws IllegalArgumentException with user-facing message if format is invalid.
+     * Validate plugboard format (even length).
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Null or empty is valid (no plugboard connections)</li>
+     *   <li>If provided, must have even length (pairs of characters)</li>
+     * </ul>
+     *
+     * <p><b>Format Only:</b> This method does NOT check:</p>
+     * <ul>
+     *   <li>❌ Duplicate characters (engine validates)</li>
+     *   <li>❌ Self-mapping (engine validates)</li>
+     *   <li>❌ Alphabet membership (engine validates)</li>
+     * </ul>
+     *
+     * @param plugboard plugboard string (e.g., "ABCD" for A↔B, C↔D)
+     * @throws IllegalArgumentException if format is invalid with user-friendly message
      */
     public static void validatePlugboardFormat(String plugboard) {
         // null or empty is valid (no plugboard)
