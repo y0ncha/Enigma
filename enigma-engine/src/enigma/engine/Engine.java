@@ -103,4 +103,105 @@ public interface Engine {
      * @return the total count of processed messages (non-negative)
      */
     long getTotalProcessedMessages();
+
+    /**
+     * Reset the machine to its original code configuration.
+     *
+     * <p><b>What This Does:</b></p>
+     * <ul>
+     *   <li>Returns rotor positions to their <b>original values</b> (as configured)</li>
+     *   <li>Maintains rotor selection, reflector selection, and plugboard</li>
+     *   <li>Maintains history and statistics</li>
+     * </ul>
+     *
+     * <p><b>What This Does NOT Do:</b></p>
+     * <ul>
+     *   <li>❌ Clear processing history</li>
+     *   <li>❌ Reset message counter</li>
+     *   <li>❌ Change rotor or reflector selection</li>
+     *   <li>❌ Create new original code (still grouped under same history key)</li>
+     * </ul>
+     *
+     * <p><b>Use Case:</b> Process multiple messages from the same starting positions
+     * without manually reconfiguring.</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>
+     * engine.configManual(new CodeConfig(..., positions=['O','D','X'], ...));
+     * engine.process("HELLO");  // positions advance to something else
+     * engine.reset();           // positions return to ['O','D','X']
+     * engine.process("WORLD");  // starts again from ['O','D','X']
+     * </pre>
+     *
+     * @throws IllegalStateException if machine is not configured
+     */
+    void reset();
+
+    /**
+     * Returns a formatted string containing complete processing history.
+     *
+     * <p>History is grouped by original code configuration. Each group shows
+     * all messages processed from that starting configuration, including:</p>
+     * <ul>
+     *   <li>Input message</li>
+     *   <li>Output message</li>
+     *   <li>Processing duration (nanoseconds)</li>
+     * </ul>
+     *
+     * <p><b>History Grouping:</b> Messages are grouped by the original code
+     * (rotor IDs, initial positions, reflector, plugboard) at configuration time.
+     * All messages processed after a configuration are grouped together, even
+     * though rotor positions change during processing.</p>
+     *
+     * <p><b>History Reset:</b> History is cleared only when:</p>
+     * <ul>
+     *   <li>New machine is loaded ({@link #loadMachine(String)})</li>
+     *   <li>Engine is terminated ({@link #terminate()})</li>
+     * </ul>
+     *
+     * <p>History is NOT cleared when reset is called.</p>
+     *
+     * @return formatted history string, or empty message if no history
+     */
+    String history();
+
+    /**
+     * Clear engine state and return to uninitialized state.
+     *
+     * <p><b>IMPORTANT:</b> Despite the name, this method does <b>NOT</b> terminate
+     * the application or call {@code System.exit()}. It only clears internal engine state.</p>
+     *
+     * <p><b>What This Does:</b></p>
+     * <ul>
+     *   <li>Clears loaded machine specification</li>
+     *   <li>Clears code configuration</li>
+     *   <li>Clears processing history</li>
+     *   <li>Resets message counter</li>
+     *   <li>Returns engine to uninitialized state (as if newly created)</li>
+     * </ul>
+     *
+     * <p><b>What This Does NOT Do:</b></p>
+     * <ul>
+     *   <li>❌ Terminate the application</li>
+     *   <li>❌ Close resources (no resources to close)</li>
+     *   <li>❌ Prevent further use (engine can be reused after terminate)</li>
+     * </ul>
+     *
+     * <p><b>Name Origin:</b> The name is historical and somewhat misleading.
+     * Consider it as "clear state" or "reset engine completely".</p>
+     *
+     * <p><b>Use Case:</b> Start fresh without creating a new engine instance,
+     * or clear sensitive data from memory.</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>
+     * engine.loadMachine("enigma.xml");
+     * engine.configManual(...);
+     * engine.process("SECRET");
+     * engine.terminate();  // Clear everything
+     * // Engine is now uninitialized but can be used again
+     * engine.loadMachine("other.xml");
+     * </pre>
+     */
+    void terminate();
 }

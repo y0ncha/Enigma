@@ -1,8 +1,44 @@
 package enigma.console.helper;
 
 /**
- * Utility class for console output and basic input parsing.
- * Contains only static methods and cannot be instantiated.
+ * Console output and input utilities.
+ *
+ * <p><b>Module:</b> enigma-console (utility helpers)</p>
+ *
+ * <h2>Purpose</h2>
+ * <p>Utilities provides stateless helper methods for console I/O operations,
+ * including formatted printing and validated input reading.</p>
+ *
+ * <h2>Output Methods</h2>
+ * <ul>
+ *   <li><b>printError:</b> Print error message with [ERROR] prefix</li>
+ *   <li><b>printInfo:</b> Print info message with [INFO] prefix</li>
+ * </ul>
+ *
+ * <h2>Input Methods</h2>
+ * <ul>
+ *   <li><b>readInt:</b> Read and validate integer with retry loop</li>
+ *   <li><b>readNonEmptyLine:</b> Read non-empty line with retry loop</li>
+ *   <li><b>askUserToRetry:</b> Ask yes/no question with validation</li>
+ * </ul>
+ *
+ * <h2>Usage Example</h2>
+ * <pre>
+ * // Print messages
+ * Utilities.printInfo("Welcome to Enigma!");
+ * Utilities.printError("Invalid input");
+ *
+ * // Read validated input
+ * int choice = Utilities.readInt(scanner, "Enter choice: ");
+ * String path = Utilities.readNonEmptyLine(scanner, "Enter path: ");
+ * boolean retry = Utilities.askUserToRetry(scanner, "Retry? (Y/N): ");
+ * </pre>
+ *
+ * <h2>Thread Safety</h2>
+ * <p>All methods are static. Methods that read from Scanner are not thread-safe
+ * (Scanner itself is not thread-safe).</p>
+ *
+ * @since 1.0
  */
 public final class Utilities {
     private Utilities() {
@@ -10,21 +46,36 @@ public final class Utilities {
     }
 
     /**
-     * Prints a generic error message in a consistent formatted style.
+     * Print an error message with [ERROR] prefix.
+     *
+     * <p>Format: {@code [ERROR] message}</p>
+     *
+     * @param message error message to display
      */
     public static void printError(String message) {
         System.out.println("[ERROR] " + message);
     }
 
     /**
-     * Prints a generic info message in a consistent format.
+     * Print an info message with [INFO] prefix.
+     *
+     * <p>Format: {@code [INFO] message}</p>
+     *
+     * @param message info message to display
      */
     public static void printInfo(String message) {
         System.out.println("[INFO] " + message);
     }
 
     /**
-     * Reads an integer from the user with validation.
+     * Read and validate an integer from user with retry loop.
+     *
+     * <p>Continues prompting until valid integer is entered.
+     * Handles empty input and non-numeric input with error messages.</p>
+     *
+     * @param scanner input scanner
+     * @param prompt prompt message to display
+     * @return validated integer
      */
     public static int readInt(java.util.Scanner scanner, String prompt) {
         while (true) {
@@ -43,7 +94,14 @@ public final class Utilities {
     }
 
     /**
-     * Reads a non-empty line from the user and returns it trimmed.
+     * Read a non-empty line from user with retry loop.
+     *
+     * <p>Continues prompting until non-empty line is entered.
+     * Trims whitespace from input.</p>
+     *
+     * @param scanner input scanner
+     * @param prompt prompt message to display
+     * @return non-empty trimmed line
      */
     public static String readNonEmptyLine(java.util.Scanner scanner, String prompt) {
         while (true) {
@@ -58,7 +116,14 @@ public final class Utilities {
         }
     }
     /**
-     * Asks the user a yes/no question and returns true for YES, false for NO.
+     * Ask user a yes/no question with validation.
+     *
+     * <p>Accepts: Y, YES, N, NO (case-insensitive)</p>
+     * <p>Continues prompting until valid answer is entered.</p>
+     *
+     * @param scanner input scanner
+     * @param prompt prompt message to display
+     * @return true for Y/YES, false for N/NO
      */
     public static boolean askUserToRetry(java.util.Scanner scanner, String prompt) {
         while (true) {

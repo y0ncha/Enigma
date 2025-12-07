@@ -40,9 +40,53 @@ public interface Machine {
      */
     boolean isConfigured();
 
+    /**
+     * Get the current code configuration metadata.
+     *
+     * <p>Returns a {@link CodeConfig} containing rotor IDs, current positions,
+     * reflector ID, and plugboard configuration. The positions reflect the
+     * current state (after any processing), not the original positions.</p>
+     *
+     * @return current code configuration, or null if not configured
+     * @since 1.0
+     */
     CodeConfig getConfig();
 
+    /**
+     * Get detailed current code state snapshot.
+     *
+     * <p>Returns a {@link CodeState} containing rotor IDs, current positions,
+     * notch distances, reflector ID, and plugboard. This provides more detail
+     * than {@link #getConfig()}, including distance to each rotor's notch.</p>
+     *
+     * @return current code state, or null if not configured
+     * @since 1.0
+     */
     CodeState getCodeState();
 
+    /**
+     * Reset rotor positions to their original values.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>Returns all rotor positions to their <b>original values</b> at configuration time</li>
+     *   <li>Maintains rotor selection, reflector selection, and plugboard</li>
+     *   <li>Does NOT change the code configuration itself</li>
+     * </ul>
+     *
+     * <p><b>Layer Responsibility:</b> Machine handles mechanical reset (positions).
+     * Engine handles history and statistics (NOT reset by this method).</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>
+     * machine.setCode(code);  // positions = ['O', 'D', 'X']
+     * machine.process('A');   // positions advance to ['O', 'D', 'Y']
+     * machine.process('B');   // positions advance to ['O', 'D', 'Z']
+     * machine.reset();        // positions return to ['O', 'D', 'X']
+     * </pre>
+     *
+     * @throws IllegalStateException if machine is not configured
+     * @since 1.0
+     */
     void reset();
 }
