@@ -1,5 +1,8 @@
 package enigma.engine;
 
+import enigma.engine.exception.EngineException;
+import enigma.engine.exception.MachineNotLoadedException;
+import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
 import enigma.loader.Loader;
 import enigma.loader.EnigmaLoadingException;
@@ -64,7 +67,7 @@ public class EngineImpl implements Engine {
      * - Caller must handle concurrency; the last successful load overwrites the engine spec.
      *
      * @param path absolute or relative path to the Enigma XML file
-     * @throws RuntimeException if parsing or validation fails (loader error wrapped)
+     * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
      */
     @Override
     public void loadMachine(String path) {
@@ -72,7 +75,13 @@ public class EngineImpl implements Engine {
             spec = loader.loadSpecs(path);
             // TODO statistics/history reset is handled elsewhere if needed
         } catch (EnigmaLoadingException e) {
-            throw new RuntimeException("Failed to load machine XML: " + e.getMessage(), e);
+            throw new EngineException(
+                String.format(
+                    "Failed to load machine specification from XML file: %s. " +
+                    "Error: %s. " +
+                    "Fix: Ensure the XML file exists, is well-formed, and satisfies all validation rules.",
+                    path, e.getMessage()),
+                e);
         }
     }
 
@@ -99,11 +108,16 @@ public class EngineImpl implements Engine {
      * {@link Machine#setCode(Code)}.</p>
      *
      * @param config configuration with rotor IDs, positions (chars), reflector ID
-     * @throws IllegalArgumentException if validation fails
-     * @throws IllegalStateException if spec is not loaded
+     * @throws enigma.engine.exception.InvalidConfigurationException if validation fails
+     * @throws MachineNotLoadedException if spec is not loaded
      */
     @Override
     public void configManual(CodeConfig config) {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot configure machine: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before configuring.");
+        }
         EngineValidator.validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
         machine.setCode(code);
@@ -122,10 +136,15 @@ public class EngineImpl implements Engine {
      * </ul>
      * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
      *
-     * @throws IllegalStateException when spec is not loaded
+     * @throws MachineNotLoadedException when spec is not loaded
      */
     @Override
     public void configRandom() {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot generate random configuration: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before generating random configuration.");
+        }
         CodeConfig config = generateRandomConfig(spec);
         configManual(config);
     }
@@ -136,27 +155,27 @@ public class EngineImpl implements Engine {
      *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
-     * @throws IllegalStateException if machine is not configured
-     * @throws IllegalArgumentException if input is null or contains invalid characters
+     * @throws MachineNotLoadedException if machine specification is not loaded
+     * @throws MachineNotConfiguredException if machine is not configured
+     * @throws enigma.engine.exception.InvalidMessageException if input is null or contains invalid characters
      */
     @Override
     public ProcessTrace process(String input) {
         // Validate machine is loaded
         if (spec == null) {
-            throw new IllegalStateException("Machine is not loaded. Load an XML file before processing messages.");
+            throw new MachineNotLoadedException(
+                "Cannot process message: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before processing messages.");
         }
         
         // Validate machine is configured
         if (!machine.isConfigured()) {
-            throw new IllegalStateException("Machine is not configured. Configure the machine before processing messages.");
+            throw new MachineNotConfiguredException(
+                "Cannot process message: Machine is not configured. " +
+                "Fix: Configure the machine using configManual(config) or configRandom() before processing messages.");
         }
         
-        // Validate input is not null
-        if (input == null) {
-            throw new IllegalArgumentException("Input must not be null");
-        }
-
-        // Validate all characters are in the machine alphabet and no forbidden characters
+        // Validate input is not null and contains only valid characters
         EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
@@ -228,14 +247,8 @@ public class EngineImpl implements Engine {
      *
      * @param spec machine specification (must be non-null)
      * @return randomly sampled {@link CodeConfig}
-     * @throws IllegalStateException when {@code spec} is null
      */
     private CodeConfig generateRandomConfig(MachineSpec spec) {
-        if (spec == null) {
-            throw new IllegalStateException(
-                    "Machine is not loaded. Load an XML file before generating a random code.");
-        }
-
         SecureRandom random = new SecureRandom();
 
         // Shuffle available rotor IDs and pick exactly ROTORS_IN_USE of them in random order (left → right)

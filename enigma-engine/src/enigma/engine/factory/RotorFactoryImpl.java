@@ -1,5 +1,6 @@
 package enigma.engine.factory;
 
+import enigma.engine.exception.InvalidConfigurationException;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
 import enigma.machine.component.alphabet.Alphabet;
@@ -37,10 +38,14 @@ public class RotorFactoryImpl implements RotorFactory {
      * Create a rotor factory bound to the given alphabet.
      *
      * @param alphabet alphabet for size validation and rotor construction
-     * @throws IllegalArgumentException if alphabet is null
+     * @throws InvalidConfigurationException if alphabet is null
      */
     public RotorFactoryImpl(Alphabet alphabet) {
-        if (alphabet == null) throw new IllegalArgumentException("alphabet must not be null");
+        if (alphabet == null) {
+            throw new InvalidConfigurationException(
+                "RotorFactory initialization failed: alphabet must not be null. " +
+                "Fix: Provide a valid Alphabet instance.");
+        }
         this.alphabet = alphabet;
     }
 
@@ -53,7 +58,7 @@ public class RotorFactoryImpl implements RotorFactory {
      *
      * @param spec rotor specification with ID, columns, and notch index
      * @return {@link RotorImpl} instance ready for position setting
-     * @throws IllegalStateException if column lengths don't match alphabet size
+     * @throws InvalidConfigurationException if column lengths don't match alphabet size
      */
     @Override
     public Rotor create(RotorSpec spec) {
@@ -61,7 +66,12 @@ public class RotorFactoryImpl implements RotorFactory {
         char[] rightChars = spec.getRightColumn();
         char[] leftChars = spec.getLeftColumn();
         if (rightChars.length != leftChars.length || rightChars.length != alphabet.size()) {
-            throw new IllegalStateException("RotorSpec column length mismatch or not equal to alphabet size");
+            throw new InvalidConfigurationException(
+                String.format(
+                    "Rotor creation failed for rotor %d: Column length mismatch. " +
+                    "Right column length: %d, Left column length: %d, Alphabet size: %d. " +
+                    "Fix: Ensure the XML rotor specification has columns matching the alphabet size.",
+                    spec.id(), rightChars.length, leftChars.length, alphabet.size()));
         }
 
         return new RotorImpl(
