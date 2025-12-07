@@ -94,22 +94,22 @@ public class EngineValidatorTester {
             passedTests++;
         }
 
-        // Test 7: Invalid reflector (not a Roman numeral)
+        // Test 7: Invalid reflector (doesn't exist in spec)
         totalTests++;
-        System.out.println("Test 7: Invalid reflector 'IIIX' (not a valid Roman numeral)");
+        System.out.println("Test 7: Invalid reflector 'III' (not in spec which has I, II)");
         try {
-            engine.validateReflectorExists(mockSpec, "IIIX");
+            engine.validateReflectorExists(mockSpec, "III");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");
             passedTests++;
         }
 
-        // Test 8: Invalid reflector (valid Roman numeral but doesn't exist)
+        // Test 8: Invalid reflector (another ID not in spec)
         totalTests++;
-        System.out.println("Test 8: Invalid reflector 'V' (valid Roman numeral but not in spec)");
+        System.out.println("Test 8: Invalid reflector 'INVALID' (not in spec)");
         try {
-            engine.validateReflectorExists(mockSpec, "V");
+            engine.validateReflectorExists(mockSpec, "INVALID");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             System.out.println("  PASSED: " + e.getMessage() + "\n");

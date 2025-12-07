@@ -3,36 +3,41 @@
 ## Overview
 This document summarizes the manual configuration validation enhancements made to `EngineValidator.java` and `EngineImpl.java`.
 
+## Validation Scope and Responsibilities
+
+**Important:** All rotor ID and reflector ID validations in the Engine layer are **relative to the MachineSpec**. The Engine validator checks if IDs exist in the loaded machine specification, not against hardcoded lists.
+
+- **XML Loader responsibility:** Validate that reflector IDs are valid Roman numerals (I, II, III, IV, V) during XML parsing
+- **Engine validator responsibility:** Check if the provided rotor/reflector IDs exist in the loaded MachineSpec
+
+This separation ensures:
+1. XML structural validation happens once at load time
+2. Engine runtime validation focuses on user configuration against the loaded spec
+3. No duplication of validation logic across layers
+
 ## Changes Made
 
-### 1. Roman Numeral Validation for Reflector IDs
+### 1. Reflector ID Validation (Relative to MachineSpec)
 
 **Location:** `EngineValidator.validateReflectorExists()`
 
-**Enhancement:** Added validation to ensure reflector IDs are valid Roman numerals (I, II, III, IV, or V) before checking existence in the machine spec.
+**Enhancement:** Validates that the reflector ID exists in the MachineSpec. The Roman numeral format validation is handled by the XML Loader during machine specification loading.
 
 **Implementation:**
 ```java
-private static final List<String> VALID_ROMAN_NUMERALS = List.of("I", "II", "III", "IV", "V");
-
 public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
     if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
-    
-    // Validate Roman numeral format
-    if (!VALID_ROMAN_NUMERALS.contains(reflectorId)) {
-        throw new IllegalArgumentException(
-            "Reflector ID '" + reflectorId + "' is not a valid Roman numeral (must be I, II, III, IV, or V)");
-    }
-    
     if (spec.getReflectorById(reflectorId) == null)
         throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
 }
 ```
 
 **Test Cases:**
-- Invalid Roman numeral like "IIIX" → throws exception
-- Valid Roman numeral but not in spec (e.g., "V" when only I and II exist) → throws exception
-- Valid Roman numeral and exists in spec → passes validation
+- Reflector ID not in spec (e.g., "III" when spec only has I, II) → throws exception
+- Invalid/malformed ID not in spec (e.g., "INVALID") → throws exception  
+- Valid reflector ID that exists in spec → passes validation
+
+**Note:** If an invalid Roman numeral makes it to this validation, it will fail the existence check since the XML loader would have rejected it during machine loading.
 
 ### 2. Plugboard Validation (Prepared for EX2)
 
@@ -126,11 +131,11 @@ public void validatePlugboard(MachineSpec spec, String plugboard) {
 The following validations were already present and are working correctly:
 
 1. **Rotor Count Validation** - Ensures exactly 3 rotors are selected (ROTORS_IN_USE constant)
-2. **Rotor ID Existence** - Validates all rotor IDs exist in the machine spec
+2. **Rotor ID Existence** - Validates all rotor IDs exist in the machine spec (relative to loaded spec)
 3. **Rotor ID Uniqueness** - Ensures no duplicate rotor IDs
 4. **Position Count** - Validates position string length matches rotor count
 5. **Position Alphabet Membership** - Ensures all position characters are in the alphabet
-6. **Reflector Existence** - Validates reflector exists in the machine spec (now also checks Roman numeral format)
+6. **Reflector Existence** - Validates reflector exists in the machine spec (relative to loaded spec)
 
 ## Complete Validation Flow
 
@@ -138,8 +143,8 @@ When `EngineValidator.validateCodeConfig()` is called, it performs validation in
 
 1. Null checks (rotorIds, positions, reflectorId)
 2. Rotor and position counts (must be exactly 3)
-3. Rotor IDs existence and uniqueness
-4. Reflector exists and is valid Roman numeral
+3. Rotor IDs existence and uniqueness (checks against MachineSpec)
+4. Reflector exists (checks against MachineSpec)
 5. Positions are in alphabet
 
 The plugboard validation is a separate method that can be called independently when needed.
@@ -152,11 +157,10 @@ A comprehensive test suite has been created at:
 This tester includes 15 test cases covering:
 - Wrong rotor counts (2 and 4 rotors)
 - Duplicate rotor IDs
-- Non-existent rotor IDs
+- Non-existent rotor IDs (relative to mock MachineSpec)
 - Wrong position string length
 - Position characters not in alphabet
-- Invalid reflector IDs (non-Roman numerals)
-- Reflector IDs that don't exist
+- Reflector IDs that don't exist in the spec
 - All plugboard validation scenarios
 - Valid configurations
 
@@ -182,6 +186,6 @@ Examples:
 - "Exactly 3 rotors must be selected"
 - "Duplicate rotor 2"
 - "Rotor 99 does not exist in spec"
-- "Reflector ID 'IIIX' is not a valid Roman numeral (must be I, II, III, IV, or V)"
+- "Reflector 'III' does not exist" (when spec only has I, II)
 - "Plugboard cannot map a letter to itself: 'AA'"
 - "Plugboard letter 'A' appears more than once"

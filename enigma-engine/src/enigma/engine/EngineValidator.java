@@ -24,7 +24,6 @@ import java.util.Set;
 public final class EngineValidator {
 
     private static final int ROTORS_IN_USE = 3; // keep in sync with EngineImpl
-    private static final List<String> VALID_ROMAN_NUMERALS = List.of("I", "II", "III", "IV", "V");
 
     private EngineValidator() { /* utility */ }
 
@@ -67,13 +66,6 @@ public final class EngineValidator {
 
     public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
-        
-        // Validate Roman numeral format
-        if (!VALID_ROMAN_NUMERALS.contains(reflectorId)) {
-            throw new IllegalArgumentException(
-                "Reflector ID '" + reflectorId + "' is not a valid Roman numeral (must be I, II, III, IV, or V)");
-        }
-        
         if (spec.getReflectorById(reflectorId) == null)
             throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
     }
