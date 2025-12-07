@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class InputMessageValidationTester {
 
+    private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
+
     public static void main(String[] args) {
         System.out.println("=== Input Message Validation Tests ===\n");
 
@@ -94,7 +96,7 @@ public class InputMessageValidationTester {
         totalTests++;
         System.out.println("Test 5: Message includes ESC character (ASCII 27)");
         try {
-            EngineValidator.validateInputInAlphabet(mockSpec, "ABC\u001BDEF");
+            EngineValidator.validateInputInAlphabet(mockSpec, "ABC" + ESC_CHAR + "DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("ESC")) {

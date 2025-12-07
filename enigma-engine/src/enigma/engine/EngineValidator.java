@@ -24,6 +24,7 @@ import java.util.Set;
 public final class EngineValidator {
 
     private static final int ROTORS_IN_USE = 3; // keep in sync with EngineImpl
+    private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
 
     private EngineValidator() { /* utility */ }
 
@@ -100,7 +101,7 @@ public final class EngineValidator {
                     errorMsg = "Invalid character: newline character is not allowed in input messages";
                 } else if (c == '\t') {
                     errorMsg = "Invalid character: tab character is not allowed in input messages";
-                } else if (c == '\u001B') { // ESC character (ASCII 27)
+                } else if (c == ESC_CHAR) {
                     errorMsg = "Invalid character: ESC character is not allowed in input messages";
                 } else {
                     errorMsg = "Invalid character: non-printable character (ASCII " + (int)c + ") is not allowed in input messages";
