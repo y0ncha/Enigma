@@ -4,6 +4,7 @@ import enigma.engine.exception.EngineException;
 import enigma.engine.exception.MachineNotLoadedException;
 import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
+import enigma.engine.history.MachineHistory;
 import enigma.loader.Loader;
 import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
@@ -32,6 +33,7 @@ public class EngineImpl implements Engine {
     private final Machine machine;
     private final Loader loader;
     private final CodeFactory codeFactory;
+    private MachineHistory history;
 
     private MachineSpec spec;
     private CodeState ogCodeState;
@@ -48,6 +50,7 @@ public class EngineImpl implements Engine {
         this.machine = new MachineImpl();
         this.loader = new LoaderXml();
         this.codeFactory = new CodeFactoryImpl();
+        this.history = new MachineHistory();
     }
 
     // ---------------------------------------------------------
@@ -73,8 +76,11 @@ public class EngineImpl implements Engine {
     public void loadMachine(String path) {
         try {
             spec = loader.loadSpecs(path);
-            // TODO statistics/history reset is handled elsewhere if needed
-        } catch (EnigmaLoadingException e) {
+            this.history = new MachineHistory();
+            this.ogCodeState = null;
+            this.stringsProcessed = 0;
+        }
+        catch (EnigmaLoadingException e) {
             throw new EngineException(
                 String.format(
                     "Failed to load machine specification from XML file: %s. " +
@@ -118,10 +124,16 @@ public class EngineImpl implements Engine {
                 "Cannot configure machine: No machine specification loaded. " +
                 "Fix: Load a machine specification using loadMachine(path) before configuring.");
         }
+        // validate config against spec
         EngineValidator.validateCodeConfig(spec, config);
+
+        // create code and assign to machine
         Code code = codeFactory.create(spec, config);
         machine.setCode(code);
+
+        // record config in history
         ogCodeState = machine.getCodeState();
+        history.recordConfig(ogCodeState);
     }
 
 
@@ -181,41 +193,57 @@ public class EngineImpl implements Engine {
         List<SignalTrace> traces = new ArrayList<>();
         StringBuilder output = new StringBuilder();
 
+        long start = System.nanoTime();
         for (char c : input.toCharArray()) {
             SignalTrace trace = machine.process(c);
             traces.add(trace);
             output.append(trace.outputChar());
         }
+        long duration = System.nanoTime() - start;
+
         this.stringsProcessed++;
+
+        // Record processed message with duration in nanoseconds
+        history.recordMessage(input, output.toString(), duration);
+
         return new ProcessTrace(output.toString(), List.copyOf(traces));
     }
 
     @Override
     public void reset() {
-        // TODO implement
-        // machine.reset();
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                    "Cannot reset machine: No machine specification loaded. " +
+                            "Fix: Load a machine specification using loadMachine(path) before resetting.");
+        }
+
+        if (!machine.isConfigured()) {
+            throw new MachineNotConfiguredException(
+                    "Cannot reset machine: Machine is not configured. " +
+                            "Fix: Configure the machine using configManual(config) or configRandom() before resetting.");
+        }
+        machine.reset();
     }
 
     @Override
     public void terminate() {
-        // TODO implement
-    }
-    /**
-     * Produce runtime statistics for the engine.
-     *
-     * <p>Currently a placeholder; implementation may be added later.</p>
-     */
-    @Override
-    public void statistics() {
-        // TODO implement
+        // Nothing to clean up.
+        // Included for interface completeness (console may call it before exiting).
     }
 
     @Override
+    public String history() {
+        return history.toString();
+    }
+
+    @Override
+    @Deprecated
     public MachineSpec getMachineSpec() {
         return spec;
     }
 
     @Override
+    @Deprecated
     public CodeConfig getCurrentCodeConfig() {
         if (!machine.isConfigured()) {
             return null;
@@ -224,6 +252,7 @@ public class EngineImpl implements Engine {
     }
 
     @Override
+    @Deprecated
     public long getTotalProcessedMessages() {
         return stringsProcessed;
         // TODO deprecate : machineData instead

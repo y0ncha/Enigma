@@ -233,10 +233,43 @@ public final class EngineValidator {
      * Truncate a string for display with ellipsis if too long.
      */
     private static String truncateForDisplay(String str, int maxLen) {
-        if (str.length() <= maxLen) {
-            return str;
+        if (str == null) {
+            return null;
         }
-        return str.substring(0, maxLen) + "...";
+
+        // First, escape control/non-printable characters to visible markers (e.g., \n, \t, ESC)
+        String escaped = escapeControlChars(str);
+
+        if (escaped.length() <= maxLen) {
+            return escaped;
+        }
+        return escaped.substring(0, maxLen) + "...";
+    }
+
+    /**
+     * Replace ISO control and other non-printable characters with visible escape sequences.
+     * Examples: newline -> "\\n", tab -> "\\t", ESC -> "\\u001B", other controls -> "\\uXXXX".
+     */
+    private static String escapeControlChars(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch ((int) c) {
+                case 0 -> sb.append("\\0");
+                case 9 -> sb.append("\\t");
+                case 10 -> sb.append("\\n");
+                case 13 -> sb.append("\\r");
+                case 27 -> sb.append("\\u001B");
+                default -> {
+                    if (Character.isISOControl(c)) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 
     /**

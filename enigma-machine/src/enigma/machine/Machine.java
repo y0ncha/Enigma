@@ -43,4 +43,6 @@ public interface Machine {
     CodeConfig getConfig();
 
     CodeState getCodeState();
+
+    void reset();
 }
