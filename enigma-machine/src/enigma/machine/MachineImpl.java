@@ -193,7 +193,7 @@ public class MachineImpl implements Machine {
         String positions = buildWindowString();
         List<Integer> notchDist = code.getNotchDist();
         String reflectorId = code.getReflector().getId();
-        return new CodeState(code.getRotorIds(), positions, notchDist, reflectorId);
+        return new CodeState(code.getRotorIds(), positions, notchDist, reflectorId, "");
     }
 
     /**
