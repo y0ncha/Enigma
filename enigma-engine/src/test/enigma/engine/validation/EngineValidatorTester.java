@@ -115,6 +115,17 @@ public class EngineValidatorTester {
             passedTests++;
         }
 
+        // Test 9: Plugboard odd length
+        totalTests++;
+        System.out.println("Test 9: Plugboard odd length (ABC)");
+        try {
+            EngineValidator.validatePlugboard(mockSpec, "ABC");
+            System.out.println("  FAILED: Should have thrown exception\n");
+        } catch (IllegalArgumentException e) {
+            System.out.println("  PASSED: " + e.getMessage() + "\n");
+            passedTests++;
+        }
+
         // Test 15: Valid configuration (should pass)
         totalTests++;
         System.out.println("Test 15: Valid complete configuration");
@@ -153,15 +164,14 @@ public class EngineValidatorTester {
 
         // Create mock rotors (minimal spec needed for validation)
         Map<Integer, RotorSpec> rotors = new HashMap<>();
-        // Build simple right/left columns using alphabet letters. notchIndex=0
-        rotors.put(1, new RotorSpec(1, 0, new char[]{'A','B','C','D'}, new char[]{'B','A','D','C'}));
-        rotors.put(2, new RotorSpec(2, 0, new char[]{'B','C','D','A'}, new char[]{'C','B','A','D'}));
-        rotors.put(3, new RotorSpec(3, 0, new char[]{'C','D','A','B'}, new char[]{'D','C','B','A'}));
+        rotors.put(1, new RotorSpec(1, 0, new char[]{'A', 'B', 'C', 'D'}, new char[]{'B', 'A', 'D', 'C'}));
+        rotors.put(2, new RotorSpec(2, 1, new char[]{'A', 'B', 'C', 'D'}, new char[]{'C', 'D', 'A', 'B'}));
+        rotors.put(3, new RotorSpec(3, 2, new char[]{'A', 'B', 'C', 'D'}, new char[]{'D', 'C', 'B', 'A'}));
 
         // Create mock reflectors (minimal spec needed for validation)
         Map<String, ReflectorSpec> reflectors = new HashMap<>();
-        reflectors.put("I", new ReflectorSpec("I", new int[]{1, 0, 3, 2}));   // Mock reflector I
-        reflectors.put("II", new ReflectorSpec("II", new int[]{2, 3, 0, 1})); // Mock reflector II
+        reflectors.put("I", new ReflectorSpec("I", new int[]{1, 0, 3, 2}));
+        reflectors.put("II", new ReflectorSpec("II", new int[]{2, 3, 0, 1}));
 
         // include rotorsInUse (3) to match MachineSpec record update
         return new MachineSpec(alphabet, rotors, reflectors, 3);

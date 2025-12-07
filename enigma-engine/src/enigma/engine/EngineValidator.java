@@ -21,6 +21,7 @@ import java.util.Set;
  */
 public final class EngineValidator {
 
+    private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
     private EngineValidator() { /* utility */ }
 
     public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
@@ -76,6 +77,19 @@ public final class EngineValidator {
         }
     }
 
+    /**
+     * Validate that input message contains only valid alphabet characters.
+     * 
+     * <p>This validation ensures:</p>
+     * <ul>
+     *   <li>All characters must be in the machine alphabet</li>
+     *   <li>No forbidden characters: newline (\n), tab (\t), ESC (ASCII 27), or other non-printables</li>
+     * </ul>
+     * 
+     * @param spec machine specification containing the alphabet
+     * @param input input message to validate
+     * @throws IllegalArgumentException if input contains invalid or forbidden characters
+     */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
         if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
         if (input == null) throw new IllegalArgumentException("Input must not be null");
