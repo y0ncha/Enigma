@@ -156,19 +156,23 @@ public class ConsoleImpl implements Console {
      */
     private void handleLoadMachineFromXml() {
 
-        // Delegate to engine – it validates XML contents (application-wise)
-        try {
-            System.out.println("Please enter the full path to the XML file:");
-            System.out.print("> ");
-            // for demo purposes
-             String path = scanner.nextLine().trim();
-            enigma.loadMachine(path);
-            // If we got here – loading succeeded
-            machineLoaded = true;
-            codeConfigured = false; // previous code no longer relevant
-            Utilities.printInfo("Machine configuration loaded successfully from: " + path);
-        } catch (Exception e) {
-            Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+        while (true) {
+            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
+            try {
+                enigma.loadMachine(path);
+                // If we got here – loading succeeded
+                machineLoaded = true;
+                codeConfigured = false; // previous code no longer relevant
+                Utilities.printInfo("Machine configuration loaded successfully from: " + path);
+                return;
+            } catch (Exception e) {
+                Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+                // Do not override any existing machine; upon failure we keep prior state
+                if (!Utilities.askUserToRetry(scanner, "Do you want to try a different path? (Y/N): ")) {
+                    return; // back to menu
+                }
+                // else - loop and ask again
+            }
         }
     }
 
