@@ -302,17 +302,7 @@ public class ConsoleImpl implements Console {
                     continue;
                 }
                 initialPositions = InputParsers.buildInitialPositions(positions);
-                // Validate that positions characters belong to machine alphabet (format-level)
-                try {
-                    ConsoleValidator.validatePositionsInAlphabet(enigma.getMachineSpec(), initialPositions);
-                } catch (IllegalArgumentException e) {
-                    Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
-                        return;
-                    }
-                    continue;
-                }
-                // Format conversion completed → move to next stage
+                // Format-level validation complete → engine will validate alphabet membership
                 break;
             }
             // =========================
@@ -418,9 +408,6 @@ public class ConsoleImpl implements Console {
 
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
-
-                // Validate input characters belong to machine alphabet before processing
-                ConsoleValidator.validateInputInAlphabet(enigma.getMachineSpec(), normalizedInput);
 
                 // 2. Process input via engine and measure duration
                 //    Engine will validate that characters are in the machine alphabet
