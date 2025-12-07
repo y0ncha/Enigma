@@ -1,4 +1,4 @@
-package enigma.loader;
+package enigma.loader.exception;
 
 /**
  * Exception thrown when an error occurs during XML loading/validation.
@@ -13,8 +13,12 @@ package enigma.loader;
  *   <li>Validation failures (alphabet, rotor, reflector constraints)</li>
  * </ul>
  *
- * <p>Exception messages are detailed and indicate the specific validation
- * rule that failed.</p>
+ * <p>Exception messages follow the pattern:</p>
+ * <ul>
+ *   <li><b>What</b> is wrong</li>
+ *   <li><b>Where</b> the problem occurred (file path, rotor ID, reflector ID, etc.)</li>
+ *   <li><b>How</b> to fix it</li>
+ * </ul>
  *
  * @since 1.0
  */
