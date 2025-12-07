@@ -255,7 +255,6 @@ public final class EngineValidator {
      *
      * @param spec machine specification containing the alphabet
      * @param plugboard plugboard configuration string (e.g., "ABCD" maps A↔B and C↔D), may be null or empty
-     * @throws InvalidConfigurationException if validation fails
      */
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
         if (spec == null) {

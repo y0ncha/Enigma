@@ -385,6 +385,12 @@ public class ExceptionMessageTester {
     }
 
     /**
+     * Minimum length for a descriptive exception message.
+     * Messages shorter than this are considered insufficiently descriptive.
+     */
+    private static final int MIN_DESCRIPTIVE_MESSAGE_LENGTH = 50;
+
+    /**
      * Check if a message contains the expected keywords that indicate a descriptive error.
      */
     private static boolean isDescriptiveMessage(String message, String... keywords) {
@@ -400,6 +406,6 @@ public class ExceptionMessageTester {
         }
         
         // Check minimum length - descriptive messages should be substantial
-        return message.length() > 50;
+        return message.length() > MIN_DESCRIPTIVE_MESSAGE_LENGTH;
     }
 }
