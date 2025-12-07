@@ -5,11 +5,7 @@ import enigma.console.helper.Utilities;
 import enigma.console.helper.ConsoleValidator;
 import enigma.engine.exception.EngineException;
 import enigma.engine.exception.InvalidConfigurationException;
-import enigma.engine.exception.InvalidMessageException;
-import enigma.engine.exception.MachineNotLoadedException;
-import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.shared.dto.tracer.ProcessTrace;
-import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.engine.Engine;
 
@@ -177,7 +173,8 @@ public class ConsoleImpl implements Console {
                 codeConfigured = false; // previous code no longer relevant
                 Utilities.printInfo("Machine configuration loaded successfully from: " + path);
                 return;
-            } catch (EngineException e) {
+            }
+            catch (EngineException e) {
                 // Catch all engine exceptions (includes EngineException and its subclasses)
                 Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
                 // Do not override any existing machine; upon failure we keep prior state
@@ -206,35 +203,37 @@ public class ConsoleImpl implements Console {
      */
     private void handleShowMachineSpecification() {
 
-        if (!machineLoaded) {
-            Utilities.printError("No machine is currently loaded. Please load an XML file first (Command 1).");
-            return;
-        }
         try {
-            MachineSpec machineSpec = enigma.getMachineSpec();
+
+//            MachineSpec machineSpec = enigma.getMachineSpec();
             System.out.println("========================================");
             System.out.println(" Enigma Machine - Specification");
             System.out.println("========================================");
-            System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
-            System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
-
-            long totalProcessedMessages = enigma.getTotalProcessedMessages();
-            System.out.println("Total processed messages     : " + totalProcessedMessages);
-
-            // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
-            CodeConfig originalCode = enigma.getCurrentCodeConfig();
-            if (originalCode != null) {
-                System.out.println("Original code configuration  : " + originalCode);
-            } else {
-                System.out.println("Original code configuration  : <not set yet>");
-            }
-            // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
-            CodeConfig currentCode = enigma.getCurrentCodeConfig();
-            if (currentCode != null) {
-                System.out.println("Current code configuration   : " + currentCode);
-            } else {
-                System.out.println("Current code configuration   : <not set yet>");
-            }
+            System.out.println(enigma.machineData());
+            // TODO Yonatan - support machine specification without configuration
+            // TODO Yonatan - Remove "Machine State" header from MachineState DTO toString()
+//            System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
+//            System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
+//
+//            long totalProcessedMessages = enigma.getTotalProcessedMessages();
+//            System.out.println("Total processed messages     : " + totalProcessedMessages);
+//
+//            // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
+//            CodeConfig originalCode = enigma.getCurrentCodeConfig();
+//            if (originalCode != null) {
+//                System.out.println("Original code configuration  : " + originalCode);
+//            }
+//            else {
+//                System.out.println("Original code configuration  : <not set yet>");
+//            }
+//            // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
+//            CodeConfig currentCode = enigma.getCurrentCodeConfig();
+//            if (currentCode != null) {
+//                System.out.println("Current code configuration   : " + currentCode);
+//            }
+//            else {
+//                System.out.println("Current code configuration   : <not set yet>");
+//            }
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
             Utilities.printError("Failed to show machine specification: " + e.getMessage());
@@ -257,11 +256,9 @@ public class ConsoleImpl implements Console {
      *  - on error: print clear message and let the user decide whether to retry or return to main menu
      *  - on success: update engine with new code and print compact format
      */
+    // TODO Ela - fix
+    // TODO Ela - let Yonatan know if need to keep getCurrentCodeConfig
     private void handleSetManualCode() {
-        if (!machineLoaded) {
-            Utilities.printError("No machine is currently loaded. Please load an XML file first (Command 1).");
-            return;
-        }
 
         boolean keepTrying = true;
         while (keepTrying) {
@@ -398,6 +395,8 @@ public class ConsoleImpl implements Console {
      * - print: original input, processed output and duration
      * - note: rotors remain in their new positions (no auto reset)
      */
+    // TODO Ela - use EngineValidator.validateInputInAlphabet() to validate input
+    // TODO Ela - remove time measurements
     private void handleProcessInput() {
         boolean keepTrying = true;
         while (keepTrying) {
@@ -450,21 +449,29 @@ public class ConsoleImpl implements Console {
      */
     private void handleResetCode() {
         // Get the current configuration from the engine
-        CodeConfig current = enigma.getCurrentCodeConfig();
-        if (current == null) {
-            Utilities.printError("No last configuration was found. Cannot reset.");
-            return;
-        }
         try {
-            // Apply the current code again (reinitializes rotors)
-            enigma.configManual(current);
-            Utilities.printInfo("Code was reset to the current configuration.");
-            System.out.println("Current code: " + current);
-            // Print the resulting (current) code in compact format
-        } catch (EngineException e) {
-            // Catch all engine exceptions
+            enigma.reset();
+        }
+        catch (EngineException e) { // TODO check if need different handling
             Utilities.printError("Failed to reset code: " + e.getMessage());
         }
+
+        // TODO Ela - remove
+//        CodeConfig current = enigma.getCurrentCodeConfig();
+//        if (current == null) {
+//            Utilities.printError("No last configuration was found. Cannot reset.");
+//            return;
+//        }
+//        try {
+//            // Apply the current code again (reinitializes rotors)
+//            enigma.configManual(current);
+//            Utilities.printInfo("Code was reset to the current configuration.");
+//            System.out.println("Current code: " + current);
+//            // Print the resulting (current) code in compact format
+//        } catch (EngineException e) {
+//            // Catch all engine exceptions
+//            Utilities.printError("Failed to reset code: " + e.getMessage());
+//        }
     }
     // =========================
     //  Command 7: History & statistics
@@ -480,7 +487,14 @@ public class ConsoleImpl implements Console {
      * where # is running index starting from 1.
      */
     private void handleShowHistoryAndStatistics() {
-        // TODO
+        try { // TODO MachineHistory toStirng by format\
+            System.out.println("========================================");
+            System.out.println(" Enigma Machine - History");
+            System.out.println("========================================");
+            System.out.println(enigma.history());
+        } catch (Exception e) { // TODO check if different bending required
+            Utilities.printError("Failed to show history and statistics: " + e.getMessage());
+        }
     }
 
     // =========================
@@ -492,6 +506,7 @@ public class ConsoleImpl implements Console {
      * Sets a flag so that the main loop in run() stops.
      */
     private void handleExit() {
+        enigma.terminate();
         exitRequested = true;
     }
 }

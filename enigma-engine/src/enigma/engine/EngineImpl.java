@@ -255,7 +255,7 @@ public class EngineImpl implements Engine {
     @Deprecated
     public long getTotalProcessedMessages() {
         return stringsProcessed;
-        // TODO deprecate : machineData instead
+        // TODO Yonatan - deprecate : machineData instead
     }
 
     // ---------------------------------------------------------

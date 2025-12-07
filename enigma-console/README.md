@@ -15,22 +15,22 @@ This module provides a console-based user interface for interacting with the Eni
 ## Responsibilities
 
 ### What This Module DOES
-- ✅ Display interactive menu
-- ✅ Read and parse user commands
-- ✅ Perform **format-level validation** (parsing, basic type checks)
-- ✅ Call engine operations (delegate business logic)
-- ✅ Display results and error messages in user-friendly format
-- ✅ Print machine data, history, and traces
-- ✅ Manage menu enabling/disabling based on state
-- ✅ Handle retry loops for invalid input
+-  Display interactive menu
+-  Read and parse user commands
+-  Perform **format-level validation** (parsing, basic type checks)
+-  Call engine operations (delegate business logic)
+-  Display results and error messages in user-friendly format
+-  Print machine data, history, and traces
+-  Manage menu enabling/disabling based on state
+-  Handle retry loops for invalid input
 
 ### What This Module DOES NOT DO
-- ❌ Validate machine specifications (loader's responsibility)
-- ❌ Validate semantic rules (engine's responsibility - alphabet membership, rotor existence)
-- ❌ Implement encryption logic (machine's responsibility)
-- ❌ Maintain history or state (engine's responsibility)
-- ❌ Parse XML (loader's responsibility)
-- ❌ Create machine components (engine's factory responsibility)
+-  Validate machine specifications (loader's responsibility)
+-  Validate semantic rules (engine's responsibility - alphabet membership, rotor existence)
+-  Implement encryption logic (machine's responsibility)
+-  Maintain history or state (engine's responsibility)
+-  Parse XML (loader's responsibility)
+-  Create machine components (engine's factory responsibility)
 
 ## Key Components
 
@@ -350,5 +350,4 @@ Console includes test helpers:
 ## Related Documentation
 
 - [Validation Layer Organization](../docs/VALIDATION_LAYER_ORGANIZATION.md)
-- [Integration Dev UI](../docs/integration-dev-ui.md)
 - Main [README.md](../README.md)
