@@ -48,7 +48,10 @@ public final class ConsoleValidator {
      * previously when there's a mismatch.
      */
     public static void ensurePositionsLengthMatches(String positions, int rotorCount) {
-        int len = positions == null ? 0 : positions.length();
+        if (positions == null || positions.isEmpty()) {
+            throw new IllegalArgumentException("Positions string cannot be empty.");
+        }
+        int len = positions.length();
         if (len != rotorCount) {
             throw new IllegalArgumentException("Number of positions (" + len
                     + ") must match number of rotors (" + rotorCount + ").");
@@ -85,5 +88,22 @@ public final class ConsoleValidator {
      */
     public static void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         EngineValidator.validatePositionsInAlphabet(spec, positions);
+    }
+
+    /**
+     * Validate basic format of plugboard input string.
+     * Checks: non-null (null is valid), even length.
+     * Does NOT check alphabet membership or semantic rules (engine handles that).
+     * Throws IllegalArgumentException with user-facing message if format is invalid.
+     */
+    public static void validatePlugboardFormat(String plugboard) {
+        // null or empty is valid (no plugboard)
+        if (plugboard == null || plugboard.isEmpty()) {
+            return;
+        }
+        // Check even length (format requirement)
+        if (plugboard.length() % 2 != 0) {
+            throw new IllegalArgumentException("Plugboard must have even length (pairs of characters). Got length: " + plugboard.length());
+        }
     }
 }
