@@ -82,7 +82,7 @@ public final class EngineValidator {
      * <p>This validation ensures:</p>
      * <ul>
      *   <li>All characters must be in the machine alphabet</li>
-     *   <li>No forbidden characters: newline (\n), tab (\t), ESC (ASCII 27), or non-printables</li>
+     *   <li>No forbidden characters: newline (\n), tab (\t), ESC (ASCII 27), or other non-printables</li>
      * </ul>
      * 
      * @param spec machine specification containing the alphabet
@@ -93,24 +93,19 @@ public final class EngineValidator {
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
             
-            // Check for forbidden control characters
-            if (c == '\n') {
-                throw new IllegalArgumentException(
-                    "Invalid character: newline character is not allowed in input messages");
-            }
-            if (c == '\t') {
-                throw new IllegalArgumentException(
-                    "Invalid character: tab character is not allowed in input messages");
-            }
-            if (c == '\u001B') { // ESC character (ASCII 27)
-                throw new IllegalArgumentException(
-                    "Invalid character: ESC character is not allowed in input messages");
-            }
-            
-            // Check for other non-printable characters (ASCII 0-31 and 127, excluding what we already checked)
+            // Check for forbidden control characters with specific error messages for common cases
             if (c < 32 || c == 127) {
-                throw new IllegalArgumentException(
-                    "Invalid character: non-printable character (ASCII " + (int)c + ") is not allowed in input messages");
+                String errorMsg;
+                if (c == '\n') {
+                    errorMsg = "Invalid character: newline character is not allowed in input messages";
+                } else if (c == '\t') {
+                    errorMsg = "Invalid character: tab character is not allowed in input messages";
+                } else if (c == '\u001B') { // ESC character (ASCII 27)
+                    errorMsg = "Invalid character: ESC character is not allowed in input messages";
+                } else {
+                    errorMsg = "Invalid character: non-printable character (ASCII " + (int)c + ") is not allowed in input messages";
+                }
+                throw new IllegalArgumentException(errorMsg);
             }
             
             // Check if character is in the machine alphabet
