@@ -150,12 +150,11 @@ public class EngineImpl implements Engine {
         }
 
         // Validate all characters are in the machine alphabet
-        String alphabet = spec.alphabet();
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            if (alphabet.indexOf(c) < 0) {
+            if (!spec.alphabet().contains(c)) {
                 throw new IllegalArgumentException(
-                    "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + alphabet);
+                    "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());
             }
         }
 
