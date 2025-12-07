@@ -1,6 +1,6 @@
 package test.enigma.loader;
 
-import enigma.loader.EnigmaLoadingException;
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.Loader;
 import enigma.loader.LoaderXml;
 import enigma.shared.spec.MachineSpec;
@@ -25,7 +25,7 @@ public class LoaderTester {
      * Entry point for the test harness.
      */
     public static void main(String[] args) {
-        Loader loader = new LoaderXml(3);
+        Loader loader = new LoaderXml();
 
         String[] files = {
                 "ex1-sanity-small.xml",

@@ -117,7 +117,7 @@ public class MachineImpl implements Machine {
         // Forward pass (right→left)
         List<RotorTrace> forwardSteps = forwardTransform(intermediate);
         if (!forwardSteps.isEmpty()) {
-            intermediate = forwardSteps.getLast().exitIndex();
+            intermediate = forwardSteps.get(forwardSteps.size() - 1).exitIndex();
         }
 
         // Reflector
@@ -132,7 +132,7 @@ public class MachineImpl implements Machine {
         // Backward pass (left→right)
         List<RotorTrace> backwardSteps = backwardTransform(intermediate);
         if (!backwardSteps.isEmpty()) {
-            intermediate = backwardSteps.getLast().exitIndex();
+            intermediate = backwardSteps.get(backwardSteps.size() - 1).exitIndex();
         }
 
         char outputChar = keyboard.toChar(intermediate);
@@ -195,26 +195,33 @@ public class MachineImpl implements Machine {
      *
      * <p><b>Stepping Logic:</b></p>
      * <ul>
-     *   <li>Rightmost rotor always advances</li>
+     *   <li>Rightmost rotor (highest index) always advances</li>
      *   <li>If a rotor reaches its notch after advancing, the rotor to its left also advances</li>
      *   <li>Propagation continues leftward until a rotor does not reach its notch</li>
      * </ul>
      *
-     * @return immutable list of rotor indices that advanced (using same indexing: 0 = leftmost)
+     * <p><b>Indexing Convention:</b> Rotors are stored left→right, so:</p>
+     * <ul>
+     *   <li>index 0 = leftmost rotor</li>
+     *   <li>index size-1 = rightmost rotor (steps first)</li>
+     * </ul>
+     *
+     * @return immutable list of rotor indices that advanced (using left→right indexing)
      */
     private List<Integer> advance() {
 
         List<Integer> advanced = new ArrayList<>();
-        List<Rotor> rotors = code.getRotors();
+        List<Rotor> rotors = code.getRotors();  // left→right array
 
-        int index = rotors.size() - 1; // start at RIGHTMOST (last index)
+        // Start at rightmost rotor (highest index in left→right array)
+        int index = rotors.size() - 1;
         boolean shouldAdvance;
 
         do {
             Rotor rotor = rotors.get(index);
             shouldAdvance = rotor.advance();
-            advanced.add(index);        // record index (0 = leftmost per standard indexing)
-            index--;                    // move leftward
+            advanced.add(index);        // record index (0 = leftmost per left→right convention)
+            index--;                    // move leftward (decrease index)
         } while (shouldAdvance && index >= 0);
 
         return List.copyOf(advanced);
@@ -223,8 +230,11 @@ public class MachineImpl implements Machine {
     /**
      * Apply forward transformation through rotors while recording traces.
      *
-     * <p>Forward direction processes signal from keyboard (right side) toward
-     * reflector (left side). Rotors are traversed from rightmost to leftmost.</p>
+     * <p><b>Physical Direction:</b> Forward direction processes signal from
+     * keyboard (right side) toward reflector (left side).</p>
+     *
+     * <p><b>Implementation:</b> Since rotors are stored left→right in the array,
+     * we iterate from highest index (rightmost) down to 0 (leftmost).</p>
      *
      * @param entryIndex initial index from keyboard (0..alphabetSize-1)
      * @return immutable list of RotorTrace (rightmost first, in iteration order)
@@ -232,16 +242,16 @@ public class MachineImpl implements Machine {
     private List<RotorTrace> forwardTransform(int entryIndex) {
 
         List<RotorTrace> steps = new ArrayList<>();
-        List<Rotor> rotors = code.getRotors();
+        List<Rotor> rotors = code.getRotors();  // left→right array
 
-        // iterate from RIGHTMOST (last index) → LEFTMOST (0)
+        // Process right→left: iterate from RIGHTMOST (last index) → LEFTMOST (0)
         for (int i = rotors.size() - 1; i >= 0; i--) {
             Rotor rotor = rotors.get(i);
             int exitIndex = rotor.process(entryIndex, Direction.FORWARD);
 
             steps.add(new RotorTrace(
                     rotor.getId(),
-                    i,
+                    i,  // rotor position in left→right array
                     entryIndex,
                     exitIndex,
                     keyboard.toChar(entryIndex),
@@ -255,8 +265,11 @@ public class MachineImpl implements Machine {
     /**
      * Apply backward transformation through rotors while recording traces.
      *
-     * <p>Backward direction processes signal from reflector (left side) back
-     * toward keyboard (right side). Rotors are traversed from leftmost to rightmost.</p>
+     * <p><b>Physical Direction:</b> Backward direction processes signal from
+     * reflector (left side) back toward keyboard (right side).</p>
+     *
+     * <p><b>Implementation:</b> Since rotors are stored left→right in the array,
+     * we iterate from index 0 (leftmost) up to size-1 (rightmost).</p>
      *
      * @param value input index from reflector (0..alphabetSize-1)
      * @return immutable list of RotorTrace (leftmost first, in iteration order)
@@ -264,9 +277,9 @@ public class MachineImpl implements Machine {
     private List<RotorTrace> backwardTransform(int value) {
 
         List<RotorTrace> steps = new ArrayList<>();
-        List<Rotor> rotors = code.getRotors();
+        List<Rotor> rotors = code.getRotors();  // left→right array
 
-        // iterate from LEFTMOST (0) → RIGHTMOST (last index)
+        // Process left→right: iterate from LEFTMOST (0) → RIGHTMOST (last index)
         for (int i = 0; i < rotors.size(); i++) {
             Rotor rotor = rotors.get(i);
             int entryIndex = value;
@@ -274,7 +287,7 @@ public class MachineImpl implements Machine {
 
             steps.add(new RotorTrace(
                     rotor.getId(),
-                    i,
+                    i,  // rotor position in left→right array
                     entryIndex,
                     exitIndex,
                     keyboard.toChar(entryIndex),

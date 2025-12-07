@@ -1,11 +1,18 @@
 package enigma.console;
+
 import enigma.console.helper.InputParsers;
 import enigma.console.helper.Utilities;
 import enigma.console.helper.ConsoleValidator;
+import enigma.engine.exception.EngineException;
+import enigma.engine.exception.InvalidConfigurationException;
+import enigma.engine.exception.InvalidMessageException;
+import enigma.engine.exception.MachineNotLoadedException;
+import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.engine.Engine;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -29,6 +36,11 @@ public class ConsoleImpl implements Console {
     public ConsoleImpl(Engine engine, Scanner scanner) {
         this.enigma = engine;
         this.scanner = scanner;
+    }
+
+    public ConsoleImpl(Engine engine) {
+        this.enigma = engine;
+        this.scanner = new Scanner(System.in);
     }
 
     @Override
@@ -156,19 +168,24 @@ public class ConsoleImpl implements Console {
      */
     private void handleLoadMachineFromXml() {
 
-        // Delegate to engine – it validates XML contents (application-wise)
-        try {
-            System.out.println("Please enter the full path to the XML file:");
-            System.out.print("> ");
-            // for demo purposes
-             String path = scanner.nextLine().trim();
-            enigma.loadMachine(path);
-            // If we got here – loading succeeded
-            machineLoaded = true;
-            codeConfigured = false; // previous code no longer relevant
-            Utilities.printInfo("Machine configuration loaded successfully from: " + path);
-        } catch (Exception e) {
-            Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+        while (true) {
+            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
+            try {
+                enigma.loadMachine(path);
+                // If we got here – loading succeeded
+                machineLoaded = true;
+                codeConfigured = false; // previous code no longer relevant
+                Utilities.printInfo("Machine configuration loaded successfully from: " + path);
+                return;
+            } catch (EngineException e) {
+                // Catch all engine exceptions (includes EngineException and its subclasses)
+                Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+                // Do not override any existing machine; upon failure we keep prior state
+                if (!Utilities.askUserToRetry(scanner, "Do you want to try a different path? (Y/N): ")) {
+                    return; // back to menu
+                }
+                // else - loop and ask again
+            }
         }
     }
 
@@ -193,29 +210,34 @@ public class ConsoleImpl implements Console {
             Utilities.printError("No machine is currently loaded. Please load an XML file first (Command 1).");
             return;
         }
-        MachineSpec machineSpec = enigma.getMachineSpec();
-        System.out.println("========================================");
-        System.out.println(" Enigma Machine - Specification");
-        System.out.println("========================================");
-        System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
-        System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
+        try {
+            MachineSpec machineSpec = enigma.getMachineSpec();
+            System.out.println("========================================");
+            System.out.println(" Enigma Machine - Specification");
+            System.out.println("========================================");
+            System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
+            System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
 
-        long totalProcessedMessages = enigma.getTotalProcessedMessages();
-        System.out.println("Total processed messages     : " + totalProcessedMessages);
+            long totalProcessedMessages = enigma.getTotalProcessedMessages();
+            System.out.println("Total processed messages     : " + totalProcessedMessages);
 
-        // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
-        CodeConfig originalCode = enigma.getCurrentCodeConfig();
-        if (originalCode != null) {
-            System.out.println("Original code configuration  : " + originalCode);
-        } else{
-            System.out.println("Original code configuration  : <not set yet>");
-        }
-        // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
-        CodeConfig currentCode = enigma.getCurrentCodeConfig();
-        if (currentCode != null) {
-            System.out.println("Current code configuration   : " + currentCode);
-        } else {
-            System.out.println("Current code configuration   : <not set yet>");
+            // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
+            CodeConfig originalCode = enigma.getCurrentCodeConfig();
+            if (originalCode != null) {
+                System.out.println("Original code configuration  : " + originalCode);
+            } else {
+                System.out.println("Original code configuration  : <not set yet>");
+            }
+            // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
+            CodeConfig currentCode = enigma.getCurrentCodeConfig();
+            if (currentCode != null) {
+                System.out.println("Current code configuration   : " + currentCode);
+            } else {
+                System.out.println("Current code configuration   : <not set yet>");
+            }
+        } catch (EngineException e) {
+            // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
+            Utilities.printError("Failed to show machine specification: " + e.getMessage());
         }
     }
 
@@ -280,17 +302,7 @@ public class ConsoleImpl implements Console {
                     continue;
                 }
                 initialPositions = InputParsers.buildInitialPositions(positions);
-                // Validate that positions characters belong to machine alphabet (format-level)
-                try {
-                    ConsoleValidator.validatePositionsInAlphabet(enigma.getMachineSpec(), initialPositions);
-                } catch (IllegalArgumentException e) {
-                    Utilities.printError(e.getMessage());
-                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
-                        return;
-                    }
-                    continue;
-                }
-                // Format conversion completed → move to next stage
+                // Format-level validation complete → engine will validate alphabet membership
                 break;
             }
             // =========================
@@ -335,7 +347,8 @@ public class ConsoleImpl implements Console {
                     System.out.println("Current code: " + currentConfig);
                 }
                 keepTrying = false; // success – exit command
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidConfigurationException e) {
+                // Catch configuration validation errors from engine
                 Utilities.printError("Invalid code configuration: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
@@ -364,7 +377,8 @@ public class ConsoleImpl implements Console {
             codeConfigured = true;
             Utilities.printInfo("Automatic code configuration was generated successfully.");
             System.out.println("Current code: " + enigma.getCurrentCodeConfig().toString());
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (EngineException e) {
+            // Catch all engine exceptions (machine not loaded, etc.)
             Utilities.printError("Failed to generate automatic code configuration: " + e.getMessage());
         }
     }
@@ -395,9 +409,6 @@ public class ConsoleImpl implements Console {
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
 
-                // Validate input characters belong to machine alphabet before processing
-                ConsoleValidator.validateInputInAlphabet(enigma.getMachineSpec(), normalizedInput);
-
                 // 2. Process input via engine and measure duration
                 //    Engine will validate that characters are in the machine alphabet
                 long startNano = System.nanoTime();
@@ -415,7 +426,8 @@ public class ConsoleImpl implements Console {
                         + " (" + String.format("%.3f", millis) + " ms)");
                 // Rotors remain in their new positions (no reset here)
                 keepTrying = false; // success → exit command
-            } catch (IllegalArgumentException | IllegalStateException e) {
+            } catch (EngineException e) {
+                // Catch all engine exceptions (invalid message, machine not configured, etc.)
                 Utilities.printError("Failed to process input: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different input string? (Y/N): ")) {
@@ -449,7 +461,8 @@ public class ConsoleImpl implements Console {
             Utilities.printInfo("Code was reset to the current configuration.");
             System.out.println("Current code: " + current);
             // Print the resulting (current) code in compact format
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (EngineException e) {
+            // Catch all engine exceptions
             Utilities.printError("Failed to reset code: " + e.getMessage());
         }
     }

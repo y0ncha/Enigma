@@ -1,8 +1,11 @@
 package enigma.engine;
 
+import enigma.engine.exception.EngineException;
+import enigma.engine.exception.MachineNotLoadedException;
+import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
 import enigma.loader.Loader;
-import enigma.loader.EnigmaLoadingException;
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
@@ -24,7 +27,7 @@ import java.util.*;
  */
 public class EngineImpl implements Engine {
 
-    private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
+    // ROTORS_IN_USE is now part of MachineSpec; the engine no longer declares a duplicate constant.
 
     private final Machine machine;
     private final Loader loader;
@@ -43,7 +46,7 @@ public class EngineImpl implements Engine {
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
-        this.loader = new LoaderXml(ROTORS_IN_USE);
+        this.loader = new LoaderXml();
         this.codeFactory = new CodeFactoryImpl();
     }
 
@@ -64,7 +67,7 @@ public class EngineImpl implements Engine {
      * - Caller must handle concurrency; the last successful load overwrites the engine spec.
      *
      * @param path absolute or relative path to the Enigma XML file
-     * @throws RuntimeException if parsing or validation fails (loader error wrapped)
+     * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
      */
     @Override
     public void loadMachine(String path) {
@@ -72,7 +75,13 @@ public class EngineImpl implements Engine {
             spec = loader.loadSpecs(path);
             // TODO statistics/history reset is handled elsewhere if needed
         } catch (EnigmaLoadingException e) {
-            throw new RuntimeException("Failed to load machine XML: " + e.getMessage(), e);
+            throw new EngineException(
+                String.format(
+                    "Failed to load machine specification from XML file: %s. " +
+                    "Error: %s. " +
+                    "Fix: Ensure the XML file exists, is well-formed, and satisfies all validation rules.",
+                    path, e.getMessage()),
+                e);
         }
     }
 
@@ -99,11 +108,16 @@ public class EngineImpl implements Engine {
      * {@link Machine#setCode(Code)}.</p>
      *
      * @param config configuration with rotor IDs, positions (chars), reflector ID
-     * @throws IllegalArgumentException if validation fails
-     * @throws IllegalStateException if spec is not loaded
+     * @throws enigma.engine.exception.InvalidConfigurationException if validation fails
+     * @throws MachineNotLoadedException if spec is not loaded
      */
     @Override
     public void configManual(CodeConfig config) {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot configure machine: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before configuring.");
+        }
         EngineValidator.validateCodeConfig(spec, config);
         Code code = codeFactory.create(spec, config);
         machine.setCode(code);
@@ -116,16 +130,21 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling strategy:</p>
      * <ul>
-     *   <li>Pick {@value #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick the number of rotors indicated by the loaded {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Generate random char positions (left→right) from alphabet</li>
      *   <li>Pick one random reflector ID</li>
      * </ul>
      * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
      *
-     * @throws IllegalStateException when spec is not loaded
+     * @throws MachineNotLoadedException when spec is not loaded
      */
     @Override
     public void configRandom() {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot generate random configuration: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before generating random configuration.");
+        }
         CodeConfig config = generateRandomConfig(spec);
         configManual(config);
     }
@@ -136,19 +155,27 @@ public class EngineImpl implements Engine {
      *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
-     * @throws IllegalStateException if machine is not configured
-     * @throws IllegalArgumentException if input is null or contains invalid characters
+     * @throws MachineNotLoadedException if machine specification is not loaded
+     * @throws MachineNotConfiguredException if machine is not configured
+     * @throws enigma.engine.exception.InvalidMessageException if input is null or contains invalid characters
      */
     @Override
     public ProcessTrace process(String input) {
+        // Validate machine is loaded
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot process message: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before processing messages.");
+        }
+        
+        // Validate machine is configured
         if (!machine.isConfigured()) {
-            throw new IllegalStateException("Machine is not configured");
+            throw new MachineNotConfiguredException(
+                "Cannot process message: Machine is not configured. " +
+                "Fix: Configure the machine using configManual(config) or configRandom() before processing messages.");
         }
-        if (input == null) {
-            throw new IllegalArgumentException("Input must not be null");
-        }
-
-        // Validate all characters are in the machine alphabet
+        
+        // Validate input is not null and contains only valid characters
         EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
@@ -199,6 +226,7 @@ public class EngineImpl implements Engine {
     @Override
     public long getTotalProcessedMessages() {
         return stringsProcessed;
+        // TODO deprecate : machineData instead
     }
 
     // ---------------------------------------------------------
@@ -210,7 +238,7 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling rules:</p>
      * <ul>
-     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick exactly the number of rotors specified by {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Pick one reflector ID at random</li>
      *   <li>Generate random starting positions as chars (left→right)</li>
      * </ul>
@@ -219,25 +247,20 @@ public class EngineImpl implements Engine {
      *
      * @param spec machine specification (must be non-null)
      * @return randomly sampled {@link CodeConfig}
-     * @throws IllegalStateException when {@code spec} is null
      */
     private CodeConfig generateRandomConfig(MachineSpec spec) {
-        if (spec == null) {
-            throw new IllegalStateException(
-                    "Machine is not loaded. Load an XML file before generating a random code.");
-        }
-
         SecureRandom random = new SecureRandom();
 
         // Shuffle available rotor IDs and pick exactly ROTORS_IN_USE of them in random order (left → right)
+        int needed = spec.getRotorsInUse();
         List<Integer> rotorPool = new ArrayList<>(spec.rotorsById().keySet());
         Collections.shuffle(rotorPool, random);
-        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, ROTORS_IN_USE)); // left→right
+        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, needed)); // left→right
 
         // Generate random starting positions as characters (left → right)
         int alphaSize = spec.alphabet().size();
-        List<Character> positions = new ArrayList<>(ROTORS_IN_USE);
-        for (int i = 0; i < ROTORS_IN_USE; i++) {
+        List<Character> positions = new ArrayList<>(needed);
+        for (int i = 0; i < needed; i++) {
             int randIndex = random.nextInt(alphaSize);        // 0 .. alphaSize-1
             char posChar = spec.alphabet().charAt(randIndex); // map index → symbol
             positions.add(posChar);
@@ -250,62 +273,4 @@ public class EngineImpl implements Engine {
         // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
-
-    // ---------------------------------------------------------
-    // Engine-level validation helpers
-    // ---------------------------------------------------------
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateCodeConfig(MachineSpec spec, CodeConfig config) {
-        EngineValidator.validateCodeConfig(spec, config);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
-        EngineValidator.validateNullChecks(rotorIds, positions, reflectorId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions) {
-        EngineValidator.validateRotorAndPositionCounts(rotorIds, positions);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
-        EngineValidator.validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateReflectorExists(MachineSpec spec, String reflectorId) {
-        EngineValidator.validateReflectorExists(spec, reflectorId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
-        EngineValidator.validatePositionsInAlphabet(spec, positions);
-    }
-
-    @Override
-    public void validateInputInAlphabet(MachineSpec spec, String input) {
-        EngineValidator.validateInputInAlphabet(spec, input);
-    }
-
 }
