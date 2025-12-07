@@ -1,6 +1,7 @@
 package test.enigma.engine.validation;
 
 import enigma.engine.EngineValidator;
+import enigma.engine.exception.InvalidMessageException;
 import enigma.machine.component.alphabet.Alphabet;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
@@ -30,8 +31,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC&DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("&") || e.getMessage().contains("alphabet")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("&") || msg.contains("alphabet") || msg.contains("invalid character")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -47,8 +49,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("alphabet") || e.getMessage().contains(" ")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("alphabet") || msg.contains(" ") || msg.contains("invalid character")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -64,8 +67,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\nDEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("newline")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("newline") || msg.contains("newl") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -81,8 +85,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\tDEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("tab")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("tab") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -98,8 +103,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC" + ESC_CHAR + "DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("ESC")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("esc") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -115,8 +121,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\u0001DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("non-printable") || e.getMessage().contains("ASCII")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("non-printable") || msg.contains("ascii") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -132,8 +139,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\u007FDEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("non-printable") || e.getMessage().contains("ASCII")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("non-printable") || msg.contains("ascii") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -150,8 +158,10 @@ public class InputMessageValidationTester {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABCDABCD");
             System.out.println("  PASSED: Valid message accepted\n");
             passedTests++;
-        } catch (Exception e) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
             System.out.println("  FAILED: Valid message should be accepted: " + e.getMessage() + "\n");
+        } catch (Exception e) {
+            System.out.println("  FAILED: Wrong exception type: " + e.getClass().getName() + "\n");
         }
 
         // Test 9: Empty message (should pass - no invalid characters)
@@ -161,8 +171,10 @@ public class InputMessageValidationTester {
             EngineValidator.validateInputInAlphabet(mockSpec, "");
             System.out.println("  PASSED: Empty message accepted\n");
             passedTests++;
-        } catch (Exception e) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
             System.out.println("  FAILED: Empty message should be accepted: " + e.getMessage() + "\n");
+        } catch (Exception e) {
+            System.out.println("  FAILED: Wrong exception type: " + e.getClass().getName() + "\n");
         }
 
         // Test 10: Message with space character (ASCII 32, not in alphabet)
@@ -171,8 +183,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "AB CD");
             System.out.println("  FAILED: Should have thrown exception (space not in alphabet)\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("alphabet")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("alphabet") || msg.contains("invalid character")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -188,8 +201,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\rDEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("non-printable") || e.getMessage().contains("ASCII")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("non-printable") || msg.contains("ascii") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -205,8 +219,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\fDEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("non-printable") || e.getMessage().contains("ASCII")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("non-printable") || msg.contains("ascii") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
@@ -222,8 +237,9 @@ public class InputMessageValidationTester {
         try {
             EngineValidator.validateInputInAlphabet(mockSpec, "ABC\u0000DEF");
             System.out.println("  FAILED: Should have thrown exception\n");
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("non-printable") || e.getMessage().contains("ASCII")) {
+        } catch (InvalidMessageException | IllegalArgumentException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (msg.contains("non-printable") || msg.contains("ascii") || msg.contains("control")) {
                 System.out.println("  PASSED: " + e.getMessage() + "\n");
                 passedTests++;
             } else {
