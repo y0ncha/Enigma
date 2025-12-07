@@ -1,8 +1,27 @@
 package enigma.console;
 
 /**
- * All supported console commands for Exercise 1.
- * The numeric id is what the user types in the menu (1..8).
+ * All supported console commands for the Enigma console interface.
+ *
+ * <p><b>Module:</b> enigma-console</p>
+ *
+ * <h2>Purpose</h2>
+ * <p>This enum defines the available user commands in the console menu,
+ * mapping numeric IDs (1-8) to specific operations.</p>
+ *
+ * <h2>Command Flow</h2>
+ * <ul>
+ *   <li><b>1. LOAD_MACHINE_FROM_XML:</b> Load machine spec from XML (always enabled)</li>
+ *   <li><b>2. SHOW_MACHINE_SPEC:</b> Display machine data (requires loaded machine)</li>
+ *   <li><b>3. SET_MANUAL_CODE:</b> Configure rotors manually (requires loaded machine)</li>
+ *   <li><b>4. SET_AUTOMATIC_CODE:</b> Configure rotors randomly (requires loaded machine)</li>
+ *   <li><b>5. PROCESS_INPUT:</b> Encrypt/decrypt message (requires configured machine)</li>
+ *   <li><b>6. RESET_CODE:</b> Return to original positions (requires configured machine)</li>
+ *   <li><b>7. SHOW_HISTORY_AND_STATS:</b> Display processing history (requires loaded machine)</li>
+ *   <li><b>8. EXIT:</b> Terminate console application (always enabled)</li>
+ * </ul>
+ *
+ * @since 1.0
  */
 public enum ConsoleCommand {
 
@@ -18,22 +37,42 @@ public enum ConsoleCommand {
     private final int id;
     private final String description;
 
+    /**
+     * Create a console command with numeric ID and description.
+     *
+     * @param id numeric identifier (1-8) displayed in menu
+     * @param description user-friendly command description
+     */
     ConsoleCommand(int id, String description) {
         this.id = id;
         this.description = description;
     }
 
+    /**
+     * Get the numeric command ID.
+     *
+     * @return command ID (1-8)
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Get the command description for display.
+     *
+     * @return user-friendly command description
+     */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Finds a command by the numeric option the user typed.
-     * Returns null if no such command exists.
+     * Find a command by its numeric ID.
+     *
+     * <p>Used to map user input (numeric menu choice) to the corresponding command.</p>
+     *
+     * @param id numeric command ID (1-8)
+     * @return matching ConsoleCommand, or null if ID is invalid
      */
     public static ConsoleCommand fromId(int id) {
         for (ConsoleCommand command : values()) {
