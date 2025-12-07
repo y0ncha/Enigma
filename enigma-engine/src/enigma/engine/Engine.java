@@ -9,9 +9,7 @@ import java.util.List;
 
 /**
  * Engine API — Coordinate loading, validation and processing.
- *
  * One-line: load machine spec, validate a CodeConfig and process messages.
- *
  * Usage:
  * <pre>
  * engine.loadMachine(path);
@@ -82,8 +80,6 @@ public interface Engine {
 
     void reset();
 
-    void terminate();
-
     /**
      * Return or print runtime statistics (usage, timing, or other metrics).
      *
@@ -91,6 +87,8 @@ public interface Engine {
      * Currently a placeholder for future implementation.</p>
      */
     void statistics();
+
+    void terminate();
 
     /**
      * Returns the current machine specification loaded by the engine.
@@ -114,15 +112,65 @@ public interface Engine {
      */
     long getTotalProcessedMessages();
 
+    /**
+     * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
+     *
+     * <p>High-level orchestration method: implementations may delegate to a
+     * dedicated validator component. Validation checks include null checks,
+     * rotor/position counts, rotor existence & uniqueness, reflector presence
+     * and that positions exist in the alphabet.</p>
+     *
+     * @param spec   machine specification (assumed valid by the loader)
+     * @param config code configuration to validate
+     * @throws IllegalArgumentException when validation fails
+     */
     void validateCodeConfig(MachineSpec spec, CodeConfig config);
 
+    /**
+     * Ensure none of the provided code parts are {@code null}.
+     *
+     * @param rotorIds   list of rotor IDs (left→right)
+     * @param positions  list of rotor starting positions (left→right)
+     * @param reflectorId reflector identifier string
+     * @throws IllegalArgumentException when any argument is {@code null}
+     */
     void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId);
 
+    /**
+     * Validate that the number of rotor IDs matches the number of positions
+     * and equals the engine's expected rotor count.
+     *
+     * @param rotorIds  list of rotor IDs
+     * @param positions list of starting positions
+     * @throws IllegalArgumentException when counts are mismatched
+     */
     void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions);
 
+    /**
+     * Validate that all rotor IDs exist in the given {@link MachineSpec} and
+     * are unique (no duplicates).
+     *
+     * @param spec     machine specification to check against
+     * @param rotorIds rotor ids to validate
+     * @throws IllegalArgumentException when a rotor id does not exist or ids are duplicated
+     */
     void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds);
 
+    /**
+     * Validate that the specified reflector exists in the provided spec.
+     *
+     * @param spec        machine specification to check against
+     * @param reflectorId reflector identifier to validate
+     * @throws IllegalArgumentException when reflector is missing
+     */
     void validateReflectorExists(MachineSpec spec, String reflectorId);
 
+    /**
+     * Validate that each starting position character exists in the machine's alphabet.
+     *
+     * @param spec      machine specification (provides alphabet)
+     * @param positions starting positions to validate
+     * @throws IllegalArgumentException when a position char is not part of the alphabet
+     */
     void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions);
 }

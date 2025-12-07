@@ -20,7 +20,6 @@ import java.util.*;
 
 /**
  * Engine implementation — orchestration and validation delegation.
- *
  * One-line: load machine specs, validate configs and run the machine.
  */
 public class EngineImpl implements Engine {
@@ -252,47 +251,48 @@ public class EngineImpl implements Engine {
     // ---------------------------------------------------------
 
     /**
-     * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
-     *
-     * <p>Orchestrates validation by calling targeted validators in sequence:</p>
-     * <ul>
-     *   <li>{@link #validateNullChecks(List, List, String)} — null checks</li>
-     *   <li>{@link #validateRotorAndPositionCounts(List, List)} — count validation</li>
-     *   <li>{@link #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)} — rotor validation</li>
-     *   <li>{@link #validateReflectorExists(MachineSpec, String)} — reflector validation</li>
-     *   <li>{@link #validatePositionsInAlphabet(MachineSpec, List)} — position validation</li>
-     * </ul>
-     * <p>Spec contents are assumed valid (loader responsibility).</p>
-     *
-     * @param spec   machine specification (assumed valid by the loader)
-     * @param config code configuration to validate
-     * @throws IllegalArgumentException when validation fails
+     * {@inheritDoc}
      */
     @Override
     public void validateCodeConfig(MachineSpec spec, CodeConfig config) {
         EngineValidator.validateCodeConfig(spec, config);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         EngineValidator.validateNullChecks(rotorIds, positions, reflectorId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions) {
         EngineValidator.validateRotorAndPositionCounts(rotorIds, positions);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         EngineValidator.validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validateReflectorExists(MachineSpec spec, String reflectorId) {
         EngineValidator.validateReflectorExists(spec, reflectorId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         EngineValidator.validatePositionsInAlphabet(spec, positions);
