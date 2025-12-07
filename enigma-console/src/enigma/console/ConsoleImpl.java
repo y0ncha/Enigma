@@ -1,11 +1,18 @@
 package enigma.console;
+
 import enigma.console.helper.InputParsers;
 import enigma.console.helper.Utilities;
 import enigma.console.helper.ConsoleValidator;
+import enigma.engine.exception.EngineException;
+import enigma.engine.exception.InvalidConfigurationException;
+import enigma.engine.exception.InvalidMessageException;
+import enigma.engine.exception.MachineNotLoadedException;
+import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.engine.Engine;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -165,7 +172,8 @@ public class ConsoleImpl implements Console {
                 codeConfigured = false; // previous code no longer relevant
                 Utilities.printInfo("Machine configuration loaded successfully from: " + path);
                 return;
-            } catch (Exception e) {
+            } catch (EngineException e) {
+                // Catch all engine exceptions (includes EngineException and its subclasses)
                 Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
                 // Do not override any existing machine; upon failure we keep prior state
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try a different path? (Y/N): ")) {
@@ -222,7 +230,8 @@ public class ConsoleImpl implements Console {
             } else {
                 System.out.println("Current code configuration   : <not set yet>");
             }
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (EngineException e) {
+            // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
             Utilities.printError("Failed to show machine specification: " + e.getMessage());
         }
     }
@@ -343,7 +352,8 @@ public class ConsoleImpl implements Console {
                     System.out.println("Current code: " + currentConfig);
                 }
                 keepTrying = false; // success – exit command
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidConfigurationException e) {
+                // Catch configuration validation errors from engine
                 Utilities.printError("Invalid code configuration: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
@@ -372,7 +382,8 @@ public class ConsoleImpl implements Console {
             codeConfigured = true;
             Utilities.printInfo("Automatic code configuration was generated successfully.");
             System.out.println("Current code: " + enigma.getCurrentCodeConfig().toString());
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (EngineException e) {
+            // Catch all engine exceptions (machine not loaded, etc.)
             Utilities.printError("Failed to generate automatic code configuration: " + e.getMessage());
         }
     }
@@ -423,7 +434,8 @@ public class ConsoleImpl implements Console {
                         + " (" + String.format("%.3f", millis) + " ms)");
                 // Rotors remain in their new positions (no reset here)
                 keepTrying = false; // success → exit command
-            } catch (IllegalArgumentException | IllegalStateException e) {
+            } catch (EngineException e) {
+                // Catch all engine exceptions (invalid message, machine not configured, etc.)
                 Utilities.printError("Failed to process input: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different input string? (Y/N): ")) {
@@ -457,7 +469,8 @@ public class ConsoleImpl implements Console {
             Utilities.printInfo("Code was reset to the current configuration.");
             System.out.println("Current code: " + current);
             // Print the resulting (current) code in compact format
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (EngineException e) {
+            // Catch all engine exceptions
             Utilities.printError("Failed to reset code: " + e.getMessage());
         }
     }
