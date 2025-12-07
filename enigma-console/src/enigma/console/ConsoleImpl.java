@@ -296,9 +296,17 @@ public class ConsoleImpl implements Console {
                     }
                     continue;
                 }
-                initialPositions = InputParsers.buildInitialPositions(positions);
-                // Format-level validation passed → move to next stage
-                break;
+                try {
+                    initialPositions = InputParsers.buildInitialPositions(positions);
+                    // Format-level validation passed → move to next stage
+                    break;
+                } catch (IllegalArgumentException e) {
+                    // Format-level validation error (non-letter character)
+                    Utilities.printError(e.getMessage());
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
+                        return;
+                    }
+                }
             }
             // =========================
             // 3) Reflector choice (loop until valid or user exits)
@@ -315,6 +323,14 @@ public class ConsoleImpl implements Console {
                 }
                 int reflectorChoice = Utilities.readInt(scanner,
                         "Choose reflector by number (1-" + reflectorsCount + "): ");
+                // Format-level check: ensure choice is in displayed range
+                if (reflectorChoice < 1 || reflectorChoice > reflectorsCount) {
+                    Utilities.printError("Reflector choice must be between 1 and " + reflectorsCount + ".");
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N): ")) {
+                        return;
+                    }
+                    continue;
+                }
                 reflectorId = InputParsers.toRoman(reflectorChoice);
                 // Format-level validation passed → move to next stage
                 break;
