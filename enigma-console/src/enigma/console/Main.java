@@ -17,4 +17,10 @@ package enigma.console;
  * @since 1.0
  */
 public class Main {
+    public static void main(String[] args) {
+        // TODO: Implement Main.java
+        // This is the entry point for the console application.
+        // It should create an instance of Engine and ConsoleImpl,
+        // then call the run() method on the console.
+    }
 }

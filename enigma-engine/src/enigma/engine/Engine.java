@@ -88,7 +88,7 @@ public interface Engine {
      *
      * @param input the input text to process (all chars must be in alphabet)
      * @return detailed debug trace of the processing steps
-     * @throws IllegalStateException if machine is not configured
+     * @throws IllegalStateException    if machine is not configured
      * @throws IllegalArgumentException if input contains invalid characters
      */
     ProcessTrace process(String input);
@@ -115,20 +115,6 @@ public interface Engine {
      */
     CodeConfig getCurrentCodeConfig();
 
-    /**
-    /**
-     * Returns the current machine specification loaded by the engine.
-     *
-     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
-     */
-    MachineSpec getMachineSpec();
-
-    /**
-     * Returns the current code configuration applied to the machine.
-     *
-     * @return the current {@link CodeConfig}, or {@code null} if not configured
-     */
-    CodeConfig getCurrentCodeConfig();
 
     /**
      * Returns the total number of messages processed by the engine since initialization.
@@ -136,3 +122,4 @@ public interface Engine {
      * @return the total count of processed messages (non-negative)
      */
     long getTotalProcessedMessages();
+}

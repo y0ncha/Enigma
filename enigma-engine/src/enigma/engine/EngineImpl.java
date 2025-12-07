@@ -206,6 +206,24 @@ public class EngineImpl implements Engine {
         // TODO implement
     }
 
+    @Override
+    public MachineSpec getMachineSpec() {
+        // TODO implement
+        return null;
+    }
+
+    @Override
+    public CodeConfig getCurrentCodeConfig() {
+        // TODO implement
+        return null;
+    }
+
+    @Override
+    public long getTotalProcessedMessages() {
+        // TODO implement
+        return 0;
+    }
+
     // ---------------------------------------------------------
     // Flow helpers: machine creation and random code generation
     // ---------------------------------------------------------

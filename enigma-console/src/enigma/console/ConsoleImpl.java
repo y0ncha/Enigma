@@ -1,7 +1,7 @@
 package enigma.console;
 import enigma.console.helper.InputParsers;
 import enigma.console.helper.Utilities;
-import enigma.shared.dto.tracer.DebugTrace;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.engine.Engine;
@@ -18,14 +18,14 @@ import java.util.Scanner;
  */
 public class ConsoleImpl implements Console {
 
-    private final Engine engine;
+    private final Engine enigma;
     private final Scanner scanner;
     private boolean machineLoaded = false;
     private boolean codeConfigured = false;
     private boolean exitRequested = false;
 
     public ConsoleImpl(Engine engine, Scanner scanner) {
-        this.engine = engine;
+        this.enigma = engine;
         this.scanner = scanner;
     }
 
@@ -179,7 +179,7 @@ public class ConsoleImpl implements Console {
             System.out.print("> ");
             // for demo purposes
              String path = scanner.nextLine().trim();
-            engine.loadMachine(path);
+            enigma.loadMachine(path);
             // If we got here – loading succeeded
             machineLoaded = true;
             codeConfigured = false; // previous code no longer relevant
@@ -210,27 +210,27 @@ public class ConsoleImpl implements Console {
             Utilities.printError("No machine is currently loaded. Please load an XML file first (Command 1).");
             return;
         }
-        MachineSpec machineSpec = engine.getMachineSpec();
+        MachineSpec machineSpec = enigma.getMachineSpec();
         System.out.println("========================================");
         System.out.println(" Enigma Machine - Specification");
         System.out.println("========================================");
         System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
         System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
 
-        long totalProcessedMessages = engine.getTotalProcessedMessages();
+        long totalProcessedMessages = enigma.getTotalProcessedMessages();
         System.out.println("Total processed messages     : " + totalProcessedMessages);
 
         // Description of the original code configuration (if it exists; the most recent one set by command 3 or 4)
-        CodeConfig originalCode = engine.getCurrentCodeConfig();
+        CodeConfig originalCode = enigma.getCurrentCodeConfig();
         if (originalCode != null) {
-            System.out.println("Original code configuration  : " + originalCode.toString());
+            System.out.println("Original code configuration  : " + originalCode);
         } else{
             System.out.println("Original code configuration  : <not set yet>");
         }
         // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
-        CodeConfig currentCode = engine.getCurrentCodeConfig();
+        CodeConfig currentCode = enigma.getCurrentCodeConfig();
         if (currentCode != null) {
-            System.out.println("Current code configuration   : " + currentCode.toString());
+            System.out.println("Current code configuration   : " + currentCode);
         } else {
             System.out.println("Current code configuration   : <not set yet>");
         }
@@ -261,13 +261,13 @@ public class ConsoleImpl implements Console {
         boolean keepTrying = true;
         while (keepTrying) {
             List<Integer> rotorIds;
-            List<Integer> initialPositions;
+            List<Character> initialPositions;
             String reflectorId;
             // =========================
             // 1) Rotor list (loop until valid or user exits)
             // =========================
             while (true) {
-                System.out.println("Available rotors: " + engine.getMachineSpec().getTotalRotors());
+                System.out.println("Available rotors: " + enigma.getMachineSpec().getTotalRotors());
                 String rotorsLine = Utilities.readNonEmptyLine(scanner,
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545):");
                 try {
@@ -317,7 +317,7 @@ public class ConsoleImpl implements Console {
             // =========================
             // 3) Reflector choice (loop until valid or user exits)
             // =========================
-            int reflectorsCount = engine.getMachineSpec().getTotalReflectors();
+            int reflectorsCount = enigma.getMachineSpec().getTotalReflectors();
             if (reflectorsCount <= 0) {
                 Utilities.printError("No reflectors are defined in the current machine configuration.");
                 return;
@@ -345,12 +345,12 @@ public class ConsoleImpl implements Console {
             // =========================
             try {
                 CodeConfig config = new CodeConfig(rotorIds, initialPositions, reflectorId);
-                engine.codeManual(config);
+                enigma.configManual(config);
                 codeConfigured = true;
                 Utilities.printInfo("Manual code configuration was set successfully.");
-                CodeConfig currentConfig = engine.getCurrentCodeConfig();
+                CodeConfig currentConfig = enigma.getCurrentCodeConfig();
                 if (currentConfig != null) {
-                    System.out.println("Current code: " + currentConfig.toString());
+                    System.out.println("Current code: " + currentConfig);
                 }
                 keepTrying = false; // success – exit command
             } catch (IllegalArgumentException e) {
@@ -377,11 +377,11 @@ public class ConsoleImpl implements Console {
     private void handleSetAutomaticCode() {
         try {
             // Delegate random code generation to the engine.
-            engine.codeRandom();
+            enigma.configRandom();
             // Mark that a valid code configuration is now active.
             codeConfigured = true;
             Utilities.printInfo("Automatic code configuration was generated successfully.");
-            System.out.println("Current code: " + engine.getCurrentCodeConfig().toString());
+            System.out.println("Current code: " + enigma.getCurrentCodeConfig().toString());
         } catch (IllegalStateException | IllegalArgumentException e) {
             Utilities.printError("Failed to generate automatic code configuration: " + e.getMessage());
         }
@@ -404,7 +404,7 @@ public class ConsoleImpl implements Console {
      */
     private void handleProcessInput() {
         // 1. Ensure we have a machine specification and alphabet
-        String alphabetUpper = engine.getMachineSpec().getLetters().toUpperCase();
+        String alphabetUpper = enigma.getMachineSpec().getLetters().toUpperCase();
         boolean keepTrying = true;
         while (keepTrying) {
             try {
@@ -439,12 +439,12 @@ public class ConsoleImpl implements Console {
                 // 4. Process input via engine and measure duration
                 long startNano = System.nanoTime();
                 // Process input
-                DebugTrace debugTrace = engine.process(normalizedInput);
+                ProcessTrace trace = enigma.process(normalizedInput);
                 long endNano = System.nanoTime();
                 long duration = endNano - startNano;
                 // Convert to milliseconds
                 double millis = duration / 1_000_000.0;
-                String processedOutput = debugTrace.output();
+                String processedOutput = trace.output();
                 // 5. Print results
                 System.out.println("Original input : <" + originalInput + ">");
                 System.out.println("Processed output: <" + processedOutput + ">");
@@ -475,16 +475,16 @@ public class ConsoleImpl implements Console {
      */
     private void handleResetCode() {
         // Get the current configuration from the engine
-        CodeConfig current = engine.getCurrentCodeConfig();
+        CodeConfig current = enigma.getCurrentCodeConfig();
         if (current == null) {
             Utilities.printError("No last configuration was found. Cannot reset.");
             return;
         }
         try {
             // Apply the current code again (reinitializes rotors)
-            engine.codeManual(current);
+            enigma.configManual(current);
             Utilities.printInfo("Code was reset to the current configuration.");
-            System.out.println("Current code: " + current.toString());
+            System.out.println("Current code: " + current);
             // Print the resulting (current) code in compact format
         } catch (IllegalArgumentException | IllegalStateException e) {
             Utilities.printError("Failed to reset code: " + e.getMessage());

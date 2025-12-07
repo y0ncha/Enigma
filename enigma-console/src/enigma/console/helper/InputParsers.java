@@ -1,7 +1,6 @@
 package enigma.console.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,21 +61,23 @@ public class InputParsers {
      * The first character in the input belongs to the RIGHTMOST rotor.
      * Case-insensitive: both uppercase and lowercase letters are accepted.
      */
-    public static List<Integer> buildInitialPositions(String positions) {
-        // Normalize input to uppercase to allow lowercase letters
+    public static List<Character> buildInitialPositions(String positions) {
         positions = positions.toUpperCase();
         int n = positions.length();
-        List<Integer> initialPositions = new ArrayList<>(Collections.nCopies(n, 0));
+        List<Character> initialPositions = new ArrayList<>(n);
+        // initialize with placeholder characters
+        for (int i = 0; i < n; i++) {
+            initialPositions.add('\0');
+        }
         for (int i = 0; i < n; i++) {
             char c = positions.charAt(i);
             if (c < 'A' || c > 'Z') {
                 throw new IllegalArgumentException(
                         "Initial position '" + c + "' is not a valid letter (A-Z, case-insensitive).");
             }
-            int index = c - 'A';
             // The first character corresponds to the RIGHTMOST rotor
             int leftIndex = n - 1 - i;
-            initialPositions.set(leftIndex, index);
+            initialPositions.set(leftIndex, c);
         }
         return initialPositions;
     }
