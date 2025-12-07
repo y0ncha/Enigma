@@ -78,13 +78,7 @@ public interface Engine {
 
     void reset();
 
-    /**
-     * Return or print runtime statistics (usage, timing, or other metrics).
-     *
-     * <p>Exact format and destination are implementation-specific.
-     * Currently a placeholder for future implementation.</p>
-     */
-    void statistics();
+    String history();
 
     void terminate();
 

@@ -117,7 +117,7 @@ public class MachineImpl implements Machine {
         // Forward pass (right→left)
         List<RotorTrace> forwardSteps = forwardTransform(intermediate);
         if (!forwardSteps.isEmpty()) {
-            intermediate = forwardSteps.get(forwardSteps.size() - 1).exitIndex();
+            intermediate = forwardSteps.getLast().exitIndex();
         }
 
         // Reflector
@@ -132,7 +132,7 @@ public class MachineImpl implements Machine {
         // Backward pass (left→right)
         List<RotorTrace> backwardSteps = backwardTransform(intermediate);
         if (!backwardSteps.isEmpty()) {
-            intermediate = backwardSteps.get(backwardSteps.size() - 1).exitIndex();
+            intermediate = backwardSteps.getLast().exitIndex();
         }
 
         char outputChar = keyboard.toChar(intermediate);
@@ -175,6 +175,12 @@ public class MachineImpl implements Machine {
     @Override
     public CodeConfig getConfig() {
         return code.getConfig();
+    }
+
+    @Override
+    public void reset() {
+        ensureConfigured();
+        code.reset();
     }
 
     // ---------------------------------------------------------

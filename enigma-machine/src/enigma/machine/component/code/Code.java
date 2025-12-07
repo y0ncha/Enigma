@@ -72,4 +72,6 @@ public interface Code {
     CodeConfig getConfig();
 
     List<Integer> getNotchDist();
+
+    void reset();
 }
