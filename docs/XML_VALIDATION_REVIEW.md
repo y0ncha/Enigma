@@ -39,7 +39,7 @@ A comprehensive review of the XML logical validation layer has been completed. *
 | **Reflectors** |
 | Roman numeral IDs | ✅ | LoaderXml:469-472 | "Illegal reflector id 'X' (must be Roman numeral I, II, III, IV or V)" |
 | Unique IDs | ✅ | LoaderXml:286-288 | "Duplicate reflector id: X" |
-| Contiguous from I | ✅ | LoaderXml:481-491 | "Reflector ids must form a contiguous Roman main starting from I (e.g. I,II,III). Got: {ids}" |
+| Contiguous from I | ✅ | LoaderXml:481-491 | "Reflector ids must form a contiguous Roman sequence starting from I (e.g. I,II,III). Got: {ids}" |
 | No self-mapping | ✅ | LoaderXml:305-308 | "Reflector X maps letter to itself at position Y" |
 | Symmetric mapping | ✅ | LoaderXml:319-320 | Enforced by construction (both directions set atomically) |
 | Complete coverage | ✅ | LoaderXml:323-328 | "Reflector X does not cover index Y" |
