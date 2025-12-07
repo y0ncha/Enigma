@@ -6,7 +6,7 @@ import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
 
 /**
- * Engine API — Coordinate loading, validation and processing.
+ * Engine API — Coordinate loading, validation, and processing.
  * One-line: load machine spec, validate a CodeConfig and process messages.
  * Usage:
  * <pre>
@@ -90,13 +90,6 @@ public interface Engine {
      */
     CodeConfig getCurrentCodeConfig();
 
-
-    /**
-     * Returns the total number of messages processed by the engine since initialization.
-     *
-     * @return the total count of processed messages (non-negative)
-     */
-    long getTotalProcessedMessages();
 
     /**
      * Reset the machine to its original code configuration.

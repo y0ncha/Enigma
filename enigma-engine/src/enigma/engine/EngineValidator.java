@@ -164,16 +164,21 @@ public final class EngineValidator {
 
     /**
      * Validate that input message contains only valid alphabet characters.
-     * 
-     * <p>This validation ensures:</p>
+     *
+     * <p>Validation rules:
      * <ul>
-     *   <li>All characters must be in the machine alphabet</li>
-     *   <li>No forbidden characters: newline (\n), tab (\t), ESC (ASCII 27), or other non-printables</li>
+     *   <li>All characters in {@code input} must be present in the machine alphabet (obtained from {@code spec}).</li>
+     *   <li>ISO control characters (newline, tab, ESC, etc.) are rejected because they are not printable and
+     *       would interfere with processing and logging.</li>
      * </ul>
-     * 
-     * @param spec machine specification containing the alphabet
-     * @param input input message to validate
-     * @throws InvalidMessageException if input contains invalid or forbidden characters
+     *
+     * <p>Failure behavior: this method throws {@link InvalidMessageException} with a clear, actionable message
+     * describing the offending character (or control name), its index, a truncated view of the input, and a fix.
+     *
+     * @param spec machine specification containing the alphabet; must be non-null
+     * @param input input message to validate; must be non-null
+     * @throws InvalidMessageException if {@code spec} or {@code input} is null, if the input contains ISO control
+     *                                 characters, or if it contains characters not present in the machine alphabet
      */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
         if (spec == null) {
@@ -186,12 +191,12 @@ public final class EngineValidator {
                 "Message validation failed: Input message is missing. " +
                 "Fix: Provide a message to process.");
         }
-        
+
         String alphabet = spec.alphabet().getLetters();
-        
+
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
-            
+
             // Reject control characters explicitly (newline, tab, escape, etc.)
             if (Character.isISOControl(c)) {
                 String controlName = getControlCharacterName(c);
@@ -202,7 +207,7 @@ public final class EngineValidator {
                         "Fix: Remove all control characters (newline, tab, ESC, etc.) from the message.",
                         controlName, i, truncateForDisplay(input, 50)));
             }
-            
+
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidMessageException(
                     String.format(
@@ -216,7 +221,20 @@ public final class EngineValidator {
     }
     
     /**
-     * Get a human-friendly name for a control character.
+     * Get a human-friendly name for a control character for use in error messages.
+     *
+     * <p>Maps common control code points to readable identifiers (for clarity):
+     * <ul>
+     *   <li>0  -> "NULL"</li>
+     *   <li>9  -> "TAB"</li>
+     *   <li>10 -> "NEWLINE (\\n)"</li>
+     *   <li>13 -> "CARRIAGE RETURN (\\r)"</li>
+     *   <li>27 -> "ESC"</li>
+     * </ul>
+     * Any other ISO control character returns the generic "CONTROL" label.
+     *
+     * @param c control character to describe
+     * @return a short, human-readable name for the control character
      */
     private static String getControlCharacterName(char c) {
         return switch ((int) c) {
@@ -230,7 +248,17 @@ public final class EngineValidator {
     }
     
     /**
-     * Truncate a string for display with ellipsis if too long.
+     * Truncate a string for display with ellipsis if it exceeds {@code maxLen} characters.
+     *
+     * <p>Before truncation, control and non-printable characters are escaped to visible sequences
+     * using {@link #escapeControlChars(String)} so the returned representation is safe for logs
+     * and error messages. If the escaped representation is longer than {@code maxLen}, it is cut
+     * and suffixed with "..." to indicate truncation.
+     *
+     * @param str original string to prepare for display (may be null)
+     * @param maxLen maximum length of the returned string before appending ellipsis
+     * @return an escaped and possibly truncated representation suitable for error messages;
+     *         returns {@code null} if {@code str} is {@code null}
      */
     private static String truncateForDisplay(String str, int maxLen) {
         if (str == null) {
@@ -248,7 +276,19 @@ public final class EngineValidator {
 
     /**
      * Replace ISO control and other non-printable characters with visible escape sequences.
-     * Examples: newline -> "\\n", tab -> "\\t", ESC -> "\\u001B", other controls -> "\\uXXXX".
+     *
+     * <p>Examples:
+     * <ul>
+     *   <li>newline -> "\\n"</li>
+     *   <li>tab -> "\\t"</li>
+     *   <li>ESC -> "\\u001B"</li>
+     *   <li>other control characters -> "\\uXXXX" (hex code)</li>
+     * </ul>
+     * The result is safe to include in logs and error messages where raw control characters
+     * would otherwise be invisible or disruptive.</p>
+     *
+     * @param s input string to escape (assumed non-null by callers)
+     * @return string where control/non-printable characters are replaced with readable escape sequences
      */
     private static String escapeControlChars(String s) {
         StringBuilder sb = new StringBuilder();

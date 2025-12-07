@@ -1,7 +1,5 @@
-# Enigma Machine — Full End-to-End Implementation
-### Course Project – Exercises 1–3
-### Target Audience: Course Instructor / Tester
-*(This README is written specifically to support verification, reproducibility, and clear understanding of the system.)*
+# Enigma Machine — Java E2E
+[DeepWiki y0ncha/Enigma](https://deepwiki.com/y0ncha/Enigma)
 
 ---
 
@@ -247,4 +245,3 @@ All position values throughout the system use **left→right** ordering:
 - `CodeConfig` stores positions as chars in left→right order
 - Machine displays positions in left→right order
 
-For detailed integration review, see [docs/integration-dev-ui.md](docs/integration-dev-ui.md).

@@ -25,6 +25,16 @@ import java.util.*;
 /**
  * Engine implementation — orchestration and validation delegation.
  * One-line: load machine specs, validate configs and run the machine.
+ * Responsibilities:
+ * <ul>
+ *   <li>Load machine specifications from XML and keep the current {@link MachineSpec}.</li>
+ *   <li>Validate and apply {@link CodeConfig} instances (manual or random) to the internal {@link Machine}.</li>
+ *   <li>Process input strings through the configured {@link Machine} and return trace information.</li>
+ *   <li>Maintain a small runtime history of configurations and processed messages.</li>
+ * </ul>
+ *
+ * Threading/concurrency: callers are responsible for synchronization if the same EngineImpl
+ * instance is accessed concurrently (methods are not synchronized internally).
  */
 public class EngineImpl implements Engine {
 
@@ -92,10 +102,18 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Print detailed machine wiring information to System.out.
+     * Return a snapshot of machine metadata and current code states.
      *
-     * <p>Delegates to {@code machine.toString()} which displays index column,
-     * reflector pairs, rotor wirings, and keyboard mapping.</p>
+     * <p>The returned {@link MachineState} contains:
+     * <ul>
+     *   <li>Number of rotors available in the spec</li>
+     *   <li>Number of reflectors available in the spec</li>
+     *   <li>Number of strings processed so far</li>
+     *   <li>The original configured code state (if configured)</li>
+     *   <li>The current runtime code state (may change as the machine processes input)</li>
+     * </ul>
+     *
+     * @return a {@link MachineState} snapshot; fields may be null if not applicable (e.g. no spec loaded)
      */
     @Override
     public MachineState machineData() {
@@ -165,6 +183,14 @@ public class EngineImpl implements Engine {
      * Process the provided input string through the currently configured
      * machine/code with detailed debugging information.
      *
+     * <p>Processing notes:
+     * <ul>
+     *   <li>Input is validated via {@link EngineValidator#validateInputInAlphabet(MachineSpec, String)}</li>
+     *   <li>Each character is processed through the {@link Machine#process(char)} method and a per-character
+     *       {@link SignalTrace} is recorded.</li>
+     *   <li>The method updates the engine's processed counter and records the message in {@link MachineHistory}.</li>
+     * </ul>
+     *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
      * @throws MachineNotLoadedException if machine specification is not loaded
@@ -209,6 +235,12 @@ public class EngineImpl implements Engine {
         return new ProcessTrace(output.toString(), List.copyOf(traces));
     }
 
+    /**
+     * Reset the currently-configured machine to its initial state for the current code.
+     *
+     * @throws MachineNotLoadedException if no machine specification has been loaded
+     * @throws MachineNotConfiguredException if the machine has not been configured with a code
+     */
     @Override
     public void reset() {
         if (spec == null) {
@@ -225,23 +257,44 @@ public class EngineImpl implements Engine {
         machine.reset();
     }
 
+    /**
+     * Terminate the engine and release any resources. This implementation currently
+     * has no resources to release; method exists for interface completeness.
+     */
     @Override
     public void terminate() {
         // Nothing to clean up.
         // Included for interface completeness (console may call it before exiting).
     }
 
+    /**
+     * Return a human-readable representation of engine history.
+     *
+     * @return textual history of recorded configurations and processed messages
+     */
     @Override
     public String history() {
         return history.toString();
     }
 
+    /**
+     * Deprecated accessor for the loaded MachineSpec. Prefer using EngineState APIs.
+     *
+     * @return the currently loaded {@link MachineSpec}, or null if none loaded
+     * @deprecated kept for backward compatibility with older tests/console
+     */
     @Override
     @Deprecated
     public MachineSpec getMachineSpec() {
         return spec;
     }
 
+    /**
+     * Deprecated convenience to expose the current {@link CodeConfig} from the machine.
+     *
+     * @return the currently-configured {@link CodeConfig} or null if the machine is not configured
+     * @deprecated use history or machine state inspection APIs instead
+     */
     @Override
     @Deprecated
     public CodeConfig getCurrentCodeConfig() {
@@ -249,13 +302,6 @@ public class EngineImpl implements Engine {
             return null;
         }
         return machine.getConfig();
-    }
-
-    @Override
-    @Deprecated
-    public long getTotalProcessedMessages() {
-        return stringsProcessed;
-        // TODO Yonatan - deprecate : machineData instead
     }
 
     // ---------------------------------------------------------
