@@ -281,12 +281,13 @@ public class EngineImpl implements Engine {
     /**
      * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
      *
-     * <p>Checks performed:</p>
+     * <p>Orchestrates validation by calling targeted validators in sequence:</p>
      * <ul>
-     *   <li>Number of rotors/positions equals {@link #ROTORS_IN_USE}</li>
-     *   <li>Rotor IDs are unique and exist in spec</li>
-     *   <li>Reflector ID exists in spec</li>
-     *   <li>Position chars are valid alphabet members</li>
+     *   <li>{@link #validateNullChecks(MachineSpec, CodeConfig)} — null checks</li>
+     *   <li>{@link #validateRotorAndPositionCounts(List, List)} — count validation</li>
+     *   <li>{@link #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)} — rotor validation</li>
+     *   <li>{@link #validateReflectorExists(MachineSpec, String)} — reflector validation</li>
+     *   <li>{@link #validatePositionsInAlphabet(MachineSpec, List)} — position validation</li>
      * </ul>
      * <p>Spec contents are assumed valid (loader responsibility).</p>
      *
@@ -295,6 +296,26 @@ public class EngineImpl implements Engine {
      * @throws IllegalArgumentException when validation fails
      */
     private void validateCodeConfig(MachineSpec spec, CodeConfig config) {
+        validateNullChecks(spec, config);
+
+        List<Integer> rotorIds = config.rotorIds();
+        List<Character> positions = config.positions();
+        String reflectorId = config.reflectorId();
+
+        validateRotorAndPositionCounts(rotorIds, positions);
+        validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
+        validateReflectorExists(spec, reflectorId);
+        validatePositionsInAlphabet(spec, positions);
+    }
+
+    /**
+     * Validate that spec, config, and config fields are not null.
+     *
+     * @param spec   machine specification
+     * @param config code configuration
+     * @throws IllegalArgumentException if any required parameter is null
+     */
+    private void validateNullChecks(MachineSpec spec, CodeConfig config) {
         if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
         if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
 
@@ -305,10 +326,28 @@ public class EngineImpl implements Engine {
         if (rotorIds == null) throw new IllegalArgumentException("rotorIds must not be null");
         if (positions == null) throw new IllegalArgumentException("positions must not be null");
         if (reflectorId == null) throw new IllegalArgumentException("reflectorId must not be null");
+    }
 
+    /**
+     * Validate that rotor and position counts match expected count.
+     *
+     * @param rotorIds  list of rotor IDs
+     * @param positions list of initial positions
+     * @throws IllegalArgumentException if counts do not match {@link #ROTORS_IN_USE}
+     */
+    private void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions) {
         if (rotorIds.size() != ROTORS_IN_USE) throw new IllegalArgumentException("Exactly " + ROTORS_IN_USE + " rotors must be selected");
         if (positions.size() != ROTORS_IN_USE) throw new IllegalArgumentException("Exactly " + ROTORS_IN_USE + " initial positions must be provided");
+    }
 
+    /**
+     * Validate that rotor IDs are unique and exist in spec.
+     *
+     * @param spec     machine specification
+     * @param rotorIds list of rotor IDs
+     * @throws IllegalArgumentException if rotor IDs are duplicated or do not exist
+     */
+    private void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         // Do not re-validate the spec contents here — loader guarantees valid spec.
 
         Set<Integer> seen = new HashSet<>();
@@ -316,10 +355,28 @@ public class EngineImpl implements Engine {
             if (!seen.add(id)) throw new IllegalArgumentException("Duplicate rotor " + id);
             if (spec.getRotorById(id) == null) throw new IllegalArgumentException("Rotor " + id + " does not exist in spec");
         }
+    }
 
+    /**
+     * Validate that reflector ID exists in spec.
+     *
+     * @param spec        machine specification
+     * @param reflectorId reflector identifier
+     * @throws IllegalArgumentException if reflector is blank or does not exist
+     */
+    private void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
         if (spec.getReflectorById(reflectorId) == null) throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
+    }
 
+    /**
+     * Validate that all position characters are valid alphabet members.
+     *
+     * @param spec      machine specification
+     * @param positions list of initial positions
+     * @throws IllegalArgumentException if any position character is not in alphabet
+     */
+    private void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         for (char c : positions) {
             if (!spec.alphabet().contains(c)) throw new IllegalArgumentException(c + " is not a valid position");
         }

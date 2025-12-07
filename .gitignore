@@ -57,6 +57,7 @@ test-machines/
 *.xml
 *.xsd
 *.bak
+sources.txt
 
 # Editor swap files
 *.swp
