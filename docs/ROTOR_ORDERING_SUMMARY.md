@@ -170,7 +170,11 @@ Total: 6 files created/modified
 
 ## Testing Notes
 
-The `RotorOrderingConsistencyTester` can be run once XML test files are available. The test is designed to:
+The `RotorOrderingConsistencyTester` is a manual test runner that requires XML test files to be present at `enigma-loader/src/test/resources/xml/ex1-sanity-paper-enigma.xml`. This follows the same pattern as other manual test runners in the project (e.g., `PaperSingleCharTester`).
+
+**Note:** If XML test files are not yet present in the repository, the test will fail gracefully with a clear error message indicating that XML files are required. This is expected behavior for manual test runners.
+
+The test is designed to:
 - Load a machine specification from XML
 - Apply configuration `<3,2,1><ABC><I>`
 - Verify stored configuration matches input
@@ -178,4 +182,4 @@ The `RotorOrderingConsistencyTester` can be run once XML test files are availabl
 - Apply alternative configuration `<1,2,3><ODX><I>`
 - Verify known encryption result
 
-The test will validate all aspects of rotor ordering consistency end-to-end.
+The test will validate all aspects of rotor ordering consistency end-to-end once XML test files are available.
