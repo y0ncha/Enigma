@@ -4,7 +4,7 @@ import enigma.console.ConsoleCommand;
 import enigma.console.helper.ConsoleValidator;
 
 /**
- * Manual tester for ConsoleValidator utility class.
+ * Automated test suite for ConsoleValidator utility class.
  * 
  * <p>Tests the validation methods used for console input processing:
  * <ul>

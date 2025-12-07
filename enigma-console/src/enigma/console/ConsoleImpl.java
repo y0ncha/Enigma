@@ -212,7 +212,7 @@ public class ConsoleImpl implements Console {
             CodeConfig originalCode = enigma.getCurrentCodeConfig();
             if (originalCode != null) {
                 System.out.println("Original code configuration  : " + originalCode);
-            } else{
+            } else {
                 System.out.println("Original code configuration  : <not set yet>");
             }
             // Description of the current code configuration (if it exists; it may differ from the original configuration due to input processing – command 5)
