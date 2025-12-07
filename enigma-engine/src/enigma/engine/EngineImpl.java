@@ -283,7 +283,7 @@ public class EngineImpl implements Engine {
      *
      * <p>Orchestrates validation by calling targeted validators in sequence:</p>
      * <ul>
-     *   <li>{@link #validateNullChecks(MachineSpec, CodeConfig, List, List, String)} — null checks</li>
+     *   <li>{@link #validateNullChecks(List, List, String)} — null checks</li>
      *   <li>{@link #validateRotorAndPositionCounts(List, List)} — count validation</li>
      *   <li>{@link #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)} — rotor validation</li>
      *   <li>{@link #validateReflectorExists(MachineSpec, String)} — reflector validation</li>
@@ -296,11 +296,14 @@ public class EngineImpl implements Engine {
      * @throws IllegalArgumentException when validation fails
      */
     private void validateCodeConfig(MachineSpec spec, CodeConfig config) {
-        List<Integer> rotorIds = config == null ? null : config.rotorIds();
-        List<Character> positions = config == null ? null : config.positions();
-        String reflectorId = config == null ? null : config.reflectorId();
+        if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
+        if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
 
-        validateNullChecks(spec, config, rotorIds, positions, reflectorId);
+        List<Integer> rotorIds = config.rotorIds();
+        List<Character> positions = config.positions();
+        String reflectorId = config.reflectorId();
+
+        validateNullChecks(rotorIds, positions, reflectorId);
         validateRotorAndPositionCounts(rotorIds, positions);
         validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
         validateReflectorExists(spec, reflectorId);
@@ -308,19 +311,14 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Validate that spec, config, and config fields are not null.
+     * Validate that config fields are not null.
      *
-     * @param spec        machine specification
-     * @param config      code configuration
      * @param rotorIds    rotor IDs from config
      * @param positions   positions from config
      * @param reflectorId reflector ID from config
      * @throws IllegalArgumentException if any required parameter is null
      */
-    private void validateNullChecks(MachineSpec spec, CodeConfig config, List<Integer> rotorIds,
-                                    List<Character> positions, String reflectorId) {
-        if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
-        if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
+    private void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         if (rotorIds == null) throw new IllegalArgumentException("rotorIds must not be null");
         if (positions == null) throw new IllegalArgumentException("positions must not be null");
         if (reflectorId == null) throw new IllegalArgumentException("reflectorId must not be null");
