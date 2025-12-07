@@ -175,4 +175,16 @@ public interface Engine {
     void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions);
 
     void validateInputInAlphabet(MachineSpec spec, String input);
+
+    /**
+     * Validate plugboard configuration string.
+     *
+     * <p>Ensures the plugboard configuration is valid according to Enigma machine rules.
+     * This method is prepared for Exercise 2 when plugboard is added to CodeConfig.</p>
+     *
+     * @param spec machine specification (provides alphabet)
+     * @param plugboard plugboard configuration string (may be null or empty for no plugboard)
+     * @throws IllegalArgumentException when plugboard configuration is invalid
+     */
+    void validatePlugboard(MachineSpec spec, String plugboard);
 }

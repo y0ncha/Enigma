@@ -24,6 +24,7 @@ import java.util.Set;
 public final class EngineValidator {
 
     private static final int ROTORS_IN_USE = 3; // keep in sync with EngineImpl
+    private static final List<String> VALID_ROMAN_NUMERALS = List.of("I", "II", "III", "IV", "V");
 
     private EngineValidator() { /* utility */ }
 
@@ -66,6 +67,13 @@ public final class EngineValidator {
 
     public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
+        
+        // Validate Roman numeral format
+        if (!VALID_ROMAN_NUMERALS.contains(reflectorId)) {
+            throw new IllegalArgumentException(
+                "Reflector ID '" + reflectorId + "' is not a valid Roman numeral (must be I, II, III, IV, or V)");
+        }
+        
         if (spec.getReflectorById(reflectorId) == null)
             throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
     }
@@ -81,6 +89,71 @@ public final class EngineValidator {
             if (!spec.alphabet().contains(c)) {
                 throw new IllegalArgumentException(
                     "Invalid character '" + c + "'. All characters must belong to the machine alphabet: " + spec.alphabet().getLetters());
+            }
+        }
+    }
+
+    /**
+     * Validate plugboard configuration string.
+     * 
+     * <p>Plugboard validation rules:</p>
+     * <ul>
+     *   <li>Must be even-length (pairs of characters)</li>
+     *   <li>No character may appear more than once</li>
+     *   <li>No character may be mapped to itself (e.g., "AA")</li>
+     *   <li>All characters must exist in the machine alphabet</li>
+     * </ul>
+     * 
+     * <p>This method is prepared for Exercise 2 when plugboard is added to CodeConfig.
+     * For now, it can be called with null or empty string to indicate no plugboard.</p>
+     * 
+     * @param spec machine specification containing the alphabet
+     * @param plugboard plugboard configuration string (e.g., "ABCD" maps A↔B and C↔D), may be null or empty
+     * @throws IllegalArgumentException if validation fails
+     */
+    public static void validatePlugboard(MachineSpec spec, String plugboard) {
+        // null or empty plugboard is valid (no plugboard configured)
+        if (plugboard == null || plugboard.isEmpty()) {
+            return;
+        }
+        
+        // Check even length
+        if (plugboard.length() % 2 != 0) {
+            throw new IllegalArgumentException(
+                "Plugboard configuration must have even length (pairs of characters), got length " + plugboard.length());
+        }
+        
+        Set<Character> seenChars = new HashSet<>();
+        
+        // Process pairs
+        for (int i = 0; i < plugboard.length(); i += 2) {
+            char first = plugboard.charAt(i);
+            char second = plugboard.charAt(i + 1);
+            
+            // Check for self-mapping
+            if (first == second) {
+                throw new IllegalArgumentException(
+                    "Plugboard cannot map a letter to itself: '" + first + first + "'");
+            }
+            
+            // Check for duplicate characters
+            if (!seenChars.add(first)) {
+                throw new IllegalArgumentException(
+                    "Plugboard letter '" + first + "' appears more than once");
+            }
+            if (!seenChars.add(second)) {
+                throw new IllegalArgumentException(
+                    "Plugboard letter '" + second + "' appears more than once");
+            }
+            
+            // Check characters are in alphabet
+            if (!spec.alphabet().contains(first)) {
+                throw new IllegalArgumentException(
+                    "Plugboard character '" + first + "' is not in the machine alphabet");
+            }
+            if (!spec.alphabet().contains(second)) {
+                throw new IllegalArgumentException(
+                    "Plugboard character '" + second + "' is not in the machine alphabet");
             }
         }
     }
