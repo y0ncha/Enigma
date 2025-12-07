@@ -19,6 +19,7 @@ import enigma.machine.component.alphabet.Alphabet;
  *   <li><b>alphabet:</b> The machine's character set (validated: even-length, unique)</li>
  *   <li><b>rotorsById:</b> Map of rotor ID → RotorSpec (IDs form 1..N sequence)</li>
  *   <li><b>reflectorsById:</b> Map of reflector ID → ReflectorSpec (Roman numerals)</li>
+ *   <li><b>rotorsInUse:</b> Number of rotors that must be selected when configuring the machine (e.g. 3)</li>
  * </ul>
  *
  * <h2>Invariants (ensured by loader)</h2>
@@ -35,12 +36,14 @@ import enigma.machine.component.alphabet.Alphabet;
  * @param alphabet machine alphabet (even-length, unique chars)
  * @param rotorsById map of rotor ID → RotorSpec
  * @param reflectorsById map of reflector ID → ReflectorSpec
+ * @param rotorsInUse number of rotors that must be selected when configuring the machine
  * @since 1.0
  */
 public record MachineSpec(
         Alphabet alphabet,
         Map<Integer, RotorSpec> rotorsById,
-        Map<String, ReflectorSpec> reflectorsById
+        Map<String, ReflectorSpec> reflectorsById,
+        int rotorsInUse
 ) {
 
     /**
@@ -80,6 +83,7 @@ public record MachineSpec(
         sb.append("MachineSpec:\n");
         sb.append("  Alphabet: ").append(letters == null ? "<none>" : letters).append("\n");
         sb.append("  Alphabet size: ").append(alphaSize).append("\n");
+        sb.append("  Rotors-in-use: ").append(rotorsInUse).append("\n");
 
         // Print rotors using RotorSpec.toString()
         if (rotorsById == null || rotorsById.isEmpty()) {
@@ -123,11 +127,13 @@ public record MachineSpec(
     }
 
     /**
-     * Returns the string of letters that make up the machine's alphabet.
+     * Returns the number of rotors that must be selected when configuring the machine.
+     * This value is part of the MachineSpec and is the authoritative source for
+     * rotor count requirements (avoids duplicating a constant across modules).
      *
-     * @return the alphabet letters as a string
+     * @return required rotors-in-use (typically 3)
      */
-    public String getLetters() {
-        return alphabet.getLetters();
+    public int getRotorsInUse() {
+        return rotorsInUse;
     }
 }

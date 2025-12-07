@@ -62,7 +62,7 @@ import java.util.*;
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
-    private static int ROTORS_IN_USE;
+    private final int rotorsInUse;
 
     /**
      * Create a loader that expects exactly {@code rotorsInUse} rotors in the machine.
@@ -70,7 +70,14 @@ public class LoaderXml implements Loader {
      * @param rotorsInUse expected number of rotors (typically 3)
      */
     public LoaderXml(int rotorsInUse) {
-        ROTORS_IN_USE = rotorsInUse;
+        this.rotorsInUse = rotorsInUse;
+    }
+
+    /**
+     * Default constructor uses the conventional 3 rotors-in-use.
+     */
+    public LoaderXml() {
+        this(3); // default is hardcoded
     }
 
     /**
@@ -99,7 +106,8 @@ public class LoaderXml implements Loader {
 
         Map<String, ReflectorSpec> reflectors = extractReflectors(root, alphabet);
 
-        return new MachineSpec(alphabet, rotors, reflectors);
+        // Build MachineSpec including rotorsInUse so callers can derive required rotor count
+        return new MachineSpec(alphabet, rotors, reflectors, rotorsInUse);
     }
 
     /**
@@ -395,8 +403,8 @@ public class LoaderXml implements Loader {
         if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
             throw new EnigmaLoadingException("No <BTE-Rotors> section or empty rotors list");
         }
-        if (bteRotors.getBTERotor().size() < ROTORS_IN_USE) {
-            throw new EnigmaLoadingException("Machine must define at least " + ROTORS_IN_USE + " rotors, but got " + bteRotors.getBTERotor().size());
+        if (bteRotors.getBTERotor().size() < rotorsInUse) {
+            throw new EnigmaLoadingException("Machine must define at least " + rotorsInUse + " rotors, but got " + bteRotors.getBTERotor().size());
         }
     }
 

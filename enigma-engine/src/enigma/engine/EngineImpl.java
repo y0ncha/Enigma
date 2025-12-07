@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class EngineImpl implements Engine {
 
-    private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
+    // ROTORS_IN_USE is now part of MachineSpec; the engine no longer declares a duplicate constant.
 
     private final Machine machine;
     private final Loader loader;
@@ -43,7 +43,7 @@ public class EngineImpl implements Engine {
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
-        this.loader = new LoaderXml(ROTORS_IN_USE);
+        this.loader = new LoaderXml();
         this.codeFactory = new CodeFactoryImpl();
     }
 
@@ -116,7 +116,7 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling strategy:</p>
      * <ul>
-     *   <li>Pick {@value #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick the number of rotors indicated by the loaded {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Generate random char positions (left→right) from alphabet</li>
      *   <li>Pick one random reflector ID</li>
      * </ul>
@@ -207,6 +207,7 @@ public class EngineImpl implements Engine {
     @Override
     public long getTotalProcessedMessages() {
         return stringsProcessed;
+        // TODO deprecate : machineData instead
     }
 
     // ---------------------------------------------------------
@@ -218,7 +219,7 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling rules:</p>
      * <ul>
-     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick exactly the number of rotors specified by {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Pick one reflector ID at random</li>
      *   <li>Generate random starting positions as chars (left→right)</li>
      * </ul>
@@ -238,14 +239,15 @@ public class EngineImpl implements Engine {
         SecureRandom random = new SecureRandom();
 
         // Shuffle available rotor IDs and pick exactly ROTORS_IN_USE of them in random order (left → right)
+        int needed = spec.getRotorsInUse();
         List<Integer> rotorPool = new ArrayList<>(spec.rotorsById().keySet());
         Collections.shuffle(rotorPool, random);
-        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, ROTORS_IN_USE)); // left→right
+        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, needed)); // left→right
 
         // Generate random starting positions as characters (left → right)
         int alphaSize = spec.alphabet().size();
-        List<Character> positions = new ArrayList<>(ROTORS_IN_USE);
-        for (int i = 0; i < ROTORS_IN_USE; i++) {
+        List<Character> positions = new ArrayList<>(needed);
+        for (int i = 0; i < needed; i++) {
             int randIndex = random.nextInt(alphaSize);        // 0 .. alphaSize-1
             char posChar = spec.alphabet().charAt(randIndex); // map index → symbol
             positions.add(posChar);
@@ -258,67 +260,4 @@ public class EngineImpl implements Engine {
         // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
-
-    // ---------------------------------------------------------
-    // Engine-level validation helpers
-    // ---------------------------------------------------------
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateCodeConfig(MachineSpec spec, CodeConfig config) {
-        EngineValidator.validateCodeConfig(spec, config);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
-        EngineValidator.validateNullChecks(rotorIds, positions, reflectorId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateRotorAndPositionCounts(List<Integer> rotorIds, List<Character> positions) {
-        EngineValidator.validateRotorAndPositionCounts(rotorIds, positions);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
-        EngineValidator.validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateReflectorExists(MachineSpec spec, String reflectorId) {
-        EngineValidator.validateReflectorExists(spec, reflectorId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
-        EngineValidator.validatePositionsInAlphabet(spec, positions);
-    }
-
-    @Override
-    public void validateInputInAlphabet(MachineSpec spec, String input) {
-        EngineValidator.validateInputInAlphabet(spec, input);
-    }
-
-    @Override
-    public void validatePlugboard(MachineSpec spec, String plugboard) {
-        EngineValidator.validatePlugboard(spec, plugboard);
-    }
-
 }
