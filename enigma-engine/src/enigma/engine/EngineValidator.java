@@ -125,7 +125,7 @@ public final class EngineValidator {
         }
     }
     /**
-     * Validates that the number of selected rotors matches the minimum required rotor count.
+     * Validates that the number of selected rotors matches the required rotor count.
      *
      * <p>
      * This method checks that the provided list of rotor IDs matches the number of rotors
