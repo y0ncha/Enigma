@@ -126,6 +126,20 @@ public final class EngineValidator {
         }
     }
     // TODO import const MIN_REQUIRED_ROTORS from a different class
+    /**
+     * Validates that the number of selected rotors matches the minimum required rotor count.
+     *
+     * <p>
+     * This method checks that the provided list of rotor IDs contains exactly {@value #MIN_REQUIRED_ROTORS} elements,
+     * as required by the machine specification. If the count does not match, an
+     * {@link InvalidConfigurationException} is thrown with a detailed error message.
+     * </p>
+     *
+     * @param spec      the machine specification (must not be {@code null})
+     * @param rotorIds  the list of selected rotor IDs (must not be {@code null})
+     * @throws InvalidConfigurationException if the number of selected rotors does not match the required count,
+     *                                       or if {@code spec} is {@code null}
+     */
     public static void validateMinimumRotorCount(MachineSpec spec, List<Integer> rotorIds) {
         // Validate spec
         specIsNull(spec);
