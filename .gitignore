@@ -54,9 +54,9 @@ todo.md
 
 # Test artifacts and temp files
 test-machines/
-*.xml
 *.xsd
 *.bak
+sources.txt
 
 # Editor swap files
 *.swp

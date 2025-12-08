@@ -96,15 +96,24 @@ public class CodeFactoryImpl implements CodeFactory {
     /**
      * Build rotors from the specification and configuration.
      *
+     * <p><b>Ordering Convention:</b> This method preserves the left→right ordering
+     * from the configuration. For example, given config <3,2,1><ABC>:</p>
+     * <ul>
+     *   <li>rotors[0] = Rotor 3 at position 'A' (leftmost)</li>
+     *   <li>rotors[1] = Rotor 2 at position 'B' (middle)</li>
+     *   <li>rotors[2] = Rotor 1 at position 'C' (rightmost)</li>
+     * </ul>
+     *
      * @param spec machine specification
-     * @param config code configuration
-     * @return list of rotors in left→right order
+     * @param config code configuration with left→right ordering
+     * @return list of rotors in left→right order (index 0 = leftmost)
      */
     private List<Rotor> buildRotors(MachineSpec spec, CodeConfig config) {
-        List<Integer> rotorIds = config.rotorIds();
-        List<Character> positions = config.positions();
+        List<Integer> rotorIds = config.rotorIds();       // left→right
+        List<Character> positions = config.positions();   // left→right
         List<Rotor> rotors = new ArrayList<>(rotorIds.size());
 
+        // Build rotors in left→right order: i=0 is leftmost, i=size-1 is rightmost
         for (int i = 0; i < rotorIds.size(); i++) {
             int rotorId = rotorIds.get(i);
             RotorSpec rotorSpec = spec.getRotorById(rotorId);
@@ -112,7 +121,7 @@ public class CodeFactoryImpl implements CodeFactory {
 
             Rotor rotor = this.rotorFactory.create(rotorSpec);
             rotor.setPosition(targetPosition);
-            rotors.add(rotor);
+            rotors.add(rotor);  // Preserves left→right order
         }
 
         return rotors;

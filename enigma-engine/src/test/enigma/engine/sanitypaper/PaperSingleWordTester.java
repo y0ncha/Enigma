@@ -3,8 +3,8 @@ package test.enigma.engine.sanitypaper;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
-import enigma.shared.dto.tracer.processTrace;
 
 import java.nio.file.Paths;
 
@@ -12,7 +12,7 @@ import java.nio.file.Paths;
  * Single-case sanity tester for the "sanity-paper" dataset.
  * Loads the sanity-paper XML, applies a single code configuration
  * and processes one input string, printing both the output and the
- * detailed {@link processTrace}.
+ * detailed {@link ProcessTrace}.
  */
 public class PaperSingleWordTester {
 
@@ -45,7 +45,7 @@ public class PaperSingleWordTester {
         engine.configManual(CODE_CONFIG);
 
         // Print machine state before processing
-        MachineState before = engine.getState();
+        MachineState before = engine.machineData();
         System.out.println("MachineState (before): " + before + "\n");
 
         System.out.println("===== Single Sanity Case =====");
@@ -53,7 +53,7 @@ public class PaperSingleWordTester {
         System.out.println("Expected: " + EXPECTED);
         System.out.println();
 
-        processTrace debug = engine.process(INPUT);
+        ProcessTrace debug = engine.process(INPUT);
 
         String actual = debug.output();
         boolean ok = actual.equals(EXPECTED);
@@ -62,10 +62,10 @@ public class PaperSingleWordTester {
         System.out.println("Result  : " + (ok ? "PASSED" : "FAILED"));
         System.out.println();
 
-        System.out.println(debug); // relies on processTrace.toString() / pretty formatting
+        System.out.println(debug); // relies on ProcessTrace.toString() / pretty formatting
         System.out.println("------------------------");
 
-        MachineState after = engine.getState();
+        MachineState after = engine.machineData();
         System.out.println("MachineState (after): " + after + "\n");
     }
 }

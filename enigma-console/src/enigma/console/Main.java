@@ -1,5 +1,8 @@
 package enigma.console;
 
+import enigma.engine.Engine;
+import enigma.engine.EngineImpl;
+
 /**
  * Entry point for the Enigma machine console application.
  *
@@ -16,5 +19,14 @@ package enigma.console;
  *
  * @since 1.0
  */
+
 public class Main {
+
+    public static void main(String[] args) {
+        Engine engine = new EngineImpl();
+        // Create the console UI, passing the engine
+        Console console = new ConsoleImpl(engine);
+        // Start the console program loop
+        console.run();
+    }
 }

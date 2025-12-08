@@ -1,7 +1,5 @@
-# Enigma Machine — Full End-to-End Implementation
-### Course Project – Exercises 1–3
-### Target Audience: Course Instructor / Tester
-*(This README is written specifically to support verification, reproducibility, and clear understanding of the system.)*
+# Enigma Machine — Java E2E
+[DeepWiki y0ncha/Enigma](https://deepwiki.com/y0ncha/Enigma)
 
 ---
 
@@ -211,3 +209,39 @@ Per course instructions:
 
 # 9. Contact
 This README serves as the canonical reference for evaluating correctness, compliance, and structure.
+
+---
+
+# 10. Integration Documentation
+
+## 10.1 Console-Engine Integration
+
+The console module provides a user-friendly command-line interface that communicates with the engine through a well-defined DTO-based API. Key integration points:
+
+### Module Responsibilities
+- **Console:** Format-level input validation, user interaction, output formatting
+- **Engine:** Semantic validation, orchestration, state management
+- **Machine:** Core Enigma mechanics and signal processing
+
+### Data Flow
+```
+User Input → Console (format check) 
+          → Engine (semantic validation)
+          → Machine (encryption)
+          → DTOs (results)
+          → Console (display)
+```
+
+### Key DTOs Used
+- `MachineSpec` - Machine configuration metadata
+- `CodeConfig` - Rotor/reflector configuration
+- `CodeState` - Current machine state with positions and notch distances
+- `MachineState` - Comprehensive snapshot (counts, original/current config)
+- `ProcessTrace` - Message processing results with signal traces
+
+### Position Convention
+All position values throughout the system use **left→right** ordering:
+- User input "ABC" means: A=leftmost rotor, B=middle, C=rightmost
+- `CodeConfig` stores positions as chars in left→right order
+- Machine displays positions in left→right order
+
