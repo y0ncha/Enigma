@@ -287,7 +287,7 @@ public class ConsoleImpl implements Console {
             while (true) {
                 String positions = Utilities.readNonEmptyLine(scanner,
                         "Enter initial positions as a continuous sequence of characters (e.g. ABCD). " +
-                                "Allowed letters: " + enigma.getMachineSpec().getLatters());
+                                "Allowed letters: " + enigma.getMachineSpec().getLetters());
                 try {
                     positionsLst = InputParsers.parsePositions(positions);
                     EngineValidator.validatePositions(enigma.getMachineSpec(), positionsLst);
