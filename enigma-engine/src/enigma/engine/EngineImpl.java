@@ -1,17 +1,21 @@
 package enigma.engine;
 
+import enigma.engine.exception.EngineException;
+import enigma.engine.exception.MachineNotLoadedException;
+import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
+import enigma.engine.history.MachineHistory;
 import enigma.loader.Loader;
-import enigma.loader.EnigmaLoadingException;
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
 import enigma.machine.component.code.Code;
 import enigma.machine.Machine;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.CodeState;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
 import enigma.shared.dto.tracer.SignalTrace;
 import enigma.shared.spec.MachineSpec;
 
@@ -19,62 +23,30 @@ import java.security.SecureRandom;
 import java.util.*;
 
 /**
- * Default {@link Engine} implementation.
- *
- * <p><b>Module:</b> enigma-engine (orchestration + validation, no UI)</p>
- *
- * <h2>Responsibilities</h2>
+ * Engine implementation — orchestration and validation delegation.
+ * One-line: load machine specs, validate configs and run the machine.
+ * Responsibilities:
  * <ul>
- *   <li>Load machine specification (XML) via {@link Loader}</li>
- *   <li>Validate runtime {@link CodeConfig} (rotor IDs, positions, reflector)</li>
- *   <li>Build runtime {@link Code} using {@link CodeFactory}</li>
- *   <li>Assign code to internal {@link Machine} instance</li>
- *   <li>Process messages and return {@link processTrace} DTOs</li>
+ *   <li>Load machine specifications from XML and keep the current {@link MachineSpec}.</li>
+ *   <li>Validate and apply {@link CodeConfig} instances (manual or random) to the internal {@link Machine}.</li>
+ *   <li>Process input strings through the configured {@link Machine} and return trace information.</li>
+ *   <li>Maintain a small runtime history of configurations and processed messages.</li>
  * </ul>
  *
- * <h2>Configuration Flow</h2>
- * <ol>
- *   <li>Load XML → {@link MachineSpec} (via loader)</li>
- *   <li>Manual or random config → {@link CodeConfig}</li>
- *   <li>Validate config against spec</li>
- *   <li>Build {@link Code} (via factory)</li>
- *   <li>Assign code to machine</li>
- * </ol>
- *
- * <h2>Validation Boundary</h2>
- * <p>Engine validates:</p>
- * <ul>
- *   <li>Number of rotors matches expected count (currently 3)</li>
- *   <li>Rotor IDs are unique and exist in spec</li>
- *   <li>Reflector ID exists in spec</li>
- *   <li>Position characters are valid alphabet members</li>
- * </ul>
- * <p>Factories assume inputs are valid and focus on object construction.</p>
- *
- * <h2>Rotor Position Model</h2>
- * <p>Positions in {@link CodeConfig} are characters from the alphabet
- * (e.g., 'O', 'D', 'X') in left→right order. The factory and machine
- * preserve this ordering throughout construction and operation.</p>
- *
- * <h2>What Engine Does NOT Do</h2>
- * <ul>
- *   <li>Does not perform I/O or printing (except getState for diagnostics)</li>
- *   <li>Does not expose internal machine or component objects</li>
- *   <li>Does not revalidate spec contents (loader responsibility)</li>
- * </ul>
- *
- * @since 1.0
+ * Threading/concurrency: callers are responsible for synchronization if the same EngineImpl
+ * instance is accessed concurrently (methods are not synchronized internally).
  */
 public class EngineImpl implements Engine {
 
-    private static final int ROTORS_IN_USE = 3; // Can be dynamically configured in the future
+    // ROTORS_IN_USE is now part of MachineSpec; the engine no longer declares a duplicate constant.
 
     private final Machine machine;
     private final Loader loader;
     private final CodeFactory codeFactory;
+    private MachineHistory history;
 
     private MachineSpec spec;
-    private CodeState ogCodeState;
+    private CodeState ogCodeState = enigma.shared.state.CodeState.notConfigured();
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
@@ -86,9 +58,15 @@ public class EngineImpl implements Engine {
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
-        this.loader = new LoaderXml(ROTORS_IN_USE);
+        this.loader = new LoaderXml();
         this.codeFactory = new CodeFactoryImpl();
+        this.history = new MachineHistory();
     }
+
+    // ---------------------------------------------------------
+    // Engine API (as described in assignment / instructions)
+    // ---------------------------------------------------------
+
 
     /**
      * Load and validate a machine specification from an XML file and store it in the engine.
@@ -102,26 +80,43 @@ public class EngineImpl implements Engine {
      * - Caller must handle concurrency; the last successful load overwrites the engine spec.
      *
      * @param path absolute or relative path to the Enigma XML file
-     * @throws RuntimeException if parsing or validation fails (loader error wrapped)
+     * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
      */
     @Override
     public void loadMachine(String path) {
         try {
             spec = loader.loadSpecs(path);
+            this.history = new MachineHistory();
+            this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
+            this.stringsProcessed = 0;
         }
         catch (EnigmaLoadingException e) {
-            throw new RuntimeException("Failed to load machine XML: " + e.getMessage(), e);
+            throw new EngineException(
+                String.format(
+                    "Failed to load machine specification from XML file: %s. " +
+                    "Error: %s. " +
+                    "Fix: Ensure the XML file exists, is well-formed, and satisfies all validation rules.",
+                    path, e.getMessage()),
+                e);
         }
     }
 
     /**
-     * Print detailed machine wiring information to System.out.
+     * Return a snapshot of machine metadata and current code states.
      *
-     * <p>Delegates to {@code machine.toString()} which displays index column,
-     * reflector pairs, rotor wirings, and keyboard mapping.</p>
+     * <p>The returned {@link MachineState} contains:
+     * <ul>
+     *   <li>Number of rotors available in the spec</li>
+     *   <li>Number of reflectors available in the spec</li>
+     *   <li>Number of strings processed so far</li>
+     *   <li>The original configured code state (if configured)</li>
+     *   <li>The current runtime code state (may change as the machine processes input)</li>
+     * </ul>
+     *
+     * @return a {@link MachineState} snapshot; fields may be null if not applicable (e.g. no spec loaded)
      */
     @Override
-    public MachineState getState() {
+    public MachineState machineData() {
         int rotors = spec == null ? 0 : spec.rotorsById().size();
         int reflectors = spec == null ? 0 : spec.reflectorsById().size();
         CodeState currCodeState = machine.getCodeState();
@@ -137,15 +132,26 @@ public class EngineImpl implements Engine {
      * {@link Machine#setCode(Code)}.</p>
      *
      * @param config configuration with rotor IDs, positions (chars), reflector ID
-     * @throws IllegalArgumentException if validation fails
-     * @throws IllegalStateException if spec is not loaded
+     * @throws enigma.engine.exception.InvalidConfigurationException if validation fails
+     * @throws MachineNotLoadedException if spec is not loaded
      */
     @Override
     public void configManual(CodeConfig config) {
-        validateCodeConfig(spec, config);
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot configure machine: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before configuring.");
+        }
+        // validate config against spec
+        EngineValidator.validateCodeConfig(spec, config);
+
+        // create code and assign to machine
         Code code = codeFactory.create(spec, config);
         machine.setCode(code);
+
+        // record config in history
         ogCodeState = machine.getCodeState();
+        history.recordConfig(ogCodeState);
     }
 
 
@@ -154,16 +160,21 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling strategy:</p>
      * <ul>
-     *   <li>Pick {@value #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick the number of rotors indicated by the loaded {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Generate random char positions (left→right) from alphabet</li>
      *   <li>Pick one random reflector ID</li>
      * </ul>
      * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
      *
-     * @throws IllegalStateException when spec is not loaded
+     * @throws MachineNotLoadedException when spec is not loaded
      */
     @Override
     public void configRandom() {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot generate random configuration: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before generating random configuration.");
+        }
         CodeConfig config = generateRandomConfig(spec);
         configManual(config);
     }
@@ -172,38 +183,125 @@ public class EngineImpl implements Engine {
      * Process the provided input string through the currently configured
      * machine/code with detailed debugging information.
      *
+     * <p>Processing notes:
+     * <ul>
+     *   <li>Input is validated via {@link EngineValidator#validateInputInAlphabet(MachineSpec, String)}</li>
+     *   <li>Each character is processed through the {@link Machine#process(char)} method and a per-character
+     *       {@link SignalTrace} is recorded.</li>
+     *   <li>The method updates the engine's processed counter and records the message in {@link MachineHistory}.</li>
+     * </ul>
+     *
      * @param input the input text to process
      * @return detailed debug trace of the processing steps
+     * @throws MachineNotLoadedException if machine specification is not loaded
+     * @throws MachineNotConfiguredException if machine is not configured
+     * @throws enigma.engine.exception.InvalidMessageException if input is null or contains invalid characters
      */
     @Override
-    public processTrace process(String input) {
+    public ProcessTrace process(String input) {
+        // Validate machine is loaded
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                "Cannot process message: No machine specification loaded. " +
+                "Fix: Load a machine specification using loadMachine(path) before processing messages.");
+        }
+        
+        // Validate machine is configured
         if (!machine.isConfigured()) {
-            throw new IllegalStateException("Machine is not configured");
+            throw new MachineNotConfiguredException(
+                "Cannot process message: Machine is not configured. " +
+                "Fix: Configure the machine using configManual(config) or configRandom() before processing messages.");
         }
-        if (input == null) {
-            throw new IllegalArgumentException("Input must not be null");
-        }
+        
+        // Validate input is not null and contains only valid characters
+        EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
         StringBuilder output = new StringBuilder();
 
+        long start = System.nanoTime();
         for (char c : input.toCharArray()) {
             SignalTrace trace = machine.process(c);
             traces.add(trace);
             output.append(trace.outputChar());
         }
+        long duration = System.nanoTime() - start;
+
         this.stringsProcessed++;
-        return new processTrace(output.toString(), List.copyOf(traces));
+
+        // Record processed message with duration in nanoseconds
+        history.recordMessage(input, output.toString(), duration);
+
+        return new ProcessTrace(output.toString(), List.copyOf(traces));
     }
 
     /**
-     * Produce runtime statistics for the engine.
+     * Reset the currently-configured machine to its initial state for the current code.
      *
-     * <p>Currently a placeholder; implementation may be added later.</p>
+     * @throws MachineNotLoadedException if no machine specification has been loaded
+     * @throws MachineNotConfiguredException if the machine has not been configured with a code
      */
     @Override
-    public void statistics() {
-        // TODO implement
+    public void reset() {
+        if (spec == null) {
+            throw new MachineNotLoadedException(
+                    "Cannot reset machine: No machine specification loaded. " +
+                            "Fix: Load a machine specification using loadMachine(path) before resetting.");
+        }
+
+        if (!machine.isConfigured()) {
+            throw new MachineNotConfiguredException(
+                    "Cannot reset machine: Machine is not configured. " +
+                            "Fix: Configure the machine using configManual(config) or configRandom() before resetting.");
+        }
+        machine.reset();
+    }
+
+    /**
+     * Terminate the engine and release any resources. This implementation currently
+     * has no resources to release; method exists for interface completeness.
+     */
+    @Override
+    public void terminate() {
+        // Nothing to clean up.
+        // Included for interface completeness (console may call it before exiting).
+    }
+
+    /**
+     * Return a human-readable representation of engine history.
+     *
+     * @return textual history of recorded configurations and processed messages
+     */
+    @Override
+    public String history() {
+        return history.toString();
+    }
+
+    /**
+     * Deprecated accessor for the loaded MachineSpec. Prefer using EngineState APIs.
+     *
+     * @return the currently loaded {@link MachineSpec}, or null if none loaded
+     * @deprecated kept for backward compatibility with older tests/console
+     */
+    @Override
+    @Deprecated
+    public MachineSpec getMachineSpec() {
+        return spec;
+    }
+
+    /**
+     * Deprecated convenience to expose the current {@link CodeConfig} from the machine.
+     *
+     * @return the currently-configured {@link CodeConfig} or null if the machine is not configured
+     * @deprecated use history or machine state inspection APIs instead
+     */
+    @Override
+    @Deprecated
+    public CodeConfig getCurrentCodeConfig() {
+        if (!machine.isConfigured()) {
+            return null;
+        }
+        return machine.getConfig();
     }
 
     // ---------------------------------------------------------
@@ -215,7 +313,7 @@ public class EngineImpl implements Engine {
      *
      * <p>Sampling rules:</p>
      * <ul>
-     *   <li>Pick exactly {@link #ROTORS_IN_USE} unique rotor IDs (left→right)</li>
+     *   <li>Pick exactly the number of rotors specified by {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
      *   <li>Pick one reflector ID at random</li>
      *   <li>Generate random starting positions as chars (left→right)</li>
      * </ul>
@@ -224,25 +322,20 @@ public class EngineImpl implements Engine {
      *
      * @param spec machine specification (must be non-null)
      * @return randomly sampled {@link CodeConfig}
-     * @throws IllegalStateException when {@code spec} is null
      */
     private CodeConfig generateRandomConfig(MachineSpec spec) {
-        if (spec == null) {
-            throw new IllegalStateException(
-                    "Machine is not loaded. Load an XML file before generating a random code.");
-        }
-
         SecureRandom random = new SecureRandom();
 
         // Shuffle available rotor IDs and pick exactly ROTORS_IN_USE of them in random order (left → right)
+        int needed = spec.getRotorsInUse();
         List<Integer> rotorPool = new ArrayList<>(spec.rotorsById().keySet());
         Collections.shuffle(rotorPool, random);
-        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, ROTORS_IN_USE)); // left→right
+        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, needed)); // left→right
 
         // Generate random starting positions as characters (left → right)
         int alphaSize = spec.alphabet().size();
-        List<Character> positions = new ArrayList<>(ROTORS_IN_USE);
-        for (int i = 0; i < ROTORS_IN_USE; i++) {
+        List<Character> positions = new ArrayList<>(needed);
+        for (int i = 0; i < needed; i++) {
             int randIndex = random.nextInt(alphaSize);        // 0 .. alphaSize-1
             char posChar = spec.alphabet().charAt(randIndex); // map index → symbol
             positions.add(posChar);
@@ -254,56 +347,5 @@ public class EngineImpl implements Engine {
 
         // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
-    }
-
-    // ---------------------------------------------------------
-    // Engine-level validation helpers
-    // ---------------------------------------------------------
-
-    /**
-     * Validate a {@link CodeConfig} against the (already-loaded) {@link MachineSpec}.
-     *
-     * <p>Checks performed:</p>
-     * <ul>
-     *   <li>Number of rotors/positions equals {@link #ROTORS_IN_USE}</li>
-     *   <li>Rotor IDs are unique and exist in spec</li>
-     *   <li>Reflector ID exists in spec</li>
-     *   <li>Position chars are valid alphabet members</li>
-     * </ul>
-     * <p>Spec contents are assumed valid (loader responsibility).</p>
-     *
-     * @param spec   machine specification (assumed valid by the loader)
-     * @param config code configuration to validate
-     * @throws IllegalArgumentException when validation fails
-     */
-    private void validateCodeConfig(MachineSpec spec, CodeConfig config) {
-        if (spec == null) throw new IllegalArgumentException("MachineSpec must not be null");
-        if (config == null) throw new IllegalArgumentException("CodeConfig must not be null");
-
-        List<Integer> rotorIds = config.rotorIds();
-        List<Character> positions = config.positions();
-        String reflectorId = config.reflectorId();
-
-        if (rotorIds == null) throw new IllegalArgumentException("rotorIds must not be null");
-        if (positions == null) throw new IllegalArgumentException("positions must not be null");
-        if (reflectorId == null) throw new IllegalArgumentException("reflectorId must not be null");
-
-        if (rotorIds.size() != ROTORS_IN_USE) throw new IllegalArgumentException("Exactly " + ROTORS_IN_USE + " rotors must be selected");
-        if (positions.size() != ROTORS_IN_USE) throw new IllegalArgumentException("Exactly " + ROTORS_IN_USE + " initial positions must be provided");
-
-        // Do not re-validate the spec contents here — loader guarantees valid spec.
-
-        Set<Integer> seen = new HashSet<>();
-        for (int id : rotorIds) {
-            if (!seen.add(id)) throw new IllegalArgumentException("Duplicate rotor " + id);
-            if (spec.getRotorById(id) == null) throw new IllegalArgumentException("Rotor " + id + " does not exist in spec");
-        }
-
-        if (reflectorId.isBlank()) throw new IllegalArgumentException("reflectorId must be non-empty");
-        if (spec.getReflectorById(reflectorId) == null) throw new IllegalArgumentException("Reflector '" + reflectorId + "' does not exist");
-
-        for (char c : positions) {
-            if (!spec.alphabet().contains(c)) throw new IllegalArgumentException(c + " is not a valid position");
-        }
     }
 }

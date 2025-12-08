@@ -3,7 +3,7 @@ package test.enigma.engine.sanitysamll;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
+import enigma.shared.dto.tracer.ProcessTrace;
 
 import java.nio.file.Paths;
 
@@ -70,7 +70,7 @@ public class SmallMultiWordTester {
             engine.configManual(config);
 
             String input = inputs[i];
-            processTrace debug = engine.process(input);
+            ProcessTrace debug = engine.process(input);
 
             boolean ok = debug.output().equals(expectedOutputs[i]);
             if (ok) passed++; else failed++;

@@ -3,7 +3,7 @@ package test.enigma.engine.sanitypaper;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
+import enigma.shared.dto.tracer.ProcessTrace;
 
 import java.nio.file.Paths;
 
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
  * Single-letter tester for the "sanity-paper" dataset.
  * Loads the sanity-paper XML, applies the code configuration
  * and processes a single input character, printing the
- * detailed {@link processTrace} to stdout.
+ * detailed {@link ProcessTrace} to stdout.
  */
 public class PaperSingleCharTester {
 
@@ -39,7 +39,7 @@ public class PaperSingleCharTester {
         System.out.println("Code configuration: " + CODE_CONFIG);
         engine.configManual(CODE_CONFIG);
 
-        processTrace debug = engine.process(INPUT);
+        ProcessTrace debug = engine.process(INPUT);
         System.out.println();
 
         // Print a concise result summary similar to the other sanity testers
@@ -52,7 +52,7 @@ public class PaperSingleCharTester {
         System.out.println("Result  : " + (ok ? "PASSED ✔" : "FAILED ✘"));
         System.out.println();
 
-        System.out.println(debug); // relies on processTrace.toString() / pretty formatting
+        System.out.println(debug); // relies on ProcessTrace.toString() / pretty formatting
         System.out.println("------------------------");
     }
 }

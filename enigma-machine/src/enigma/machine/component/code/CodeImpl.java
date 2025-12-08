@@ -94,4 +94,14 @@ public class CodeImpl implements Code {
         }
         return notchDist;
     }
+
+    @Override
+    public void reset() {
+        for (int i = 0; i < rotors.size(); i++) {
+            Rotor r = rotors.get(i);
+            char pos = positions.get(i);
+            r.setPosition(pos);
+        }
+
+    }
 }

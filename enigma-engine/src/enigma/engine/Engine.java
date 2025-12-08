@@ -1,36 +1,19 @@
 package enigma.engine;
 
-import enigma.machine.Machine;
+import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
+import enigma.shared.spec.MachineSpec;
 
 /**
- * Engine API for coordinating machine loading, configuration and processing.
- *
- * <p><b>Module:</b> enigma-engine (orchestration + validation, no UI)</p>
- *
- * <h2>Responsibilities</h2>
- * <ul>
- *   <li>Load machine specifications from XML via {@link enigma.loader.Loader}</li>
- *   <li>Validate {@link CodeConfig} against loaded {@link enigma.shared.spec.MachineSpec}</li>
- *   <li>Build runtime {@link enigma.machine.component.code.Code} via factories</li>
- *   <li>Process messages and return {@link processTrace} DTOs</li>
- * </ul>
- *
- * <h2>What Engine Does NOT Do</h2>
- * <ul>
- *   <li>Does not perform I/O or UI interactions (console responsibility)</li>
- *   <li>Does not expose internal machine or component objects</li>
- *   <li>Does not modify XML or reorder wires (loader responsibility)</li>
- * </ul>
- *
- * <h2>Validation Boundary</h2>
- * <p>Engine validates runtime configuration (rotor IDs, positions, reflector ID)
- * and ensures they match the loaded spec. Factories assume inputs are valid
- * and focus on object construction.</p>
- *
- * @since 1.0
+ * Engine API — Coordinate loading, validation, and processing.
+ * One-line: load machine spec, validate a CodeConfig and process messages.
+ * Usage:
+ * <pre>
+ * engine.loadMachine(path);
+ * engine.configManual(codeConfig);
+ * ProcessTrace trace = engine.process(input);
+ * </pre>
  */
 public interface Engine {
 
@@ -52,7 +35,7 @@ public interface Engine {
      * <p>The exact output format and destination are implementation-specific.
      * Typically delegates to {@code machine.toString()} for detailed wiring display.</p>
      */
-    MachineState getState();
+    MachineState machineData();
 
     /**
      * Configure the machine with a manual code configuration.
@@ -84,20 +67,128 @@ public interface Engine {
      *
      * <p>Each character is processed individually, generating a {@link enigma.shared.dto.tracer.SignalTrace}
      * for detailed step-by-step analysis. The output string and all traces are bundled
-     * into a {@link processTrace} DTO.</p>
+     * into a {@link ProcessTrace} DTO.</p>
      *
      * @param input the input text to process (all chars must be in alphabet)
      * @return detailed debug trace of the processing steps
-     * @throws IllegalStateException if machine is not configured
+     * @throws IllegalStateException    if machine is not configured
      * @throws IllegalArgumentException if input contains invalid characters
      */
-    processTrace process(String input);
+    ProcessTrace process(String input);
 
     /**
-     * Return or print runtime statistics (usage, timing, or other metrics).
+     * Returns the current machine specification loaded by the engine.
      *
-     * <p>Exact format and destination are implementation-specific.
-     * Currently a placeholder for future implementation.</p>
+     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
      */
-    void statistics();
+    MachineSpec getMachineSpec();
+
+    /**
+     * Returns the current code configuration applied to the machine.
+     *
+     * @return the current {@link CodeConfig}, or {@code null} if not configured
+     */
+    CodeConfig getCurrentCodeConfig();
+
+
+    /**
+     * Reset the machine to its original code configuration.
+     *
+     * <p><b>What This Does:</b></p>
+     * <ul>
+     *   <li>Returns rotor positions to their <b>original values</b> (as configured)</li>
+     *   <li>Maintains rotor selection, reflector selection, and plugboard</li>
+     *   <li>Maintains history and statistics</li>
+     * </ul>
+     *
+     * <p><b>What This Does NOT Do:</b></p>
+     * <ul>
+     *   <li>❌ Clear processing history</li>
+     *   <li>❌ Reset message counter</li>
+     *   <li>❌ Change rotor or reflector selection</li>
+     *   <li>❌ Create new original code (still grouped under same history key)</li>
+     * </ul>
+     *
+     * <p><b>Use Case:</b> Process multiple messages from the same starting positions
+     * without manually reconfiguring.</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>
+     * engine.configManual(new CodeConfig(..., positions=['O','D','X'], ...));
+     * engine.process("HELLO");  // positions advance to something else
+     * engine.reset();           // positions return to ['O','D','X']
+     * engine.process("WORLD");  // starts again from ['O','D','X']
+     * </pre>
+     *
+     * @throws IllegalStateException if machine is not configured
+     */
+    void reset();
+
+    /**
+     * Returns a formatted string containing complete processing history.
+     *
+     * <p>History is grouped by original code configuration. Each group shows
+     * all messages processed from that starting configuration, including:</p>
+     * <ul>
+     *   <li>Input message</li>
+     *   <li>Output message</li>
+     *   <li>Processing duration (nanoseconds)</li>
+     * </ul>
+     *
+     * <p><b>History Grouping:</b> Messages are grouped by the original code
+     * (rotor IDs, initial positions, reflector, plugboard) at configuration time.
+     * All messages processed after a configuration are grouped together, even
+     * though rotor positions change during processing.</p>
+     *
+     * <p><b>History Reset:</b> History is cleared only when:</p>
+     * <ul>
+     *   <li>New machine is loaded ({@link #loadMachine(String)})</li>
+     *   <li>Engine is terminated ({@link #terminate()})</li>
+     * </ul>
+     *
+     * <p>History is NOT cleared when reset is called.</p>
+     *
+     * @return formatted history string, or empty message if no history
+     */
+    String history();
+
+    /**
+     * Clear engine state and return to uninitialized state.
+     *
+     * <p><b>IMPORTANT:</b> Despite the name, this method does <b>NOT</b> terminate
+     * the application or call {@code System.exit()}. It only clears internal engine state.</p>
+     *
+     * <p><b>What This Does:</b></p>
+     * <ul>
+     *   <li>Clears loaded machine specification</li>
+     *   <li>Clears code configuration</li>
+     *   <li>Clears processing history</li>
+     *   <li>Resets message counter</li>
+     *   <li>Returns engine to uninitialized state (as if newly created)</li>
+     * </ul>
+     *
+     * <p><b>What This Does NOT Do:</b></p>
+     * <ul>
+     *   <li> Terminate the application</li>
+     *   <li> Close resources (no resources to close)</li>
+     *   <li> Prevent further use (engine can be reused after terminate)</li>
+     * </ul>
+     *
+     * <p><b>Name Origin:</b> The name is historical and somewhat misleading.
+     * Consider it as "clear state" or "reset engine completely".</p>
+     *
+     * <p><b>Use Case:</b> Start fresh without creating a new engine instance,
+     * or clear sensitive data from memory.</p>
+     *
+     * <p><b>Example:</b></p>
+     * <pre>
+     * engine.loadMachine("enigma.xml");
+     * engine.configManual(...);
+     * engine.process("SECRET");
+     * engine.terminate();  // Clear everything
+     * // Engine is now uninitialized but can be used again
+     * engine.loadMachine("other.xml");
+     * </pre>
+     */
+    void terminate();
 }

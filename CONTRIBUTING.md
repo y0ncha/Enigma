@@ -50,6 +50,7 @@ It is strict by design to maintain alignment with course requirements.
 - One-line functional summary
 - Tags: `@param`, `@return`, `@throws` (short descriptions only)
 - Document preconditions clearly
+- When overriding or inheriting a method's documentation in a subclass or implementation, use `{@inheritDoc}` in the overriding method's Javadoc to inherit the parent/interface documentation; add only the subclass-specific differences as short sentences (do not duplicate the parent's content).
 
 ### 3.3 Inline Comments
 - Use `//` for *why*, not for *what*
@@ -129,4 +130,4 @@ Before submitting:
 - No redundant logic
 - No UI or printing in engine/loader
 - All validations enforced
-- Tests (manual or automated) run successfully  
+- Tests (manual or automated) run successfully

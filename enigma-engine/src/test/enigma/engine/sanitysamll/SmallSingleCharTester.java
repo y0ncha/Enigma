@@ -3,14 +3,14 @@ package test.enigma.engine.sanitysamll;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.shared.dto.config.CodeConfig;
-import enigma.shared.dto.tracer.processTrace;
+import enigma.shared.dto.tracer.ProcessTrace;
 
 import java.nio.file.Paths;
 
 /**
  * Single-letter tester for the Enigma engine.
  * Loads the small sanity XML, applies a code configuration and processes a single
- * input character, printing both the output and the detailed {@link processTrace}.
+ * input character, printing both the output and the detailed {@link ProcessTrace}.
  */
 public class SmallSingleCharTester {
 
@@ -37,10 +37,10 @@ public class SmallSingleCharTester {
         System.out.println("Code configuration: " + CODE_CONFIG);
         engine.configManual(CODE_CONFIG);
 
-        processTrace debug = engine.process(INPUT);
+        ProcessTrace debug = engine.process(INPUT);
         System.out.println();
 
-        System.out.println(debug); // relies on processTrace.toString() / pretty formatting
+        System.out.println(debug); // relies on ProcessTrace.toString() / pretty formatting
         System.out.println("------------------------");
     }
 }
