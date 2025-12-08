@@ -27,7 +27,6 @@ public final class EngineValidator {
 
     private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
     private EngineValidator() { /* utility */ }
-    private static final int MIN_REQUIRED_ROTORS = 3;
 
     private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
@@ -125,13 +124,12 @@ public final class EngineValidator {
                             required, positions.size(), positions, required));
         }
     }
-    // TODO import const MIN_REQUIRED_ROTORS from a different class
     /**
-     * Validates that the number of selected rotors matches the minimum required rotor count.
+     * Validates that the number of selected rotors matches the required rotor count.
      *
      * <p>
-     * This method checks that the provided list of rotor IDs contains exactly {@value #MIN_REQUIRED_ROTORS} elements,
-     * as required by the machine specification. If the count does not match, an
+     * This method checks that the provided list of rotor IDs matches the number of rotors
+     * required by the machine specification. If the count does not match, an
      * {@link InvalidConfigurationException} is thrown with a detailed error message.
      * </p>
      *
