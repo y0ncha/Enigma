@@ -100,6 +100,21 @@ public record CodeState(
         String reflectorId,
         String plugboard
 ) {
+
+    /**
+     * A canonical sentinel CodeState used to indicate "not configured".
+     * <p>Use {@link #notConfigured()} or this constant when the machine has no active configuration.
+     */
+    public static final CodeState NOT_CONFIGURED = new CodeState(List.of(), "", List.of(), "", "");
+
+    /**
+     * Factory accessor for the canonical not-configured state.
+     * @return canonical {@link CodeState} representing an unconfigured machine
+     */
+    public static CodeState notConfigured() {
+        return NOT_CONFIGURED;
+    }
+
     /**
      * Returns a detailed string representation including notch distances.
      *

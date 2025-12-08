@@ -111,22 +111,15 @@ public record MachineState(
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("Machine State\n");
-        sb.append("------------------------------\n");
-        sb.append("Rotors Defined        : ").append(numOfRotors).append("\n");
-        sb.append("Reflectors Defined    : ").append(numOfReflectors).append("\n");
-        sb.append("Strings Processed     : ").append(stringsProcessed).append("\n\n");
-
-        sb.append("Original Configuration : ")
-                .append(ogCodeState == null ? "<none>" : ogCodeState.toString())
-                .append("\n");
-
-        sb.append("Current Configuration  : ")
-                .append(curCodeState == null ? "<none>" : curCodeState.toString())
-                .append("\n");
-
-        return sb.toString();
+        return  "Rotors Defined        : " + numOfRotors + "\n" +
+                "Reflectors Defined    : " + numOfReflectors + "\n" +
+                "Strings Processed     : " + stringsProcessed + "\n" +
+                "Original Configuration : " +
+                (ogCodeState == null || ogCodeState == CodeState.NOT_CONFIGURED ? "<not configured>" : ogCodeState.toString()) +
+                "\n" +
+                "Current Configuration  : " +
+                (curCodeState == null || curCodeState == CodeState.NOT_CONFIGURED ? "<not configured>" : curCodeState.toString()) +
+                "\n";
     }
 }

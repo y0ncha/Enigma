@@ -190,6 +190,9 @@ public class MachineImpl implements Machine {
 
     @Override
     public CodeState getCodeState() {
+        // If code is not configured, return a default 'not configured' state
+        if (!isConfigured()) return CodeState.notConfigured();
+
         String positions = buildWindowString();
         List<Integer> notchDist = code.getNotchDist();
         String reflectorId = code.getReflector().getId();

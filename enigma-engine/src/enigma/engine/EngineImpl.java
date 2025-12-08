@@ -46,7 +46,7 @@ public class EngineImpl implements Engine {
     private MachineHistory history;
 
     private MachineSpec spec;
-    private CodeState ogCodeState;
+    private CodeState ogCodeState = enigma.shared.state.CodeState.notConfigured();
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
@@ -87,7 +87,7 @@ public class EngineImpl implements Engine {
         try {
             spec = loader.loadSpecs(path);
             this.history = new MachineHistory();
-            this.ogCodeState = null;
+            this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
             this.stringsProcessed = 0;
         }
         catch (EnigmaLoadingException e) {
