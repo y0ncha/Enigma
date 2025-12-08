@@ -355,7 +355,7 @@ public class ConsoleImpl implements Console {
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 // Unknown / unexpected error
                 Utilities.printError("Unexpected error: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
