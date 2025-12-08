@@ -204,14 +204,11 @@ public class ConsoleImpl implements Console {
     private void handleShowMachineSpecification() {
 
         try {
-
 //            MachineSpec machineSpec = enigma.getMachineSpec();
             System.out.println("========================================");
             System.out.println(" Enigma Machine - Specification");
             System.out.println("========================================");
             System.out.println(enigma.machineData());
-            // TODO Yonatan - support machine specification without configuration
-            // TODO Yonatan - Remove "Machine State" header from MachineState DTO toString()
 //            System.out.println("Number of Reflectors         : " + machineSpec.getTotalReflectors());
 //            System.out.println("Number of Rotors             : " + machineSpec.getTotalRotors());
 //
@@ -487,7 +484,7 @@ public class ConsoleImpl implements Console {
      * where # is running index starting from 1.
      */
     private void handleShowHistoryAndStatistics() {
-        try { // TODO MachineHistory toStirng by format\
+        try {
             System.out.println("========================================");
             System.out.println(" Enigma Machine - History");
             System.out.println("========================================");
@@ -510,3 +507,4 @@ public class ConsoleImpl implements Console {
         exitRequested = true;
     }
 }
+

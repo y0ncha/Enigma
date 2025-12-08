@@ -192,32 +192,40 @@ public final class MachineHistory {
      */
     @Override
     public String toString() {
-        if (history.isEmpty()) {
-            return "No history available. No messages were processed.";
-        }
-
         StringBuilder sb = new StringBuilder();
+        boolean printedAny = false;
 
         for (Map.Entry<CodeState, List<MessageRecord>> entry : history.entrySet()) {
             CodeState code = entry.getKey();
             List<MessageRecord> records = entry.getValue();
 
-            sb.append("=== Original Code: ")
-                    .append(code)
-                    .append(" ===\n");
-
             if (records.isEmpty()) {
-                sb.append("  No messages processed under this configuration.\n\n");
+                // Instructions: only show codes that actually processed messages
                 continue;
             }
 
-            for (MessageRecord record : records) {
-                sb.append("  • ").append(record.toString()).append("\n");
+            printedAny = true;
+
+            // Print the original code (instruction §7: "present the code used")
+            sb.append(code).append(System.lineSeparator());
+
+            // Print each record with numbering starting at 1
+            for (int i = 0; i < records.size(); i++) {
+                MessageRecord r = records.get(i);
+                int index = i + 1;
+                sb.append("  ")
+                        .append(index)
+                        .append(". ")
+                        .append(r.toString())   // uses our new format
+                        .append(System.lineSeparator());
             }
 
-            sb.append("\n");
+            sb.append(System.lineSeparator());
         }
 
-        return sb.toString();
+        if (!printedAny) {
+            return "No history available. No messages were processed.";
+        }
+        return sb.toString().trim();
     }
 }
