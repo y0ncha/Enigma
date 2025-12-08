@@ -100,6 +100,18 @@ public final class EngineValidator {
                     required, positions.size(), positions, required));
         }
     }
+    /**
+     * Validates that the number of initial positions matches the number of rotors required by the machine specification.
+     *
+     * @param spec      the machine specification containing the required number of rotors
+     * @param positions the list of initial positions to validate
+     * @throws InvalidConfigurationException if the number of positions does not match the number of rotors in use
+     *
+     * Usage:
+     * <pre>
+     * EngineValidator.validatePositionCounts(spec, positions);
+     * </pre>
+     */
     public static void validatePositionCounts(MachineSpec spec, List<Character> positions) {
         // Validate spec
         specIsNull(spec);
