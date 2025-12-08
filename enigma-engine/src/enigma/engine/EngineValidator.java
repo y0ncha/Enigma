@@ -28,12 +28,18 @@ public final class EngineValidator {
     private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
     private EngineValidator() { /* utility */ }
 
-    public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
+    private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
+                    "Configuration validation failed: Machine specification is missing. " +
+                            "Fix: Load a machine specification before configuring.");
         }
+    }
+
+    public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
+        // Validate spec
+        specIsNull(spec);
+
         if (config == null) {
             throw new InvalidConfigurationException(
                 "Configuration validation failed: Configuration details are missing. " +
@@ -72,11 +78,9 @@ public final class EngineValidator {
     }
 
     public static void validateRotorAndPositionCounts(MachineSpec spec, List<Integer> rotorIds, List<Character> positions) {
-        if (spec == null) {
-            throw new InvalidConfigurationException(
-                "Configuration validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
-        }
+        // Validate spec
+        specIsNull(spec);
+
         int required = spec.getRotorsInUse();
         if (rotorIds.size() != required) {
             throw new InvalidConfigurationException(
@@ -95,6 +99,62 @@ public final class EngineValidator {
                     required, positions.size(), positions, required));
         }
     }
+    /**
+     * Validates that the number of initial positions matches the number of rotors required by the machine specification.
+     *
+     * @param spec      the machine specification containing the required number of rotors
+     * @param positions the list of initial positions to validate
+     * @throws InvalidConfigurationException if the number of positions does not match the number of rotors in use
+     *
+     * Usage:
+     * <pre>
+     * EngineValidator.validatePositionCounts(spec, positions);
+     * </pre>
+     */
+    public static void validatePositionCounts(MachineSpec spec, List<Character> positions) {
+        // Validate spec
+        specIsNull(spec);
+        int required = spec.getRotorsInUse();
+        if (positions.size() != required) {
+            throw new InvalidConfigurationException(
+                    String.format(
+                            "Position count mismatch: Expected exactly %d initial positions, but got %d. " +
+                                    "Provided positions: %s. " +
+                                    "Fix: Provide exactly %d initial positions (one per rotor).",
+                            required, positions.size(), positions, required));
+        }
+    }
+    /**
+     * Validates that the number of selected rotors matches the required rotor count.
+     *
+     * <p>
+     * This method checks that the provided list of rotor IDs matches the number of rotors
+     * required by the machine specification. If the count does not match, an
+     * {@link InvalidConfigurationException} is thrown with a detailed error message.
+     * </p>
+     *
+     * @param spec      the machine specification (must not be {@code null})
+     * @param rotorIds  the list of selected rotor IDs (must not be {@code null})
+     * @throws InvalidConfigurationException if the number of selected rotors does not match the required count,
+     *                                       or if {@code spec} is {@code null}
+     */
+    public static void validateRotorCount(MachineSpec spec, List<Integer> rotorIds) {
+        // Validate spec
+        specIsNull(spec);
+        int required = spec.getRotorsInUse();
+        if (rotorIds.size() != required) {
+            throw new InvalidConfigurationException(
+                    String.format(
+                            "Invalid rotor selection: Exactly %d rotors must be selected, but got %d. " +
+                                    "Provided rotor IDs: %s. " +
+                                    "Fix: Select exactly %d rotor IDs from the available rotors in the machine specification.",
+                            required, rotorIds.size(), rotorIds, required
+                    )
+            );
+        }
+    }
+
+
 
     public static void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         Set<Integer> seen = new HashSet<>();
@@ -133,7 +193,7 @@ public final class EngineValidator {
                 "Invalid reflector ID: reflectorId must be non-empty. " +
                 "Fix: Provide a valid reflector ID (e.g., 'I', 'II', 'III', etc.).");
         }
-        
+
         if (spec.getReflectorById(reflectorId) == null) {
             Set<String> availableReflectorIds = spec.reflectorsById().keySet();
             throw new InvalidConfigurationException(
@@ -181,11 +241,9 @@ public final class EngineValidator {
      *                                 characters, or if it contains characters not present in the machine alphabet
      */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
-        if (spec == null) {
-            throw new InvalidMessageException(
-                "Message validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before processing messages.");
-        }
+        // Validate spec
+        specIsNull(spec);
+
         if (input == null) {
             throw new InvalidMessageException(
                 "Message validation failed: Input message is missing. " +
@@ -330,11 +388,8 @@ public final class EngineValidator {
      * @param plugboard plugboard configuration string (e.g., "ABCD" maps A↔B and C↔D), may be null or empty
      */
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
-        if (spec == null) {
-            throw new InvalidConfigurationException(
-                "Plugboard validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
-        }
+        // Validate spec
+        specIsNull(spec);
         
         // null or empty plugboard is valid (no plugboard configured)
         if (plugboard == null || plugboard.isEmpty()) {
@@ -409,4 +464,40 @@ public final class EngineValidator {
             }
         }
     }
+    /**
+     * Validates the rotor configuration for the machine.
+     * <p>
+     * Checks that the number of rotors matches the machine's required count,
+     * that all specified rotor IDs exist in the machine specification, and that
+     * there are no duplicate rotor IDs.
+     *
+     * @param spec     the machine specification to validate against (must not be null)
+     * @param rotorIds the list of rotor IDs to validate (must not be null)
+     * @throws InvalidConfigurationException if the rotor configuration is invalid,
+     *         including incorrect rotor count, non-existent rotor IDs, or duplicate IDs.
+     * @see #validateRotorCount(MachineSpec, List)
+     * @see #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)
+     */
+    public static void validateRotors(MachineSpec spec, List<Integer> rotorIds) {
+        validateRotorCount(spec, rotorIds);
+        validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
+    }
+    /**
+     * Validates the initial positions for the rotors against the machine specification.
+     * <p>
+     * Checks that the number of positions matches the required rotor count and that
+     * each position character is present in the machine's alphabet.
+     *
+     * @param spec      the machine specification to validate against (must not be null)
+     * @param positions the list of initial rotor positions (must not be null)
+     * @throws InvalidConfigurationException if the number of positions is incorrect or
+     *         if any position character is not in the machine's alphabet
+     * @see #validatePositionCounts(MachineSpec, List)
+     * @see #validatePositionsInAlphabet(MachineSpec, List)
+     */
+    public static void validatePositions(MachineSpec spec, List<Character> positions) {
+        validatePositionCounts(spec, positions);
+        validatePositionsInAlphabet(spec, positions);
+    }
+
 }

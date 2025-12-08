@@ -97,34 +97,7 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Validate that positions string length matches rotor count.
-     *
-     * <p><b>Validation:</b></p>
-     * <ul>
-     *   <li>Position string is non-empty</li>
-     *   <li>Length equals expected rotor count</li>
-     * </ul>
-     *
-     * <p>This is a format check only. Engine validates that characters
-     * are in the machine's alphabet.</p>
-     *
-     * @param positions user-provided positions string (e.g., "ABC")
-     * @param rotorCount expected number of rotors
-     * @throws IllegalArgumentException if length doesn't match with a user-friendly message
-     */
-    public static void ensurePositionsLengthMatches(String positions, int rotorCount) {
-        if (positions == null || positions.isEmpty()) {
-            throw new IllegalArgumentException("Positions string cannot be empty.");
-        }
-        int len = positions.length();
-        if (len != rotorCount) {
-            throw new IllegalArgumentException("Number of positions (" + len
-                    + ") must match number of rotors (" + rotorCount + ").");
-        }
-    }
-
-    /**
-     * Validate that reflector choice is an in valid range.
+     * Validate that reflector choice is in a valid range.
      *
      * <p><b>Validation:</b></p>
      * <ul>
