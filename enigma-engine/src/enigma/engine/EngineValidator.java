@@ -469,6 +469,19 @@ public final class EngineValidator {
         validateMinimumRotorCount(spec, rotorIds);
         validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
     }
+    /**
+     * Validates the initial positions for the rotors against the machine specification.
+     * <p>
+     * Checks that the number of positions matches the required rotor count and that
+     * each position character is present in the machine's alphabet.
+     *
+     * @param spec      the machine specification to validate against (must not be null)
+     * @param positions the list of initial rotor positions (must not be null)
+     * @throws InvalidConfigurationException if the number of positions is incorrect or
+     *         if any position character is not in the machine's alphabet
+     * @see #validatePositionCounts(MachineSpec, List)
+     * @see #validatePositionsInAlphabet(MachineSpec, List)
+     */
     public static void validatePositions(MachineSpec spec, List<Character> positions) {
         validatePositionCounts(spec, positions);
         validatePositionsInAlphabet(spec, positions);
