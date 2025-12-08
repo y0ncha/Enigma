@@ -129,13 +129,14 @@ public final class EngineValidator {
     public static void validateMinimumRotorCount(MachineSpec spec, List<Integer> rotorIds) {
         // Validate spec
         specIsNull(spec);
-        if (rotorIds.size() != MIN_REQUIRED_ROTORS) {
+        int required = spec.getRotorsInUse();
+        if (rotorIds.size() != required) {
             throw new InvalidConfigurationException(
                     String.format(
                             "Invalid rotor selection: Exactly %d rotors must be selected, but got %d. " +
                                     "Provided rotor IDs: %s. " +
                                     "Fix: Select exactly %d rotor IDs from the available rotors in the machine specification.",
-                            MIN_REQUIRED_ROTORS, rotorIds.size(), rotorIds, MIN_REQUIRED_ROTORS
+                            required, rotorIds.size(), rotorIds, required
                     )
             );
         }
