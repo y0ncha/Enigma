@@ -50,7 +50,6 @@ local.properties
 secrets.properties
 *.keystore
 *.jks
-todo.md
 
 # Test artifacts and temp files
 test-machines/
