@@ -414,7 +414,7 @@ public class ConsoleImpl implements Console {
                 // 1. Read input from user
                 String originalInput = Utilities.readNonEmptyLine(scanner,
                         "Enter the text you want to process, only characters from the machine alphabet: "
-                                + enigma.getMachineSpec().getLatters());
+                                + enigma.getMachineSpec().getLetters());
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
                 // 2. Process input via engine and measure duration
