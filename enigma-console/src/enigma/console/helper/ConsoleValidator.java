@@ -97,7 +97,7 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Validate that reflector choice is an in valid range.
+     * Validate that reflector choice is in a valid range.
      *
      * <p><b>Validation:</b></p>
      * <ul>
