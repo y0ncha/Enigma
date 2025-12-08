@@ -138,7 +138,7 @@ public final class EngineValidator {
      * @throws InvalidConfigurationException if the number of selected rotors does not match the required count,
      *                                       or if {@code spec} is {@code null}
      */
-    public static void validateMinimumRotorCount(MachineSpec spec, List<Integer> rotorIds) {
+    public static void validateRotorCount(MachineSpec spec, List<Integer> rotorIds) {
         // Validate spec
         specIsNull(spec);
         int required = spec.getRotorsInUse();
@@ -467,19 +467,19 @@ public final class EngineValidator {
     /**
      * Validates the rotor configuration for the machine.
      * <p>
-     * Checks that the number of rotors meets the machine's minimum requirements,
+     * Checks that the number of rotors matches the machine's required count,
      * that all specified rotor IDs exist in the machine specification, and that
      * there are no duplicate rotor IDs.
      *
      * @param spec     the machine specification to validate against (must not be null)
      * @param rotorIds the list of rotor IDs to validate (must not be null)
      * @throws InvalidConfigurationException if the rotor configuration is invalid,
-     *         including too few rotors, non-existent rotor IDs, or duplicate IDs.
-     * @see #validateMinimumRotorCount(MachineSpec, List)
+     *         including incorrect rotor count, non-existent rotor IDs, or duplicate IDs.
+     * @see #validateRotorCount(MachineSpec, List)
      * @see #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)
      */
     public static void validateRotors(MachineSpec spec, List<Integer> rotorIds) {
-        validateMinimumRotorCount(spec, rotorIds);
+        validateRotorCount(spec, rotorIds);
         validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
     }
     /**
