@@ -54,14 +54,12 @@ public record MessageRecord(
     /**
      * Returns a formatted string representation of the message record.
      *
-     * <p>Format: {@code Input="originalText", Output="processedText", Duration=Xns}</p>
+     * <p>Format: {@code #. <source> --> <processed> (n nano-seconds)}</p>
      *
      * @return formatted record string
      */
     @Override
     public String toString() {
-        return "Input=\"" + originalText + "\"" +
-                ", Output=\"" + processedText + "\"" +
-                ", Duration=" + durationNanos + "ns";
+        return "<" + originalText + "> --> <" + processedText + "> (" + durationNanos + " nano-seconds)";
     }
 }

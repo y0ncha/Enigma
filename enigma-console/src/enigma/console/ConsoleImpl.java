@@ -472,7 +472,7 @@ public class ConsoleImpl implements Console {
      * where # is running index starting from 1.
      */
     private void handleShowHistoryAndStatistics() {
-        try { // TODO MachineHistory toStirng by format\
+        try {
             System.out.println("========================================");
             System.out.println(" Enigma Machine - History");
             System.out.println("========================================");
@@ -495,3 +495,4 @@ public class ConsoleImpl implements Console {
         exitRequested = true;
     }
 }
+
