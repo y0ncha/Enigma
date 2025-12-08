@@ -137,7 +137,12 @@ public record MachineSpec(
         return rotorsInUse;
     }
 
-    public String getLatters() {
+    /**
+     * Returns the alphabet string used by this machine.
+     *
+     * @return the alphabet string (sequence of valid characters)
+     */
+    public String getAlphabet() {
         return alphabet.getLetters();
     }
 

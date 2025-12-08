@@ -286,7 +286,7 @@ public class ConsoleImpl implements Console {
             while (true) {
                 String positions = Utilities.readNonEmptyLine(scanner,
                         "Enter initial positions as a continuous sequence of characters (e.g. ABCD). " +
-                                "Allowed letters: " + enigma.getMachineSpec().getLetters());
+                                "Allowed letters: " + enigma.getMachineSpec().getAlphabet());
                 try {
                     positionsLst = InputParsers.parsePositions(positions);
                     EngineValidator.validatePositions(enigma.getMachineSpec(), positionsLst);
@@ -413,7 +413,7 @@ public class ConsoleImpl implements Console {
                 // 1. Read input from user
                 String originalInput = Utilities.readNonEmptyLine(scanner,
                         "Enter the text you want to process, only characters from the machine alphabet: "
-                                + enigma.getMachineSpec().getLetters());
+                                + enigma.getMachineSpec().getAlphabet());
                 // Normalize to upper-case to make input case-insensitive
                 String normalizedInput = originalInput.toUpperCase();
                 // 2. Process input via engine and measure duration
