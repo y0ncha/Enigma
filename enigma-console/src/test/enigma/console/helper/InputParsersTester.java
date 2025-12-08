@@ -104,11 +104,20 @@ public class InputParsersTester {
         };
 
         for (String[] testCase : testCases) {
-            int input = Integer.parseInt(testCase[0]);
+            int input;
             String expected = testCase[1];
-            String actual = InputParsers.toRoman(input);
-            boolean passed = actual.equals(expected);
-            System.out.println("Input: " + input + " -> Expected: \"" + expected + "\", Actual: \"" + actual + "\" " + (passed ? "✔" : "✘"));
+            String actual;
+            boolean passed;
+            try {
+                input = Integer.parseInt(testCase[0]);
+                actual = InputParsers.toRoman(input);
+                passed = actual.equals(expected);
+                System.out.println("Input: " + input + " -> Expected: \"" + expected + "\", Actual: \"" + actual + "\" " + (passed ? "✔" : "✘"));
+            } catch (NumberFormatException e) {
+                actual = "NumberFormatException";
+                passed = false;
+                System.out.println("Input: " + testCase[0] + " -> Expected: \"" + expected + "\", Actual: \"" + actual + "\" ✘ (invalid integer input)");
+            }
             allPassed &= passed;
         }
 
