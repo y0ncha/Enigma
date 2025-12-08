@@ -439,6 +439,20 @@ public final class EngineValidator {
             }
         }
     }
+    /**
+     * Validates the rotor configuration for the machine.
+     * <p>
+     * Checks that the number of rotors meets the machine's minimum requirements,
+     * that all specified rotor IDs exist in the machine specification, and that
+     * there are no duplicate rotor IDs.
+     *
+     * @param spec     the machine specification to validate against (must not be null)
+     * @param rotorIds the list of rotor IDs to validate (must not be null)
+     * @throws InvalidConfigurationException if the rotor configuration is invalid,
+     *         including too few rotors, non-existent rotor IDs, or duplicate IDs.
+     * @see #validateMinimumRotorCount(MachineSpec, List)
+     * @see #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)
+     */
     public static void validateRotors(MachineSpec spec, List<Integer> rotorIds) {
         validateMinimumRotorCount(spec, rotorIds);
         validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
