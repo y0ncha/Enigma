@@ -131,7 +131,7 @@ public final class EngineValidator {
      *
      * <p>
      * This method checks that the provided list of rotor IDs contains exactly the number of rotors
-     * specified by the machine specification. If the count does not match, an
+     * specified by {@code spec.getRotorsInUse()}. If the count does not match, an
      * {@link InvalidConfigurationException} is thrown with a detailed error message.
      * </p>
      *
