@@ -167,9 +167,8 @@ public class ConsoleImpl implements Console {
     private void handleLoadMachineFromXml() {
 
         while (true) {
-//            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
+            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
             try {
-                String path = "C:\\Enigma\\integration\\Enigma\\enigma-loader\\src\\test\\resources\\xml\\ex1-sanity-small.xml";
                 enigma.loadMachine(path);
                 // If we got here – loading succeeded
                 machineLoaded = true;
