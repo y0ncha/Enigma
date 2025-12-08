@@ -117,8 +117,8 @@ public class InputParsers {
             throw new IllegalArgumentException(
                     "Positions must contain at least one character. Empty input is not allowed.");
         }
-        // Convert to uppercase for consistency
-        String cleaned = line.toUpperCase();
+        // Trim input and convert to uppercase for consistency
+        String cleaned = line.trim().toUpperCase();
         List<Character> result = new ArrayList<>();
         // Validate each character and collect
         for (int i = 0; i < cleaned.length(); i++) {
