@@ -95,6 +95,47 @@ public class InputParsers {
         return result;
     }
     /**
+     * Parse a raw positions string into a list of uppercase characters.
+     *
+     * <p><b>Expected format:</b> a continuous sequence of letters with no spaces
+     * or separators. Examples: "CCC", "abc", "AzQ".</p>
+     *
+     * <p><b>Validation:</b></p>
+     * <ul>
+     *   <li>Input must be non-null and non-empty</li>
+     * </ul>
+     *
+     * <p>The returned list preserves user order and converts all characters to uppercase.</p>
+     *
+     * @param line raw user input containing rotor positions (e.g., "abc", "CCC")
+     * @return list of uppercase characters in left→right order
+     * @throws IllegalArgumentException if the input format is invalid
+     */
+    public static List<Character> parsePositions(String line) {
+        // Basic null/empty validation
+        if (line == null || line.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Positions must contain at least one character. Empty input is not allowed.");
+        }
+        // Convert to uppercase for consistency
+        String cleaned = line.toUpperCase();
+        List<Character> result = new ArrayList<>();
+        // Validate each character and collect
+        for (int i = 0; i < cleaned.length(); i++) {
+            char c = cleaned.charAt(i);
+            if (!Character.isLetter(c)) {
+                throw new IllegalArgumentException(
+                        String.format(
+                                "Invalid position character: '%c'. " +
+                                        "Positions must contain only alphabet letters. Input: \"%s\".",
+                                c, line));
+            }
+            result.add(c);
+        }
+        return result;
+    }
+
+    /**
      * Convert integer to Roman numeral (I-V).
      *
      * <p><b>Mappings:</b></p>
@@ -140,7 +181,7 @@ public class InputParsers {
         positions = positions.toUpperCase();
         int n = positions.length();
         List<Character> initialPositions = new ArrayList<>(n);
-        
+
         for (int i = 0; i < n; i++) {
             char c = positions.charAt(i);
             // Pass characters in the same order as input (left→right)

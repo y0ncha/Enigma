@@ -27,13 +27,20 @@ public final class EngineValidator {
 
     private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
     private EngineValidator() { /* utility */ }
+    private static final int MIN_REQUIRED_ROTORS = 3;
 
-    public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
+    private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
+                    "Configuration validation failed: Machine specification is missing. " +
+                            "Fix: Load a machine specification before configuring.");
         }
+    }
+
+    public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
+        // Validate spec
+        specIsNull(spec);
+
         if (config == null) {
             throw new InvalidConfigurationException(
                 "Configuration validation failed: Configuration details are missing. " +
@@ -72,11 +79,9 @@ public final class EngineValidator {
     }
 
     public static void validateRotorAndPositionCounts(MachineSpec spec, List<Integer> rotorIds, List<Character> positions) {
-        if (spec == null) {
-            throw new InvalidConfigurationException(
-                "Configuration validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
-        }
+        // Validate spec
+        specIsNull(spec);
+
         int required = spec.getRotorsInUse();
         if (rotorIds.size() != required) {
             throw new InvalidConfigurationException(
@@ -95,6 +100,36 @@ public final class EngineValidator {
                     required, positions.size(), positions, required));
         }
     }
+    public static void validatePositionCounts(MachineSpec spec, List<Character> positions) {
+        // Validate spec
+        specIsNull(spec);
+        int required = spec.getRotorsInUse();
+        if (positions.size() != required) {
+            throw new InvalidConfigurationException(
+                    String.format(
+                            "Position count mismatch: Expected exactly %d initial positions, but got %d. " +
+                                    "Provided positions: %s. " +
+                                    "Fix: Provide exactly %d initial positions (one per rotor).",
+                            required, positions.size(), positions, required));
+        }
+    }
+    // TODO import const MIN_REQUIRED_ROTORS from a different class
+    public static void validateMinimumRotorCount(MachineSpec spec, List<Integer> rotorIds) {
+        // Validate spec
+        specIsNull(spec);
+        if (rotorIds.size() != MIN_REQUIRED_ROTORS) {
+            throw new InvalidConfigurationException(
+                    String.format(
+                            "Invalid rotor selection: Exactly %d rotors must be selected, but got %d. " +
+                                    "Provided rotor IDs: %s. " +
+                                    "Fix: Select exactly %d rotor IDs from the available rotors in the machine specification.",
+                            MIN_REQUIRED_ROTORS, rotorIds.size(), rotorIds, MIN_REQUIRED_ROTORS
+                    )
+            );
+        }
+    }
+
+
 
     public static void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         Set<Integer> seen = new HashSet<>();
@@ -133,7 +168,7 @@ public final class EngineValidator {
                 "Invalid reflector ID: reflectorId must be non-empty. " +
                 "Fix: Provide a valid reflector ID (e.g., 'I', 'II', 'III', etc.).");
         }
-        
+
         if (spec.getReflectorById(reflectorId) == null) {
             Set<String> availableReflectorIds = spec.reflectorsById().keySet();
             throw new InvalidConfigurationException(
@@ -181,11 +216,9 @@ public final class EngineValidator {
      *                                 characters, or if it contains characters not present in the machine alphabet
      */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
-        if (spec == null) {
-            throw new InvalidMessageException(
-                "Message validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before processing messages.");
-        }
+        // Validate spec
+        specIsNull(spec);
+
         if (input == null) {
             throw new InvalidMessageException(
                 "Message validation failed: Input message is missing. " +
@@ -330,11 +363,8 @@ public final class EngineValidator {
      * @param plugboard plugboard configuration string (e.g., "ABCD" maps A↔B and C↔D), may be null or empty
      */
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
-        if (spec == null) {
-            throw new InvalidConfigurationException(
-                "Plugboard validation failed: Machine specification is missing. " +
-                "Fix: Load a machine specification before configuring.");
-        }
+        // Validate spec
+        specIsNull(spec);
         
         // null or empty plugboard is valid (no plugboard configured)
         if (plugboard == null || plugboard.isEmpty()) {
@@ -409,4 +439,13 @@ public final class EngineValidator {
             }
         }
     }
+    public static void validateRotors(MachineSpec spec, List<Integer> rotorIds) {
+        validateMinimumRotorCount(spec, rotorIds);
+        validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
+    }
+    public static void validatePositions(MachineSpec spec, List<Character> positions) {
+        validatePositionCounts(spec, positions);
+        validatePositionsInAlphabet(spec, positions);
+    }
+
 }

@@ -136,4 +136,9 @@ public record MachineSpec(
     public int getRotorsInUse() {
         return rotorsInUse;
     }
+
+    public String getLatters() {
+        return alphabet.getLetters();
+    }
+
 }
