@@ -31,6 +31,8 @@ public class ConsoleImpl implements Console {
     private boolean machineLoaded = false;
     private boolean codeConfigured = false;
     private boolean exitRequested = false;
+
+
     public ConsoleImpl(Engine engine, Scanner scanner) {
         this.enigma = engine;
         this.scanner = scanner;
@@ -43,7 +45,11 @@ public class ConsoleImpl implements Console {
 
     @Override
     public void run() {
-        Utilities.printInfo("Welcome to the Enigma machine console (Exercise 1)");
+        System.out.println();
+        System.out.println("Welcome to the Enigma machine console (Exercise 1)");
+        System.out.println("===============================================================");
+        System.out.println();
+
         while (!exitRequested) {
             printMenu();
             ConsoleCommand command = readCommandFromUser();
@@ -52,14 +58,13 @@ public class ConsoleImpl implements Console {
         }
         Utilities.printInfo("Goodbye!");
     }
-    // =========================
-    //  Menu & dispatch
-    // =========================
+
+// ---------------------------------------------------------
+// Menu & dispatch
+// ---------------------------------------------------------
 
     private void printMenu() {
-        System.out.println("========================================");
-        System.out.println(" Enigma Machine - Main Menu");
-        System.out.println("========================================");
+        printSectionHeader("Enigma Machine - Main Menu");
         System.out.println("Please choose an option by number:");
         for (ConsoleCommand cmd : ConsoleCommand.values()) {
             boolean enabled = isCommandEnabled(cmd);
@@ -120,7 +125,8 @@ public class ConsoleImpl implements Console {
                     if (reason == null) {
                         reason = "This command is currently disabled.";
                     }
-                    Utilities.printError(reason);
+                    // print headline and reason on same line
+                    Utilities.printError("This command is currently disabled. Reason: " + reason);
                     System.out.print("> ");
                     continue;
                 }
@@ -149,10 +155,10 @@ public class ConsoleImpl implements Console {
         }
     }
 
+// ---------------------------------------------------------
+// Command 1: Load machine from XML
+// ---------------------------------------------------------
 
-    // =========================
-    //  Command 1: Load machine from XML
-    // =========================
     /**
      * Command 1: Load machine configuration from XML file.
      * <p>
@@ -188,53 +194,25 @@ public class ConsoleImpl implements Console {
         }
     }
 
-    // =========================
-    //  Command 2: Show machine specification
-    // =========================
+// ---------------------------------------------------------
+// Command 2: Show machine specification
+// ---------------------------------------------------------
 
-    /**
-     * Command 2: Show machine specification of the last successfully loaded machine.
-     * Prints:
-     *  - total rotors in system
-     *  - total reflectors
-     *  - total processed messages since last XML load
-     *  - original code configuration (if exists)
-     *  - current code configuration (if exists)
-     * Code configuration is printed in the compact format defined in the exercise,
-     * delegated to CodeConfig.toString().
-     */
     private void handleShowMachineSpecification() {
 
         try {
-            System.out.println("========================================");
-            System.out.println(" Enigma Machine - Specification");
-            System.out.println("========================================");
+            printSectionHeader("Enigma Machine - Specification");
             System.out.println(enigma.machineData());
-            // TODO Yonatan - support machine specification without configuration
-            // TODO Yonatan - Remove "Machine State" header from MachineState DTO toString()
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
             Utilities.printError("Failed to show machine specification: " + e.getMessage());
         }
     }
 
+// ---------------------------------------------------------
+// Command 3: Manual code selection
+// ---------------------------------------------------------
 
-    // =========================
-    //  Command 3: Manual code selection
-    // =========================
-
-    /**
-     * Command 3: Let user manually choose current code configuration.
-     * Flow:
-     *  - read rotors list as comma-separated decimal ids (e.g. "23,542,231,545")
-     *  - read initial positions as continuous string (e.g. "ABCD")
-     *  - show reflectors as numeric menu (1..N) and read decimal choice
-     *  *  - perform basic input validation (numbers where expected, lengths match, etc.)
-     *  - delegate deeper validation to the engine
-     *  - on error: print clear message and let the user decide whether to retry or return to main menu
-     *  - on success: update engine with new code and print compact format
-     */
-    // TODO Ela - let Yonatan know if need to keep getCurrentCodeConfig - can delete
     private void handleSetManualCode() {
 
         boolean keepTrying = true;
@@ -244,9 +222,9 @@ public class ConsoleImpl implements Console {
         String reflectorId;
         while (keepTrying) {
 
-            // =========================
-            // 1) Rotor list (loop until valid or user exits)
-            // =========================
+// ---------------------------------------------------------
+// 1) Rotor list (loop until valid or user exits)
+// ---------------------------------------------------------
             while (true) {
                 int total = enigma.getMachineSpec().getTotalRotors();
                 String available = IntStream.rangeClosed(1, total)
@@ -280,9 +258,10 @@ public class ConsoleImpl implements Console {
                     }
                 }
             }
-            // =========================
-            // 2) Initial positions (loop until valid or user exits)
-            // =========================
+
+// ---------------------------------------------------------
+// 2) Initial positions (loop until valid or user exits)
+// ---------------------------------------------------------
             while (true) {
                 String positions = Utilities.readNonEmptyLine(scanner,
                         "Enter initial positions as a continuous sequence of characters (e.g. ABCD). " +
@@ -306,9 +285,10 @@ public class ConsoleImpl implements Console {
                     }
                 }
             }
-            // =========================
-            // 3) Reflector choice (loop until valid or user exits)
-            // =========================
+
+// ---------------------------------------------------------
+// 3) Reflector choice (loop until valid or user exits)
+// ---------------------------------------------------------
             while (true) {
                 System.out.println("Available reflectors:");
                 for (int i = 1; i <= reflectorsCount; i++) {
@@ -335,10 +315,10 @@ public class ConsoleImpl implements Console {
                     }
                 }
             }
-            // =========================
-            // 4) Build CodeConfig and delegate to engine
-            //    Engine may still reject configuration (range, duplicates, etc.)
-            // =========================
+
+// ---------------------------------------------------------
+// 4) Build CodeConfig and delegate to engine
+// ---------------------------------------------------------
             try {
                 CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId);
                 enigma.configManual(config);
@@ -366,9 +346,9 @@ public class ConsoleImpl implements Console {
         }
     }
 
-    // =========================
-    //  Command 4: Automatic code selection
-    // =========================
+// ---------------------------------------------------------
+// Command 4: Automatic code selection
+// ---------------------------------------------------------
 
     /**
      * Command 4: Automatically generate random valid code configuration.
@@ -391,10 +371,9 @@ public class ConsoleImpl implements Console {
         }
     }
 
-
-    // =========================
-    //  Command 5: Process input
-    // =========================
+// ---------------------------------------------------------
+// Command 5: Process input
+// ---------------------------------------------------------
 
     /**
      * Command 5: Process user input string through the machine.
@@ -438,10 +417,10 @@ public class ConsoleImpl implements Console {
         }
     }
 
+// ---------------------------------------------------------
+// Command 6: Reset current code
+// ---------------------------------------------------------
 
-    // =========================
-    //  Command 6: Reset current code
-    // =========================
     /**
      * Command 6: Reset current rotors to original code configuration.
      * - enabled only after XML is loaded AND a code was set (3 or 4)
@@ -458,9 +437,9 @@ public class ConsoleImpl implements Console {
             Utilities.printError("Failed to reset code: " + e.getMessage());
         }
     }
-    // =========================
-    //  Command 7: History & statistics
-    // =========================
+// ---------------------------------------------------------
+// Command 7: History & statistics
+// ---------------------------------------------------------
 
     /**
      * Command 7: Show machine history & statistics.
@@ -473,18 +452,28 @@ public class ConsoleImpl implements Console {
      */
     private void handleShowHistoryAndStatistics() {
         try {
-            System.out.println("========================================");
-            System.out.println(" Enigma Machine - History");
-            System.out.println("========================================");
+            printSectionHeader("Enigma Machine - History");
             System.out.println(enigma.history());
         } catch (Exception e) {
             Utilities.printError("Failed to show history and statistics: " + e.getMessage());
         }
     }
 
-    // =========================
-    //  Command 8: Exit
-    // =========================
+    // ---------------------------------------------------------
+    // Section header printer
+    // ---------------------------------------------------------
+
+    /**
+     * Print a single-line bracketed section header with surrounding blank lines.
+     * Example output:
+     * ----------[ Enigma Machine - Main Menu ]----------
+     */
+    private void printSectionHeader(String title) {
+        System.out.println("----------[ " + title + " ]----------");
+        System.out.println();
+    }
+
+    // ----------[ Command 8: Exit ]----------
 
     /**
      * Command 8: Exit application.
