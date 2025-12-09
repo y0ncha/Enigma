@@ -44,27 +44,53 @@ public final class Utilities {
     private Utilities() {
         // Prevent instantiation
     }
+    /**
+     * Wrap long text into multiple lines so it does not overflow console width.
+     *
+     * <p>This method splits by words and builds lines up to maxWidth characters.
+     * When a line exceeds the limit, a newline is inserted automatically.</p>
+     *
+     * @param text full message to wrap
+     * @return wrapped text with '\n' inserted
+     */
+    private static String wrapText(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        StringBuilder result = new StringBuilder();
+        StringBuilder line = new StringBuilder();
+
+        for (String word : text.split(" ")) {
+            // If adding this word exceeds maxWidth → finish the current line
+            if (line.length() + word.length() + 1 > Utilities.WRAP_WIDTH) {
+                result.append(line.toString().trim()).append("\n");
+                line.setLength(0); // reset line
+            }
+            line.append(word).append(" ");
+        }
+        // append last line
+        if (!line.isEmpty()) {
+            result.append(line.toString().trim());
+        }
+        return result.toString();
+    }
+
+    private static final int WRAP_WIDTH = 80;
 
     /**
-     * Print an error message with [ERROR] prefix.
-     *
-     * <p>Format: {@code [ERROR] message}</p>
-     *
-     * @param message error message to display
+     * Print an error message with word-wrapping.
      */
     public static void printError(String message) {
-        System.out.println("[ERROR] " + message);
+        String wrapped = wrapText("[ERROR] " + message);
+        System.out.println(wrapped);
     }
 
     /**
-     * Print an info message with [INFO] prefix.
-     *
-     * <p>Format: {@code [INFO] message}</p>
-     *
-     * @param message info message to display
+     * Print an info message with word-wrapping.
      */
     public static void printInfo(String message) {
-        System.out.println("[INFO] " + message);
+        String wrapped = wrapText("[INFO] " + message);
+        System.out.println(wrapped);
     }
 
     /**
@@ -105,7 +131,8 @@ public final class Utilities {
      */
     public static String readNonEmptyLine(java.util.Scanner scanner, String prompt) {
         while (true) {
-            System.out.println(prompt);
+            String wrapped = wrapText(prompt);
+            System.out.println(wrapped);
             System.out.print("> ");
             String line = scanner.nextLine().trim();
             if (line.isEmpty()) {

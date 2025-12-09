@@ -32,7 +32,9 @@ public enum ConsoleCommand {
     PROCESS_INPUT(5, "Process input"),
     RESET_CODE(6, "Reset current code to original"),
     SHOW_HISTORY_AND_STATS(7, "Show history & statistics"),
-    EXIT(8, "Exit");
+    EXIT(8, "Exit"),
+    SAVE_CURRENT_MACHINE_STATE_TO_FILE(9, "Save current machine state to JSON file"),
+    LOAD_MACHINE_STATE_FROM_FILE(10, "Load machine state from JSON file");
 
     private final int id;
     private final String description;

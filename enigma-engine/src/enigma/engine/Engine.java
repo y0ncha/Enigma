@@ -191,4 +191,8 @@ public interface Engine {
      * </pre>
      */
     void terminate();
+
+    void saveSnapshot(String basePath);
+
+    void loadSnapshot(String basePath);
 }

@@ -1,5 +1,7 @@
 package enigma.shared.state;
 
+import enigma.shared.dto.config.CodeConfig;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -152,4 +154,37 @@ public record CodeState(
 
         return "<%s><%s><%s>".formatted(ids, posBuilder, reflectorId);
     }
+
+    /**
+     * Convert this {@link CodeState} into an immutable {@link CodeConfig}
+     * using the current rotor IDs, window positions and reflector ID.
+     *
+     * <p>Note:</p>
+     * <ul>
+     *   <li>Positions string (e.g. "ODX") is converted to a List of Characters
+     *       (['O','D','X']) in left→right order.</li>
+     *   <li>Plugboard is ignored for now because {@link CodeConfig} does not
+     *       contain a plugboard field yet (Exercise 2).</li>
+     * </ul>
+     *
+     * @return a CodeConfig built from this state
+     * @throws IllegalStateException if this state represents NOT_CONFIGURED
+     */
+    public CodeConfig toCodeConfig() {
+        // Guard against using the sentinel NOT_CONFIGURED as a real config
+        if (this == NOT_CONFIGURED) {
+            throw new IllegalStateException(
+                    "Cannot convert NOT_CONFIGURED state to CodeConfig. " +
+                            "Fix: Configure the machine before exporting a CodeConfig.");
+        }
+
+        // Convert positions string (e.g. "ODX") to List<Character> ['O','D','X']
+        List<Character> positionChars = new ArrayList<>(positions.length());
+        for (int i = 0; i < positions.length(); i++) {
+            positionChars.add(positions.charAt(i));
+        }
+        // rotorIds is already a List<Integer>, reflectorId is already a String
+        return new CodeConfig(rotorIds, positionChars, reflectorId);
+    }
+
 }

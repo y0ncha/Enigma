@@ -5,6 +5,8 @@ import enigma.engine.exception.MachineNotLoadedException;
 import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
 import enigma.engine.history.MachineHistory;
+import enigma.engine.snapshot.EngineSnapshot;
+import enigma.engine.snapshot.EngineSnapshotJson;
 import enigma.loader.Loader;
 import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
@@ -153,7 +155,6 @@ public class EngineImpl implements Engine {
         ogCodeState = machine.getCodeState();
         history.recordConfig(ogCodeState);
     }
-
 
     /**
      * Generate a random, valid {@link CodeConfig} and configure the machine.
@@ -348,4 +349,72 @@ public class EngineImpl implements Engine {
         // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
+    /**
+     * Bonus: Save the current machine state (spec + code + history + statistics)
+     * into a JSON snapshot file.
+     *
+     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
+     * @throws EngineException if no spec is loaded or snapshot saving fails
+     */
+    @Override
+    public void saveSnapshot(String basePath) {
+        try{
+            if (spec == null) {
+                throw new EngineException(
+                        "Cannot save snapshot: No machine specification loaded. " +
+                                "Fix: Load an XML specification and configure the machine before saving.");
+            }
+            MachineState state = machineData(); // uses ogCodeState + stringsProcessed etc.
+            EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
+            EngineSnapshotJson.save(snapshot, basePath);
+        }catch (Exception e){
+            throw new EngineException(e.getMessage());
+        }
+    }
+
+    /**
+     * Bonus: Load a machine state from a previously saved JSON snapshot file.
+     *
+     * <p>This method REPLACES the current machine specification, history and
+     * counters with the loaded data.</p>
+     *
+     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
+     * @throws EngineException if loading fails or snapshot is invalid
+     */
+    @Override
+    public void loadSnapshot(String basePath) {
+        try {
+            // 1) Load snapshot from JSON file
+            EngineSnapshot snapshot = EngineSnapshotJson.load(basePath);
+            // 2) Replace machine specification
+            this.spec = snapshot.spec();
+            // 3) Replace history
+            this.history = snapshot.history() != null
+                    ? snapshot.history()
+                    : new MachineHistory();
+            // 4) Restore machine runtime state
+            MachineState state = snapshot.machineState();
+            if (state != null) {
+                this.stringsProcessed = state.stringsProcessed();
+                this.ogCodeState = state.ogCodeState();
+                boolean hasCurrent =
+                        state.curCodeState() != null &&
+                                state.curCodeState() != CodeState.NOT_CONFIGURED;
+                if (hasCurrent) {
+                    // Machine was configured when snapshot was taken
+                    configManual(ogCodeState.toCodeConfig());
+                }
+            } else {
+                // Defensive fallback in damaged snapshot file
+                this.stringsProcessed = 0;
+                this.ogCodeState = CodeState.NOT_CONFIGURED;
+                machine.reset();
+            }
+        } catch (Exception e) {
+            // Wrap everything in EngineException with meaningful message
+            throw new EngineException(e.getMessage());
+        }
+    }
+
+
 }

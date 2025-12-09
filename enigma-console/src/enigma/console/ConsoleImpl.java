@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import enigma.shared.state.CodeState;
+
 /**
  * Concrete console implementation for Exercise 1.
  * Responsible for:
@@ -79,15 +79,18 @@ public class ConsoleImpl implements Console {
     private String getDisabledReason(ConsoleCommand command) {
         switch (command) {
             // Command 1 + 8: always enabled
+            // TODO - check if save & load is disabled
             case LOAD_MACHINE_FROM_XML:
             case EXIT:
+            case LOAD_MACHINE_STATE_FROM_FILE:
                 return null;
             // Commands 2, 3, 4, 7: require a valid XML to be loaded first
             case SHOW_MACHINE_SPEC:
             case SET_MANUAL_CODE:
             case SET_AUTOMATIC_CODE:
             case SHOW_HISTORY_AND_STATS:
-                if (!machineLoaded) {  return "You must load a valid XML configuration first (Command 1)."; }
+            case SAVE_CURRENT_MACHINE_STATE_TO_FILE:
+                if (!machineLoaded) {  return "You must load a valid XML | File configuration first (Command 1 | 9)."; }
                 return null;
             // Commands 5, 6: require XML + code configuration (manual/automatic)
             case PROCESS_INPUT:
@@ -146,6 +149,8 @@ public class ConsoleImpl implements Console {
             case RESET_CODE -> handleResetCode();
             case SHOW_HISTORY_AND_STATS -> handleShowHistoryAndStatistics();
             case EXIT -> handleExit();
+            case SAVE_CURRENT_MACHINE_STATE_TO_FILE ->handleSaveSnapshot();
+            case LOAD_MACHINE_STATE_FROM_FILE -> handleLoadSnapshot();
         }
     }
 
@@ -167,7 +172,8 @@ public class ConsoleImpl implements Console {
     private void handleLoadMachineFromXml() {
 
         while (true) {
-            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
+//            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file:");
+            String path = "C:\\Enigma\\integration\\Enigma\\enigma-loader\\src\\test\\resources\\xml\\ex1-sanity-paper-enigma.xml";
             try {
                 enigma.loadMachine(path);
                 // If we got here – loading succeeded
@@ -178,7 +184,7 @@ public class ConsoleImpl implements Console {
             }
             catch (EngineException e) {
                 // Catch all engine exceptions (includes EngineException and its subclasses)
-                Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+                Utilities.printError(e.getMessage());
                 // Do not override any existing machine; upon failure we keep prior state
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try a different path? (Y/N): ")) {
                     return; // back to menu
@@ -210,8 +216,6 @@ public class ConsoleImpl implements Console {
             System.out.println(" Enigma Machine - Specification");
             System.out.println("========================================");
             System.out.println(enigma.machineData());
-            // TODO Yonatan - support machine specification without configuration
-            // TODO Yonatan - Remove "Machine State" header from MachineState DTO toString()
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
             Utilities.printError("Failed to show machine specification: " + e.getMessage());
@@ -351,7 +355,7 @@ public class ConsoleImpl implements Console {
                 keepTrying = false; // success – exit command
             } catch (InvalidConfigurationException e) {
                 // Catch configuration validation errors from engine
-                Utilities.printError("Invalid code configuration: " + e.getMessage());
+                Utilities.printError(e.getMessage());
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
                 }
@@ -387,7 +391,7 @@ public class ConsoleImpl implements Console {
             System.out.println("Current code: " + enigma.machineData().curCodeState());
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, etc.)
-            Utilities.printError("Failed to generate automatic code configuration: " + e.getMessage());
+            Utilities.printError(e.getMessage());
         }
     }
 
@@ -429,7 +433,7 @@ public class ConsoleImpl implements Console {
                 keepTrying = false; // success → exit command
             } catch (EngineException e) {
                 // Catch all engine exceptions (invalid message, machine not configured, etc.)
-                Utilities.printError("Failed to process input: " + e.getMessage());
+                Utilities.printError(e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different input string? (Y/N): ")) {
                     return;
@@ -453,9 +457,10 @@ public class ConsoleImpl implements Console {
         // Get the current configuration from the engine
         try {
             enigma.reset();
+            Utilities.printInfo("Code was reset successfully.");
         }
         catch (EngineException e) {
-            Utilities.printError("Failed to reset code: " + e.getMessage());
+            Utilities.printError(e.getMessage());
         }
     }
     // =========================
@@ -494,5 +499,79 @@ public class ConsoleImpl implements Console {
         enigma.terminate();
         exitRequested = true;
     }
+    // =========================
+    //  Command 9: Save current machine state to a JSON file
+    // =========================
+    /**
+     * Bonus command: Save current machine state to a JSON file.
+     *
+     * Flow:
+     *  - ensure a machine is loaded (from XML or previous snapshot)
+     *  - ask user for full path (without extension)
+     *  - delegate to EngineImpl.saveSnapshot(basePath)
+     *  - on error: print message and let user retry or go back to main menu
+     */
+    private void handleSaveSnapshot() {
+        while (true) {
+            String basePath = Utilities.readNonEmptyLine(
+                    scanner,
+                    "Enter full path (folder + file name, without extension) for the snapshot file:");
+            try {
+                // We know enigma is EngineImpl, so we can safely cast here
+                enigma.saveSnapshot(basePath);
+                Utilities.printInfo("Machine snapshot was saved successfully.");
+                return;
+            } catch (EngineException e) {
+                Utilities.printError(e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "Do you want to try again with a different path? (Y/N): ")) {
+                    return;
+                }
+            } catch (Exception e) {
+                Utilities.printError("Unexpected error: " + e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "An unexpected error occurred. Try again? (Y/N): ")) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // =========================
+    //  Command 10: Load machine state from a previously saved JSON snapshot file
+    // =========================
+    /**
+     * Bonus command: Load machine state from a previously saved JSON snapshot file.
+     * Flow:
+     *  - ask user for full path (without extension)
+     *  - delegate to EngineImpl.loadSnapshot(basePath)
+     *  - on success: mark machineLoaded=true, codeConfigured according to loaded state
+     */
+    private void handleLoadSnapshot() {
+        while (true) {
+            String basePath = Utilities.readNonEmptyLine(
+                    scanner,
+                    "Enter full path (folder + file name, without extension) of the snapshot to load:");
+            try {
+                    enigma.loadSnapshot(basePath);
+                    machineLoaded = true;
+                    Utilities.printInfo("Machine snapshot loaded successfully.");
+                    return;
+            } catch (EngineException e) {
+                Utilities.printError(e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "Do you want to try again with a different path? (Y/N): ")) {
+                    return;
+                }
+            } catch (Exception e) {
+                Utilities.printError("Unexpected error: " + e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "An unexpected error occurred. Try again? (Y/N): ")) {
+                    return;
+                }
+            }
+        }
+    }
+
 }
 
