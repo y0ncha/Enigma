@@ -46,8 +46,8 @@ public class ConsoleImpl implements Console {
     @Override
     public void run() {
         System.out.println();
-        System.out.println("Welcome to the Enigma machine console (Exercise 1)");
-        System.out.println("===============================================================");
+        Utilities.printInfo("Welcome to the Enigma machine console (Exercise 1)");
+        Utilities.printInfo("===============================================================");
         System.out.println();
 
         while (!exitRequested) {
@@ -65,7 +65,7 @@ public class ConsoleImpl implements Console {
 
     private void printMenu() {
         printSectionHeader("Enigma Machine - Main Menu");
-        System.out.println("Please choose an option by number:");
+        Utilities.printInfo("Please choose an option by number:");
         for (ConsoleCommand cmd : ConsoleCommand.values()) {
             boolean enabled = isCommandEnabled(cmd);
             if (enabled) {
@@ -133,6 +133,7 @@ public class ConsoleImpl implements Console {
                 return command;
             } catch (IllegalArgumentException e) {
                 Utilities.printError(e.getMessage());
+                Utilities.printInfo("[FIX] Enter a valid command number (1-8).");
                 System.out.print("> ");
             }
         }
@@ -184,7 +185,9 @@ public class ConsoleImpl implements Console {
             }
             catch (EngineException e) {
                 // Catch all engine exceptions (includes EngineException and its subclasses)
-                Utilities.printError("Failed to load machine from XML file: " + e.getMessage());
+                Utilities.printError("Failed to load machine from XML file.");
+                Utilities.printError("Reason: " + e.getMessage());
+                Utilities.printInfo("[FIX] Try a different XML file path.");
                 // Do not override any existing machine; upon failure we keep prior state
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try a different path? (Y/N): ")) {
                     return; // back to menu
@@ -202,10 +205,11 @@ public class ConsoleImpl implements Console {
 
         try {
             printSectionHeader("Enigma Machine - Specification");
-            System.out.println(enigma.machineData());
+            Utilities.printInfo(enigma.machineData().toString());
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
-            Utilities.printError("Failed to show machine specification: " + e.getMessage());
+            Utilities.printError("Failed to show machine specification.");
+            Utilities.printError("Reason: " + e.getMessage());
         }
     }
 
@@ -230,7 +234,7 @@ public class ConsoleImpl implements Console {
                 String available = IntStream.rangeClosed(1, total)
                         .mapToObj(String::valueOf)
                         .collect(Collectors.joining(", "));
-                System.out.println("Available rotors: " + available);
+                Utilities.printInfo("Available rotors: " + available);
                 String rotorsLine = Utilities.readNonEmptyLine(scanner,
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545). " +
                                 "Note: The FIRST rotor you enter is the LEFTMOST rotor (e.g. in \"3,2,1\" → 3 is leftmost, 1 is rightmost):");
@@ -245,6 +249,7 @@ public class ConsoleImpl implements Console {
                 } catch (IllegalArgumentException e) {
                     // Known validation error
                     Utilities.printError(e.getMessage());
+                    Utilities.printInfo("[FIX] Check the rotor IDs and try again.");
                     if (!Utilities.askUserToRetry(scanner,
                             "Do you want to try again with a different rotor list? (Y/N): ")) {
                         return; // back to main menu
@@ -273,6 +278,7 @@ public class ConsoleImpl implements Console {
                     break;
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
+                    Utilities.printInfo("[FIX] Use only alphabet letters and match the rotor count.");
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N): ")) {
                         return;
                     }
@@ -290,7 +296,7 @@ public class ConsoleImpl implements Console {
 // 3) Reflector choice (loop until valid or user exits)
 // ---------------------------------------------------------
             while (true) {
-                System.out.println("Available reflectors:");
+                Utilities.printInfo("Available reflectors:");
                 for (int i = 1; i <= reflectorsCount; i++) {
                     System.out.println(" " + i + ". " + InputParsers.toRoman(i));
                 }
@@ -303,6 +309,7 @@ public class ConsoleImpl implements Console {
                     break;
                 } catch (IllegalArgumentException e) {
                     Utilities.printError(e.getMessage());
+                    Utilities.printInfo("[FIX] Choose a number between 1 and " + reflectorsCount + ".");
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N): ")) {
                         return;
                     }
@@ -326,12 +333,14 @@ public class ConsoleImpl implements Console {
                 Utilities.printInfo("Manual code configuration was set successfully.");
                 CodeState currentConfig = enigma.machineData().curCodeState();
                 if (currentConfig != null) {
-                    System.out.println("Current code: " + currentConfig);
+                    Utilities.printInfo("Current code: " + currentConfig);
                 }
                 keepTrying = false; // success – exit command
             } catch (InvalidConfigurationException e) {
                 // Catch configuration validation errors from engine
-                Utilities.printError("Invalid code configuration: " + e.getMessage());
+                Utilities.printError("Invalid code configuration.");
+                Utilities.printError("Reason: " + e.getMessage());
+                Utilities.printInfo("[FIX] Review the configuration and try again.");
                 if (!Utilities.askUserToRetry(scanner, "Do you want to try again and fix the configuration? (Y/N): ")) {
                     return;
                 }
@@ -364,10 +373,11 @@ public class ConsoleImpl implements Console {
             // Mark that a valid code configuration is now active.
             codeConfigured = true;
             Utilities.printInfo("Automatic code configuration was generated successfully.");
-            System.out.println("Current code: " + enigma.machineData().curCodeState());
+            Utilities.printInfo("Current code: " + enigma.machineData().curCodeState());
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, etc.)
-            Utilities.printError("Failed to generate automatic code configuration: " + e.getMessage());
+            Utilities.printError("Failed to generate automatic code configuration.");
+            Utilities.printError("Reason: " + e.getMessage());
         }
     }
 
@@ -402,13 +412,15 @@ public class ConsoleImpl implements Console {
                 // Convert to milliseconds
                 String processedOutput = trace.output();
                 // 3. Print results
-                System.out.println("Original input : <" + normalizedInput + ">");
-                System.out.println("Processed output: <" + processedOutput + ">");
+                Utilities.printInfo("Original input : <" + normalizedInput + ">");
+                Utilities.printInfo("Processed output: <" + processedOutput + ">");
                 // Rotors remain in their new positions (no reset here)
                 keepTrying = false; // success → exit command
             } catch (EngineException e) {
                 // Catch all engine exceptions (invalid message, machine not configured, etc.)
-                Utilities.printError("Failed to process input: " + e.getMessage());
+                Utilities.printError("Failed to process input.");
+                Utilities.printError("Reason: " + e.getMessage());
+                Utilities.printInfo("[FIX] Check that all characters are in the machine alphabet.");
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different input string? (Y/N): ")) {
                     return;
@@ -432,9 +444,11 @@ public class ConsoleImpl implements Console {
         // Get the current configuration from the engine
         try {
             enigma.reset();
+            Utilities.printInfo("Code has been reset to original configuration.");
         }
         catch (EngineException e) {
-            Utilities.printError("Failed to reset code: " + e.getMessage());
+            Utilities.printError("Failed to reset code.");
+            Utilities.printError("Reason: " + e.getMessage());
         }
     }
 // ---------------------------------------------------------
@@ -453,9 +467,10 @@ public class ConsoleImpl implements Console {
     private void handleShowHistoryAndStatistics() {
         try {
             printSectionHeader("Enigma Machine - History");
-            System.out.println(enigma.history());
+            Utilities.printInfo(enigma.history().toString());
         } catch (Exception e) {
-            Utilities.printError("Failed to show history and statistics: " + e.getMessage());
+            Utilities.printError("Failed to show history and statistics.");
+            Utilities.printError("Reason: " + e.getMessage());
         }
     }
 
