@@ -205,7 +205,7 @@ public class ConsoleImpl implements Console {
 
         try {
             printSectionHeader("Enigma Machine - Specification");
-            Utilities.printInfo(enigma.machineData().toString());
+            Utilities.printInfo(enigma.machineData());
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, machine not configured, etc.)
             Utilities.printError("Failed to show machine specification.");
@@ -373,7 +373,10 @@ public class ConsoleImpl implements Console {
             // Mark that a valid code configuration is now active.
             codeConfigured = true;
             Utilities.printInfo("Automatic code configuration was generated successfully.");
-            Utilities.printInfo("Current code: " + enigma.machineData().curCodeState());
+            CodeState currentConfig = enigma.machineData().curCodeState();
+            if (currentConfig != null) {
+                Utilities.printInfo("Current code: " + currentConfig);
+            }
         } catch (EngineException e) {
             // Catch all engine exceptions (machine not loaded, etc.)
             Utilities.printError("Failed to generate automatic code configuration.");
@@ -467,7 +470,7 @@ public class ConsoleImpl implements Console {
     private void handleShowHistoryAndStatistics() {
         try {
             printSectionHeader("Enigma Machine - History");
-            Utilities.printInfo(enigma.history().toString());
+            Utilities.printInfo(enigma.history());
         } catch (Exception e) {
             Utilities.printError("Failed to show history and statistics.");
             Utilities.printError("Reason: " + e.getMessage());
