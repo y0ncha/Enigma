@@ -13,6 +13,7 @@ package enigma.console.helper;
  * <ul>
  *   <li><b>printError:</b> Print error message with [ERROR] prefix</li>
  *   <li><b>printInfo:</b> Print info message with [INFO] prefix</li>
+ *   <li><b>printFix:</b> Print fix suggestion with [FIX] prefix</li>
  * </ul>
  *
  * <h2>Input Methods</h2>
@@ -65,6 +66,17 @@ public final class Utilities {
      */
     public static void printInfo(String message) {
         System.out.println("[INFO] " + message);
+    }
+
+    /**
+     * Print a fix suggestion message with [FIX] prefix.
+     *
+     * <p>Format: {@code [FIX] message}</p>
+     *
+     * @param message fix suggestion message to display
+     */
+    public static void printFix(String message) {
+        System.out.println("[FIX] " + message);
     }
 
     /**
