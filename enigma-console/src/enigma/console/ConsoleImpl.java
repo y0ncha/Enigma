@@ -46,8 +46,8 @@ public class ConsoleImpl implements Console {
     @Override
     public void run() {
         System.out.println();
-        Utilities.printInfo("Welcome to the Enigma machine console (Exercise 1)");
-        Utilities.printInfo("===============================================================");
+        System.out.println("Welcome to the Enigma machine console (Exercise 1)");
+        System.out.println("===============================================================");
         System.out.println();
 
         while (!exitRequested) {
@@ -65,7 +65,7 @@ public class ConsoleImpl implements Console {
 
     private void printMenu() {
         printSectionHeader("Enigma Machine - Main Menu");
-        Utilities.printInfo("Please choose an option by number:");
+        System.out.println("Please choose an option by number:");
         for (ConsoleCommand cmd : ConsoleCommand.values()) {
             boolean enabled = isCommandEnabled(cmd);
             if (enabled) {
@@ -234,7 +234,7 @@ public class ConsoleImpl implements Console {
                 String available = IntStream.rangeClosed(1, total)
                         .mapToObj(String::valueOf)
                         .collect(Collectors.joining(", "));
-                Utilities.printInfo("Available rotors: " + available);
+                System.out.println("Available rotors: " + available);
                 String rotorsLine = Utilities.readNonEmptyLine(scanner,
                         "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545). " +
                                 "Note: The FIRST rotor you enter is the LEFTMOST rotor (e.g. in \"3,2,1\" → 3 is leftmost, 1 is rightmost):");
@@ -296,7 +296,7 @@ public class ConsoleImpl implements Console {
 // 3) Reflector choice (loop until valid or user exits)
 // ---------------------------------------------------------
             while (true) {
-                Utilities.printInfo("Available reflectors:");
+                System.out.println("Available reflectors:");
                 for (int i = 1; i <= reflectorsCount; i++) {
                     System.out.println(" " + i + ". " + InputParsers.toRoman(i));
                 }
