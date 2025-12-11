@@ -96,6 +96,7 @@ public class ExceptionMessageTester {
             engine.loadMachine(INVALID_XML);
             System.out.println("✗ FAIL: Expected EngineException but no exception was thrown\n");
         }
+        }
         catch (Exception e) {
             System.out.println("✓ PASS: Got EngineException");
             System.out.println("Message: " + e.getMessage());
