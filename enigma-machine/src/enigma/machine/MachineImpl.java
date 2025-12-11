@@ -183,6 +183,12 @@ public class MachineImpl implements Machine {
         code.reset();
     }
 
+    @Override
+    public void setPositions(String positions) {
+        ensureConfigured();
+        code.setPositions(positions);
+    }
+
     // ---------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------

@@ -73,5 +73,24 @@ public interface Code {
 
     List<Integer> getNotchDist();
 
+    /**
+     * Reset all rotor positions to their original configured values.
+     * 
+     * <p>This returns all rotors to the positions they had when the code
+     * was initially created, allowing the machine to restart encryption
+     * from the same starting point.</p>
+     */
     void reset();
+
+    /**
+     * Set rotor positions to specific values.
+     * 
+     * <p>This method allows manually advancing or setting rotor positions
+     * without going through a full reconfiguration. Used primarily when
+     * loading snapshots to restore the exact rotor state.</p>
+     *
+     * @param positions string of position characters (left→right), length must match rotor count
+     * @throws IllegalArgumentException if positions length doesn't match rotor count
+     */
+    void setPositions(String positions);
 }

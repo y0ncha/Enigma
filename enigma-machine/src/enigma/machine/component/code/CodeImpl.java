@@ -102,6 +102,21 @@ public class CodeImpl implements Code {
             char pos = positions.get(i);
             r.setPosition(pos);
         }
+    }
 
+    @Override
+    public void setPositions(String newPositions) {
+        if (newPositions == null) {
+            throw new IllegalArgumentException("Positions string cannot be null");
+        }
+        if (newPositions.length() != rotors.size()) {
+            throw new IllegalArgumentException(
+                String.format("Positions length (%d) must match rotor count (%d)", 
+                    newPositions.length(), rotors.size()));
+        }
+        
+        for (int i = 0; i < rotors.size(); i++) {
+            rotors.get(i).setPosition(newPositions.charAt(i));
+        }
     }
 }

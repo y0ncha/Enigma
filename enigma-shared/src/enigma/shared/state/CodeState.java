@@ -119,6 +119,16 @@ public record CodeState(
     }
 
     /**
+     * Check if this CodeState represents a configured machine.
+     * <p>A CodeState is considered configured if it has at least one rotor.</p>
+     *
+     * @return true if this state represents a configured machine, false otherwise
+     */
+    public boolean isConfigured() {
+        return rotorIds != null && !rotorIds.isEmpty();
+    }
+
+    /**
      * Returns a detailed string representation including notch distances.
      *
      * <p>Format: {@code <rotorIds><positions(notchDist)><reflectorId>}</p>

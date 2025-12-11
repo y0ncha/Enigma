@@ -376,22 +376,38 @@ public class EngineImpl implements Engine {
             MachineState state = snapshot.machineState();
             if (state != null) {
                 this.stringsProcessed = state.stringsProcessed();
-                this.curCodeState = state.ogCodeState();
-                CodeState theCurCodeState = state.curCodeState();
-                boolean hasCurrent =
-                        theCurCodeState != null &&
-                                theCurCodeState != CodeState.NOT_CONFIGURED;
-                if (hasCurrent) {
-                    // Machine was configured when snapshot was taken
+                
+                CodeState ogState = state.ogCodeState();
+                CodeState curState = state.curCodeState();
+                
+                // Check if the machine was configured when snapshot was taken
+                if (ogState != null && ogState.isConfigured() && 
+                    curState != null && curState.isConfigured()) {
+                    
+                    // Store the original code state (used for reset and history)
+                    this.curCodeState = ogState;
+                    
+                    // Configure machine with ORIGINAL code (sets up reset target)
                     isSnapshot = true;
-                    configManual(theCurCodeState.toCodeConfig());
+                    configManual(ogState.toCodeConfig());
+                    isSnapshot = false;
+                    
+                    // Now manually set rotors to CURRENT positions
+                    // This allows reset() to work correctly while preserving history
+                    if (!ogState.positions().equals(curState.positions())) {
+                        machine.setPositions(curState.positions());
+                    }
+                } else if (ogState != null && ogState.isConfigured()) {
+                    // Only ogState is configured (shouldn't happen but handle it)
+                    this.curCodeState = ogState;
+                    isSnapshot = true;
+                    configManual(ogState.toCodeConfig());
                     isSnapshot = false;
                 }
             } else {
                 // Defensive fallback in damaged snapshot file
                 this.stringsProcessed = 0;
                 this.curCodeState = CodeState.NOT_CONFIGURED;
-                machine.reset();
             }
         } catch (Exception e) {
             // Wrap everything in EngineException with meaningful message

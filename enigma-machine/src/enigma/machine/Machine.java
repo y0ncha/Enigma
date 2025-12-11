@@ -89,4 +89,17 @@ public interface Machine {
      * @since 1.0
      */
     void reset();
+
+    /**
+     * Set rotor positions to specific values without reconfiguring.
+     *
+     * <p>This method allows advancing rotors to a specific state, useful
+     * when loading snapshots or restoring saved machine states.</p>
+     *
+     * @param positions rotor positions as string (left→right), e.g., "ODX"
+     * @throws IllegalStateException if machine is not configured
+     * @throws IllegalArgumentException if positions length doesn't match rotor count
+     * @since 1.0
+     */
+    void setPositions(String positions);
 }
