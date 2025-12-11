@@ -121,13 +121,14 @@ public class ConsoleImpl implements Console {
      * <p>
      * The method performs the following steps:
      * - Reads a line of input from the user.
-     * - Attempts to parse the input into a `ConsoleCommand` using `ConsoleValidator.parseCommand`.
-     * - Checks if the parsed command is currently enabled using `isCommandEnabled`.
+     * - Attempts to parse the input into a {@code ConsoleCommand} using {@code ConsoleValidator.parseCommand}.
+     * - Checks if the parsed command is currently enabled using {@code isCommandEnabled}.
      * - If the command is disabled, displays an error message with the reason and prompts the user to try again.
      * - If the input is invalid, catches the exception, displays an error message, and prompts the user to enter a valid command.
-     * - Returns the valid and enabled `ConsoleCommand` once successfully parsed and validated.
+     * - Returns the valid and enabled {@code ConsoleCommand} once successfully parsed and validated.
      *
-     * @return The valid and enabled `ConsoleCommand` entered by the user.
+     * @return the valid and enabled {@link ConsoleCommand} entered by the user
+     * @throws IllegalArgumentException if the input cannot be parsed into a valid command
      */
     private ConsoleCommand readCommandFromUser() {
         while (true) {
