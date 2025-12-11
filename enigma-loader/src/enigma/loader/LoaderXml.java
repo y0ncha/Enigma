@@ -133,7 +133,7 @@ public class LoaderXml implements Loader {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
-        catch(JAXBException e) {
+        catch (JAXBException e) {
             throw new EnigmaLoadingException("Parsing failed");
         }
     }
