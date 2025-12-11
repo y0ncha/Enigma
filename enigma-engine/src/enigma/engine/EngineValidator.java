@@ -8,7 +8,6 @@ import enigma.shared.spec.MachineSpec;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * EngineValidator — stateless validation helpers for engine configuration.
@@ -100,7 +99,6 @@ public final class EngineValidator {
      * @param spec      the machine specification containing the required number of rotors
      * @param positions the list of initial positions to validate
      * @throws InvalidConfigurationException if the number of positions does not match the number of rotors in use
-     *
      * Usage:
      * <pre>
      * EngineValidator.validatePositionCounts(spec, positions);
@@ -190,17 +188,13 @@ public final class EngineValidator {
 
     public static void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         String alphabet = spec.alphabet().getLetters();
-        
-        for (int i = 0; i < positions.size(); i++) {
-            char c = positions.get(i);
+
+        for (char c : positions) {
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidConfigurationException(
-                    String.format(
-                        "Invalid position character: Position at index %d has invalid character '%c'. " +
-                        "Machine alphabet: %s. " +
-                        "All positions: %s. " +
-                        "Fix: Use only characters from the machine alphabet.",
-                        i, c, alphabet, positions));
+                        String.format(
+                                "Position must me in the Alphabet, '%c' is not a valid position",
+                                c));
             }
         }
     }

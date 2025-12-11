@@ -87,11 +87,11 @@ public final class ConsoleValidator {
         try {
             commandId = Integer.parseInt(trimmed);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid input. Please enter a number between 1 and 8.");
+            throw new IllegalArgumentException("Unknown command number, ");
         }
         ConsoleCommand cmd = ConsoleCommand.fromId(commandId);
         if (cmd == null) {
-            throw new IllegalArgumentException("Unknown command number. Please choose a number between 1 and 8.");
+            throw new IllegalArgumentException("Unknown command number, ");
         }
         return cmd;
     }
