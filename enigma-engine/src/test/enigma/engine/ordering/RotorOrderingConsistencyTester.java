@@ -181,7 +181,7 @@ public class RotorOrderingConsistencyTester {
         String testInput = "A";
         ProcessTrace trace = engine.process(testInput);
         // ProcessTrace uses signalTraces() accessor (not traces())
-        SignalTrace signalTrace = trace.signalTraces().getFirst();
+        SignalTrace signalTrace = trace.signalTraces().get(0);
 
         String positionsAfter = signalTrace.windowAfter();
         System.out.println("  Positions after 'A' (left→right): " + positionsAfter);
