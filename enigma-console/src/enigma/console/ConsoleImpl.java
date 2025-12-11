@@ -196,9 +196,7 @@ public class ConsoleImpl implements Console {
     private void handleLoadMachineFromXml() {
 
         while (true) {
-//            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file :");
-            String path = "C:\\Enigma\\integration\\Enigma\\enigma-loader\\src\\test\\resources\\xml\\ex1-sanity-paper-enigma.xml";
-
+            String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file :");
             try {
                 enigma.loadMachine(path);
                 // If we got here – loading succeeded
@@ -576,6 +574,9 @@ public class ConsoleImpl implements Console {
             try {
                 enigma.loadSnapshot(basePath);
                 machineLoaded = true;
+                if (enigma.machineData().curCodeState() != null) {
+                    codeConfigured = true;
+                }
                 System.out.println("Machine snapshot loaded successfully.");
                 return;
             } catch (EngineException e) {
