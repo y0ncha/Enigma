@@ -132,7 +132,7 @@ Example (required style):
             enigma.reset();
             System.out.println("Code has been reset to original configuration");
         }
-        catch (EngineException e) {
+        catch(EngineException e) {
             System.out.println("Failed to reset code : " + e.getMessage());
         }
 ```
