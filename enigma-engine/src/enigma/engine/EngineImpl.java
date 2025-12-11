@@ -276,7 +276,7 @@ public class EngineImpl implements Engine {
     @Deprecated
     public CodeConfig getCurrentCodeConfig() {
         if (!machine.isConfigured()) {
-            throw new MachineNotConfiguredException("Machine is not configured");
+            return null;
         }
         return machine.getConfig();
     }
