@@ -83,7 +83,7 @@ public final class EngineValidator {
 
         int required = spec.getRotorsInUse();
         if (rotorIds.size() != required) {
-            throw new InvalidConfigurationException("Expected exactly " + required + "rotors, got " + rotorIds.size());
+            throw new InvalidConfigurationException("Expected exactly " + required + " rotors, got " + rotorIds.size());
         }
         if (positions.size() != required) {
             throw new InvalidConfigurationException(
