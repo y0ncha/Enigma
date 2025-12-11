@@ -308,7 +308,7 @@ public class LoaderXml implements Loader {
                 if (in < 0 || in >= alphabetSize ||
                         out < 0 || out >= alphabetSize) {
                     throw new EnigmaLoadingException("Reflector " + id +
-                            " mapping out of range (" + (in + 1) + "<->" + (out + 1) +")");
+                            " mapping out of range (" + (in + 1) + " <-> " + (out + 1) +")");
                 }
 
                 if (in == out) {
