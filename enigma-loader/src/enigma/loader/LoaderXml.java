@@ -121,7 +121,7 @@ public class LoaderXml implements Loader {
         Path path = Paths.get(filePath);
 
         if (!Files.exists(path)) {
-            throw new EnigmaLoadingException("File not found");
+            throw new EnigmaLoadingException("File " + filePath +" not found");
         }
 
         if (!filePath.toLowerCase().endsWith(".xml")) {
