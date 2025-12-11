@@ -219,9 +219,13 @@ public class EngineImpl implements Engine {
      */
     @Override
     public void reset() {
-        if (spec != null && machine.isConfigured()) {
-            machine.reset();
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
         }
+        if (!machine.isConfigured()) {
+            throw new MachineNotConfiguredException("Machine is not configured");
+        }
+        machine.reset();
     }
 
     /**
