@@ -376,7 +376,7 @@ public class LoaderXml implements Loader {
 
         if (cleanAbc.length() % 2 != 0) {
             throw new EnigmaLoadingException(
-                String.format("Alphabet must have even length, but got %d characters " + "Alphabet: \"%s\"", cleanAbc.length(), cleanAbc));
+                String.format("Alphabet must have even length, but got %d characters (Alphabet: \"%s\")", cleanAbc.length(), cleanAbc));
         }
 
         // Check for duplicate characters
