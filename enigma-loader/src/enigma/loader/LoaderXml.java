@@ -134,7 +134,7 @@ public class LoaderXml implements Loader {
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
-            throw new EnigmaLoadingException("Parsing failed");
+            throw new EnigmaLoadingException("Parsing failed for file '" + filePath + "': " + e.getMessage(), e);
         }
     }
 
