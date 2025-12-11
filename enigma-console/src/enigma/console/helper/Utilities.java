@@ -67,7 +67,7 @@ public final class Utilities {
             try {
                 return Integer.parseInt(line);
             } catch (NumberFormatException e) {
-                System.out.print("Invalid input. Please enter a valid integer number.");
+                System.out.print("Invalid input. Please enter a valid integer number");
             }
         }
     }
