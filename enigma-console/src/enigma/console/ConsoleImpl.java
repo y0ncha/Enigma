@@ -151,7 +151,7 @@ public class ConsoleImpl implements Console {
             }
             catch (IllegalArgumentException e) {
                 System.out.print(e.getMessage());
-                System.out.print("Enter a valid command number (1-8) :");
+                System.out.println("Enter a valid command number (1-8) :");
                 System.out.print("> ");
             }
         }
@@ -297,7 +297,6 @@ public class ConsoleImpl implements Console {
                 }
                 catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
-                    System.out.println("Use only alphabet letters and match the rotor count");
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N) : ")) {
                         return;
                     }

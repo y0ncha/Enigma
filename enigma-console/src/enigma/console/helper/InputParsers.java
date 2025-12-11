@@ -115,7 +115,7 @@ public class InputParsers {
         // Basic null/empty validation
         if (line == null || line.isBlank()) {
             throw new IllegalArgumentException(
-                    "Positions must contain at least one character. Empty input is not allowed.");
+                    "Positions must contain at least one character, Empty input is not allowed");
         }
         // Trim input and convert to uppercase for consistency
         String cleaned = line.trim().toUpperCase();
@@ -126,9 +126,8 @@ public class InputParsers {
             if (!Character.isLetter(c)) {
                 throw new IllegalArgumentException(
                         String.format(
-                                "Invalid position character: '%c'. " +
-                                        "Positions must contain only alphabet letters. Input: \"%s\".",
-                                c, line));
+                                "Invalid position character: '%c', All Positions must be alphabet letters",
+                                c));
             }
             result.add(c);
         }
