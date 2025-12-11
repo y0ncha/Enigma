@@ -485,7 +485,7 @@ public class LoaderXml implements Loader {
     private void validateReflectorIdFormat(String id) throws EnigmaLoadingException {
         if (!ROMAN_ORDER.contains(id)) {
             throw new EnigmaLoadingException(
-                String.format("Reflector ID '%s' is not a valid Roman numeral" + "(valid reflector IDs: I, II, III, IV, V)", id));
+                String.format("Reflector ID '%s' is not a valid Roman numeral " + "(valid reflector IDs: I, II, III, IV, V)", id));
         }
     }
 
