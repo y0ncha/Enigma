@@ -95,7 +95,6 @@ public class LoaderXml implements Loader {
      *
      * @param filePath path to XML file
      * @return validated MachineSpec
-     * @throws EnigmaLoadingException on parse or validation errors
      */
     @Override
     public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {
@@ -122,29 +121,20 @@ public class LoaderXml implements Loader {
         Path path = Paths.get(filePath);
 
         if (!Files.exists(path)) {
-            throw new EnigmaLoadingException(
-                "XML file not found: " + filePath + ". " +
-                "Fix: Ensure the file path is correct and the file exists.");
+            throw new EnigmaLoadingException("File not found");
         }
 
         if (!filePath.toLowerCase().endsWith(".xml")) {
-            throw new EnigmaLoadingException(
-                "Invalid file type: File must have a .xml extension (case-insensitive). " +
-                "File: " + filePath + ". " +
-                "Fix: Use an XML file with a .xml extension.");
+            throw new EnigmaLoadingException("File must have a .xml extension (case-insensitive)");
         }
 
         try {
             JAXBContext context = JAXBContext.newInstance(BTEEnigma.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
-        } catch (JAXBException e) {
-            throw new EnigmaLoadingException(
-                "XML parsing failed: Unable to parse the XML file using JAXB. " +
-                "File: " + filePath + ". " +
-                "Error: " + e.getMessage() + ". " +
-                "Fix: Ensure the XML is well-formed and matches the expected schema.",
-                e);
+        }
+        catch(JAXBException e) {
+            throw new EnigmaLoadingException("Parsing failed");
         }
     }
 
@@ -229,8 +219,8 @@ public class LoaderXml implements Loader {
                 if (rightIdx == -1 || leftIdx == -1) {
                     throw new EnigmaLoadingException(
                             "Rotor " + rotorXml.getId() +
-                                    " uses letters not in alphabet: right=" + rightChar +
-                                    " left=" + leftChar);
+                                    " uses letters not in alphabet (right=" + rightChar +
+                                    " left=" + leftChar + ")");
                 }
 
                 if (!seenRight.add(rightIdx)) {
@@ -303,7 +293,7 @@ public class LoaderXml implements Loader {
         for (BTEReflector refXml : bteReflectors.getBTEReflector()) {
             String id = refXml.getId();
             if (result.containsKey(id)) {
-                throw new EnigmaLoadingException("Duplicate reflector id: " + id);
+                throw new EnigmaLoadingException("Duplicate reflector id (" + id + ")");
             }
 
             validateReflectorIdFormat(id);
@@ -318,7 +308,7 @@ public class LoaderXml implements Loader {
                 if (in < 0 || in >= alphabetSize ||
                         out < 0 || out >= alphabetSize) {
                     throw new EnigmaLoadingException("Reflector " + id +
-                            " mapping out of range: " + (in + 1) + "<->" + (out + 1));
+                            " mapping out of range (" + (in + 1) + "<->" + (out + 1) +")");
                 }
 
                 if (in == out) {
@@ -327,31 +317,27 @@ public class LoaderXml implements Loader {
                 }
 
                 if (mapping[in] != -1) {
-                    throw new EnigmaLoadingException("Reflector " + id +
-                            " reuses index " + (in + 1));
+                    throw new EnigmaLoadingException("Reflector '" + id +
+                            "' reuses index " + (in + 1));
                 }
                 if (mapping[out] != -1) {
                     throw new EnigmaLoadingException("Reflector " + id +
                             " reuses index " + (out + 1));
                 }
-
                 mapping[in] = out;
                 mapping[out] = in;
             }
-
             for (int i = 0; i < alphabetSize; i++) {
                 if (mapping[i] == -1) {
                     throw new EnigmaLoadingException("Reflector " + id +
                             " does not cover index " + (i + 1));
                 }
             }
-
             result.put(id, new ReflectorSpec(id, mapping));
         }
 
         // After building reflectors, ensure ids form a contiguous Roman main starting from I
         validateReflectorIdRun(result.keySet());
-
         return result;
     }
 
@@ -380,25 +366,17 @@ public class LoaderXml implements Loader {
      */
     private String validateAlphabet(String rawAbc) throws EnigmaLoadingException {
         if (rawAbc == null) {
-            throw new EnigmaLoadingException(
-                "Missing alphabet: XML does not contain an <ABC> section. " +
-                "Fix: Add an <ABC> section with an even-length alphabet (e.g., <ABC>ABCDEFGHIJKLMNOPQRSTUVWXYZ</ABC>).");
+            throw new EnigmaLoadingException("<ABC> section is missing");
         }
 
         String cleanAbc = rawAbc.replaceAll("\\s+", "");
         if (cleanAbc.isEmpty()) {
-            throw new EnigmaLoadingException(
-                "Empty alphabet: <ABC> section is empty after removing whitespace. " +
-                "Fix: Provide a non-empty alphabet with even length (e.g., <ABC>ABCDEFGHIJKLMNOPQRSTUVWXYZ</ABC>).");
+            throw new EnigmaLoadingException("<ABC> section is empty after removing whitespace");
         }
 
         if (cleanAbc.length() % 2 != 0) {
             throw new EnigmaLoadingException(
-                String.format(
-                    "Invalid alphabet length: Alphabet must have even length, but got %d characters. " +
-                    "Alphabet: \"%s\". " +
-                    "Fix: Add or remove one character to make the alphabet length even.",
-                    cleanAbc.length(), cleanAbc));
+                String.format("Alphabet must have even length, but got %d characters " + "Alphabet: \"%s\"", cleanAbc.length(), cleanAbc));
         }
 
         // Check for duplicate characters
@@ -406,11 +384,7 @@ public class LoaderXml implements Loader {
         for (char c : cleanAbc.toCharArray()) {
             if (!charSet.add(c)) {
                 throw new EnigmaLoadingException(
-                    String.format(
-                        "Duplicate character in alphabet: Character '%c' appears more than once. " +
-                        "Alphabet: \"%s\". " +
-                        "Fix: Remove duplicate characters from the alphabet.",
-                        c, cleanAbc));
+                    String.format("Character '%c' appears more than once", c));
             }
         }
         return cleanAbc;
@@ -427,15 +401,15 @@ public class LoaderXml implements Loader {
     private void validateRotorsHeader(BTERotors bteRotors) throws EnigmaLoadingException {
         if (bteRotors == null || bteRotors.getBTERotor().isEmpty()) {
             throw new EnigmaLoadingException(
-                "Missing rotors: XML does not contain a <BTE-Rotors> section or the rotors list is empty. " +
-                "Fix: Add a <BTE-Rotors> section with at least " + rotorsInUse + " rotor definitions.");
+                    "<BTE-Rotors> section is missing");
+        }
+        if (bteRotors.getBTERotor().isEmpty()) {
+            throw new EnigmaLoadingException(
+                    "<BTE-Rotors> section is empty");
         }
         if (bteRotors.getBTERotor().size() < rotorsInUse) {
             throw new EnigmaLoadingException(
-                String.format(
-                    "Insufficient rotors: Machine requires at least %d rotors, but only %d were defined. " +
-                    "Fix: Add more rotor definitions to the <BTE-Rotors> section.",
-                    rotorsInUse, bteRotors.getBTERotor().size()));
+                    "<BTE-Rotors> section must include at least " + rotorsInUse + " rotor specifications, got "  + bteRotors.getBTERotor().size());
         }
     }
 
@@ -449,10 +423,7 @@ public class LoaderXml implements Loader {
     private void validateRotorIdUnique(int id, Map<Integer, RotorSpec> existing) throws EnigmaLoadingException {
         if (existing.containsKey(id)) {
             throw new EnigmaLoadingException(
-                String.format(
-                    "Duplicate rotor ID: Rotor ID %d appears more than once in the XML. " +
-                    "Fix: Ensure each rotor has a unique ID (e.g., 1, 2, 3, ...).",
-                    id));
+                String.format("Rotor ID %d appears more than once", id));
         }
     }
 
@@ -466,12 +437,7 @@ public class LoaderXml implements Loader {
      */
     private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
         if (notch < 1 || notch > alphabetSize) {
-            throw new EnigmaLoadingException(
-                String.format(
-                    "Invalid notch position in rotor %d: Notch position %d is out of bounds. " +
-                    "Valid range: 1 to %d (alphabet size). " +
-                    "Fix: Set the notch position to a value within the valid range.",
-                    rotorId, notch, alphabetSize));
+            throw new EnigmaLoadingException("Notch position is out of bound");
         }
     }
 
@@ -489,12 +455,7 @@ public class LoaderXml implements Loader {
         int expectedCount = max - min + 1;
 
         if (min != 1 || expectedCount != ids.size()) {
-            throw new EnigmaLoadingException(
-                String.format(
-                    "Invalid rotor ID sequence: Rotor IDs must form a contiguous sequence 1..N without gaps. " +
-                    "Found IDs: %s. " +
-                    "Fix: Ensure rotor IDs are consecutive starting from 1 (e.g., 1, 2, 3, 4).",
-                    ids));
+            throw new EnigmaLoadingException("Rotor IDs must form a consecutive starting from 1 (e.g., 1, 2, 3, 4)" + "Got " + ids);
         }
     }
 
@@ -507,10 +468,11 @@ public class LoaderXml implements Loader {
      * @throws EnigmaLoadingException if validation fails
      */
     private void validateReflectorsHeader(BTEReflectors bteReflectors) throws EnigmaLoadingException {
-        if (bteReflectors == null || bteReflectors.getBTEReflector().isEmpty()) {
-            throw new EnigmaLoadingException(
-                "Missing reflectors: XML does not contain a <BTE-Reflectors> section or the reflectors list is empty. " +
-                "Fix: Add a <BTE-Reflectors> section with at least one reflector definition (e.g., reflector I).");
+        if (bteReflectors == null) {
+            throw new EnigmaLoadingException("<BTE-Reflectors> section is missing");
+        }
+        if (bteReflectors.getBTEReflector().isEmpty()) {
+            throw new EnigmaLoadingException("<BTE-Reflectors> section is empty");
         }
     }
 
@@ -523,11 +485,7 @@ public class LoaderXml implements Loader {
     private void validateReflectorIdFormat(String id) throws EnigmaLoadingException {
         if (!ROMAN_ORDER.contains(id)) {
             throw new EnigmaLoadingException(
-                String.format(
-                    "Invalid reflector ID format: Reflector ID '%s' is not a valid Roman numeral. " +
-                    "Valid reflector IDs: I, II, III, IV, V. " +
-                    "Fix: Use a valid Roman numeral for the reflector ID.",
-                    id));
+                String.format("Reflector ID '%s' is not a valid Roman numeral" + "(valid reflector IDs: I, II, III, IV, V)", id));
         }
     }
 
@@ -546,12 +504,7 @@ public class LoaderXml implements Loader {
             String required = ROMAN_ORDER.get(i);
             if (!ids.contains(required)) {
                 throw new EnigmaLoadingException(
-                    String.format(
-                        "Invalid reflector ID sequence: Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III). " +
-                        "Found IDs: %s. " +
-                        "Missing ID: %s. " +
-                        "Fix: Ensure reflector IDs are consecutive Roman numerals starting from I.",
-                        ids, required));
+                        "Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III)" + "Got " + ids + "Missing " + required);
             }
         }
     }

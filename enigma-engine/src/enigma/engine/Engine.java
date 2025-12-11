@@ -1,5 +1,6 @@
 package enigma.engine;
 
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
@@ -27,7 +28,7 @@ public interface Engine {
      * @param path file-system path to machine XML
      * @throws RuntimeException if loading or validation fails
      */
-    void loadMachine(String path);
+    void loadMachine(String path) throws Exception;
 
     /**
      * Print or display current machine wiring/configuration data.

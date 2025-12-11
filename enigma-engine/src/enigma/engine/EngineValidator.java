@@ -83,17 +83,12 @@ public final class EngineValidator {
 
         int required = spec.getRotorsInUse();
         if (rotorIds.size() != required) {
-            throw new InvalidConfigurationException(
-                String.format(
-                    "Rotor count mismatch: Expected exactly %d rotors, but got %d. " +
-                    "Provided rotor IDs: %s. " +
-                    "Fix: Select exactly %d rotor IDs from the available rotors in the machine specification.",
-                    required, rotorIds.size(), rotorIds, required));
+            throw new InvalidConfigurationException("Expected exactly " + required + "rotors, got " + rotorIds.size());
         }
         if (positions.size() != required) {
             throw new InvalidConfigurationException(
                 String.format(
-                    "Position count mismatch: Expected exactly %d initial positions, but got %d. " +
+                    "Position count mismatch: Expected exactly %d initial positions, but got %d." +
                     "Provided positions: %s. " +
                     "Fix: Provide exactly %d initial positions (one per rotor).",
                     required, positions.size(), positions, required));
@@ -158,31 +153,19 @@ public final class EngineValidator {
 
     public static void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         Set<Integer> seen = new HashSet<>();
-        Set<Integer> availableRotorIds = spec.rotorsById().keySet();
-        
-        for (int i = 0; i < rotorIds.size(); i++) {
-            int id = rotorIds.get(i);
-            
+        Set<Integer> availableRotorIds = new HashSet<>(spec.rotorsById().keySet());
+
+        for (int id : rotorIds) {
             // Check for duplicates
             if (!seen.add(id)) {
                 throw new InvalidConfigurationException(
-                    String.format(
-                        "Duplicate rotor ID detected: Rotor %d appears more than once in the configuration. " +
-                        "Position in list: %d. " +
-                        "All rotor IDs: %s. " +
-                        "Fix: Each rotor can only be used once. Remove the duplicate rotor ID.",
-                        id, i, rotorIds));
+                        String.format(
+                                "Duplicate rotor ID detected: Rotor %d appears more than once in the configuration", id));
             }
-            
+
             // Check if rotor exists in spec
             if (spec.getRotorById(id) == null) {
-                throw new InvalidConfigurationException(
-                    String.format(
-                        "Invalid rotor ID: Rotor %d does not exist in the machine specification. " +
-                        "Position in list: %d. " +
-                        "Available rotor IDs: %s. " +
-                        "Fix: Choose from the available rotor IDs listed above.",
-                        id, i, availableRotorIds.stream().sorted().collect(Collectors.toList())));
+                throw new InvalidConfigurationException("Invalid rotor ID: Rotor " + id + " does not exist in the machine specification (Available rotors " + availableRotorIds + ")");
             }
         }
     }

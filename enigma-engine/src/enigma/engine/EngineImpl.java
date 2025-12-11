@@ -83,22 +83,11 @@ public class EngineImpl implements Engine {
      * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
      */
     @Override
-    public void loadMachine(String path) {
-        try {
-            spec = loader.loadSpecs(path);
-            this.history = new MachineHistory();
-            this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
-            this.stringsProcessed = 0;
-        }
-        catch (EnigmaLoadingException e) {
-            throw new EngineException(
-                String.format(
-                    "Failed to load machine specification from XML file: %s. " +
-                    "Error: %s. " +
-                    "Fix: Ensure the XML file exists, is well-formed, and satisfies all validation rules.",
-                    path, e.getMessage()),
-                e);
-        }
+    public void loadMachine(String path) throws Exception {
+        spec = loader.loadSpecs(path);
+        this.history = new MachineHistory();
+        this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
+        this.stringsProcessed = 0;
     }
 
     /**
@@ -138,9 +127,7 @@ public class EngineImpl implements Engine {
     @Override
     public void configManual(CodeConfig config) {
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot configure machine: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before configuring.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
         // validate config against spec
         EngineValidator.validateCodeConfig(spec, config);
@@ -171,9 +158,7 @@ public class EngineImpl implements Engine {
     @Override
     public void configRandom() {
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot generate random configuration: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before generating random configuration.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
         CodeConfig config = generateRandomConfig(spec);
         configManual(config);
@@ -199,18 +184,12 @@ public class EngineImpl implements Engine {
      */
     @Override
     public ProcessTrace process(String input) {
-        // Validate machine is loaded
+
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot process message: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before processing messages.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
-        
-        // Validate machine is configured
         if (!machine.isConfigured()) {
-            throw new MachineNotConfiguredException(
-                "Cannot process message: Machine is not configured. " +
-                "Fix: Configure the machine using configManual(config) or configRandom() before processing messages.");
+            throw new MachineNotConfiguredException("Machine is not configured");
         }
         
         // Validate input is not null and contains only valid characters
@@ -237,24 +216,12 @@ public class EngineImpl implements Engine {
 
     /**
      * Reset the currently-configured machine to its initial state for the current code.
-     *
-     * @throws MachineNotLoadedException if no machine specification has been loaded
-     * @throws MachineNotConfiguredException if the machine has not been configured with a code
      */
     @Override
     public void reset() {
-        if (spec == null) {
-            throw new MachineNotLoadedException(
-                    "Cannot reset machine: No machine specification loaded. " +
-                            "Fix: Load a machine specification using loadMachine(path) before resetting.");
+        if (spec != null && machine.isConfigured()) {
+            machine.reset();
         }
-
-        if (!machine.isConfigured()) {
-            throw new MachineNotConfiguredException(
-                    "Cannot reset machine: Machine is not configured. " +
-                            "Fix: Configure the machine using configManual(config) or configRandom() before resetting.");
-        }
-        machine.reset();
     }
 
     /**
@@ -274,6 +241,9 @@ public class EngineImpl implements Engine {
      */
     @Override
     public String history() {
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
+        }
         return history.toString();
     }
 
@@ -286,6 +256,9 @@ public class EngineImpl implements Engine {
     @Override
     @Deprecated
     public MachineSpec getMachineSpec() {
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
+        }
         return spec;
     }
 
@@ -299,7 +272,7 @@ public class EngineImpl implements Engine {
     @Deprecated
     public CodeConfig getCurrentCodeConfig() {
         if (!machine.isConfigured()) {
-            return null;
+            throw new MachineNotConfiguredException("Machine is not configured");
         }
         return machine.getConfig();
     }

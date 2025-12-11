@@ -25,8 +25,14 @@ public class PaperlMultiWordTester {
 
         Engine engine = new EngineImpl();
 
-        System.out.println("Loading XML: " + XML_PATH + "\n");
-        engine.loadMachine(XML_PATH);
+        try {
+            System.out.println("Loading XML: " + XML_PATH + "\n");
+            engine.loadMachine(XML_PATH);
+        }
+        catch (Exception e) {
+            System.err.println("Failed to load machine: " + e.getMessage());
+            return;
+        }
 
         // Code: <1,2,3><ODX><I>
         CodeConfig config = new CodeConfig(
