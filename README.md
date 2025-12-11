@@ -141,7 +141,38 @@ Engine records:
 
 ---
 
-# 6. How to Build & Run
+# 6. Snapshot System (Bonus Feature)
+
+The snapshot system enables saving and loading complete engine state:
+
+## Features
+- **Complete State Capture**: Saves machine spec, rotor positions, history, and counters
+- **Exact Restoration**: Loaded snapshots behave identically to original engine
+- **Reset Support**: Reset functionality works correctly after loading
+- **Error Handling**: Graceful failure with user-friendly messages for corrupted files
+
+## Usage
+```java
+// Save current state
+engine.saveSnapshot("/path/to/snapshot");
+
+// Load saved state
+engine.loadSnapshot("/path/to/snapshot");
+```
+
+## Architecture
+- **EngineSnapshot**: Root container (spec + state + history)
+- **MachineState**: Runtime state (original + current positions)
+- **CodeState**: Complete code configuration with rotor positions
+- **MachineHistory**: All messages grouped by configuration
+
+Files are saved as pretty-printed JSON with `.enigma.json` extension.
+
+See [Snapshot Architecture Documentation](docs/SNAPSHOT_ARCHITECTURE.md) for complete details.
+
+---
+
+# 7. How to Build & Run
 
 ## Exercise 1 / 2 — Console
 ```
