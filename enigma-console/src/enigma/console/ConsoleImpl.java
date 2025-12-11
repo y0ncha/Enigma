@@ -159,7 +159,7 @@ public class ConsoleImpl implements Console {
 
     private void dispatchCommand(ConsoleCommand command) {
         if (command == null) {
-            System.out.print("Invalid command. Please choose a number between 1 and 8");
+            System.out.println("Invalid command. Please choose a number between 1 and 8");
             return;
         }
         switch (command) {
