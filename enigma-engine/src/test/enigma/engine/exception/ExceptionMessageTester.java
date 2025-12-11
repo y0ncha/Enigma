@@ -3,7 +3,6 @@ package test.enigma.engine.exception;
 import enigma.engine.Engine;
 import enigma.engine.EngineImpl;
 import enigma.engine.exception.*;
-import enigma.loader.exception.EnigmaLoadingException;
 import enigma.shared.dto.config.CodeConfig;
 
 import java.nio.file.Paths;
@@ -95,7 +94,6 @@ public class ExceptionMessageTester {
             Engine engine = new EngineImpl();
             engine.loadMachine(INVALID_XML);
             System.out.println("✗ FAIL: Expected EngineException but no exception was thrown\n");
-        }
         }
         catch (Exception e) {
             System.out.println("✓ PASS: Got EngineException");
