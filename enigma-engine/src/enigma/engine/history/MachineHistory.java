@@ -222,9 +222,8 @@ public final class MachineHistory {
 
             sb.append(System.lineSeparator());
         }
-
         if (!printedAny) {
-            return "No history available. No messages were processed.";
+            return "No history recorded - no messages have been processed yet.";
         }
         return sb.toString().trim();
     }

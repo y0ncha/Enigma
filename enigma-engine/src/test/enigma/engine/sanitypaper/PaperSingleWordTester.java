@@ -39,7 +39,13 @@ public class PaperSingleWordTester {
         Engine engine = new EngineImpl();
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
-        engine.loadMachine(XML_PATH); // keep the current Engine API as-is
+        try {
+            engine.loadMachine(XML_PATH); // keep the current Engine API as-is
+        }
+        catch (Exception e) {
+            System.err.println("Failed to load machine: " + e.getMessage());
+            return;
+        }
 
         System.out.println("Code configuration: " + CODE_CONFIG + "\n");
         engine.configManual(CODE_CONFIG);
