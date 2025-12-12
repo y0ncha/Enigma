@@ -28,6 +28,52 @@ This module contains the core mechanical model of the Enigma machine, implementi
 - ❌ Manage history or statistics (engine's responsibility)
 - ❌ Handle user input (console's responsibility)
 
+## Constraints and Assumptions
+
+### Preconditions (Assumed by Machine)
+The machine assumes all inputs are valid. The following constraints are **not validated** by this module:
+
+**Alphabet:**
+- Even length (required for reflector symmetry)
+- Unique characters (no duplicates)
+
+**Rotor Configuration:**
+- All rotor IDs exist in the specification
+- Rotor IDs are unique (no rotor used twice)
+- Positions are valid alphabet characters
+
+**Reflector Configuration:**
+- Reflector ID exists in the specification
+- Reflector mappings are symmetric and complete
+
+**Input Characters:**
+- All characters belong to the machine's alphabet
+- No forbidden control characters
+
+**Validation Responsibility:** All preconditions are validated by the **engine layer** before delegating to the machine.
+
+### Invariants Maintained by Machine
+
+**Position Consistency:**
+- Rotor positions always represent valid alphabet indices
+- Position changes are deterministic and reproducible
+- Positions are preserved between operations (except during stepping)
+
+**State Determinism:**
+- Same initial state + same input → same output (guaranteed)
+- No randomness in encryption operations
+- Reset operation returns to exact original positions
+
+**Immutability of Code:**
+- Once a Code is set on the machine, its rotor/reflector composition is immutable
+- Only positions change during processing
+- Reconfiguration requires setting a new Code
+
+**Stepping Order:**
+- Rightmost rotor (highest index) always steps first
+- Stepping propagates leftward based on notch positions
+- Stepping completes before signal processing begins
+
 ## Key Components
 
 ### Machine (`MachineImpl`)
@@ -67,15 +113,20 @@ This module contains the core mechanical model of the Enigma machine, implementi
 
 ## Rotor Ordering Convention
 
-**Critical**: Rotors are stored in **left→right** order throughout the system.
-- Index 0 = leftmost rotor (visible in window position 1)
-- Index size-1 = rightmost rotor (steps every time)
+**Critical Design Principle**: Rotors are stored in **left→right** order throughout the system, matching the user's visual perspective.
 
-This convention is consistent across:
-- `Code.getRotors()` list
-- `CodeConfig.rotorIds()` list
-- `CodeConfig.positions()` list
-- User input and display
+**Indexing:**
+- Index 0 = leftmost rotor (visible in left window position)
+- Index size-1 = rightmost rotor (steps every character)
+
+**Consistency Across Layers:**
+This left→right convention is maintained in:
+- `Code.getRotors()` list (domain model)
+- `CodeConfig.rotorIds()` list (DTO)
+- `CodeConfig.positions()` list (DTO)
+- User input and display (console)
+
+**Rationale:** Consistent ordering simplifies reasoning and avoids index-related bugs.
 
 ## Signal Processing
 
@@ -95,19 +146,37 @@ Physically moves signal back toward the keyboard.
 
 ## Stepping Logic
 
-1. **Always step rightmost rotor** (index size-1)
-2. **Check for notch**: If rotor position equals notch after stepping
-3. **Propagate left**: Step next rotor to the left if notch triggered
-4. **Double-stepping**: A rotor at its notch steps itself and propagates
+The machine implements the historical Enigma stepping mechanism:
 
-The stepping happens **before** signal processing for each character.
+1. **Rightmost rotor always steps** (index size-1): Advances by one position before each character
+2. **Notch-triggered propagation**: When a rotor's position equals its notch after stepping, it signals the next rotor to the left to advance
+3. **Double-stepping mechanism**: A rotor at its notch position steps both itself and the rotor to its left on the same character (this causes the middle rotor to sometimes advance on consecutive characters)
+
+**Implementation Details:**
+- Stepping occurs **before** signal processing for each character
+- Stepping begins at the rightmost rotor and propagates leftward
+- A rotor "at notch" means: current position equals notch position
+
+**Example Double-Stepping Scenario:**
+If the middle rotor is at its notch:
+- Character N: Middle rotor steps itself and leftmost rotor
+- Character N+1: Rightmost rotor steps, triggers middle rotor (which was already past its notch)
+
+This matches the historical Enigma machine behavior.
 
 ## Reset Behavior
 
-`Machine.reset()`:
-- Returns rotors to their **original positions** (as configured)
-- Does **NOT** clear history or statistics (engine's responsibility)
-- Does **NOT** reset the code configuration (maintains rotors/reflector)
+**Purpose:** Return rotors to their original positions without clearing configuration or history.
+
+`Machine.reset()` operation:
+- Returns rotors to their **original positions** (as configured at setup time)
+- **Preserves** the rotor/reflector selection (no component changes)
+- Does **NOT** clear history or statistics (engine's responsibility, not machine's)
+- Does **NOT** reset the code configuration itself
+
+**Use Case:** Allows re-encryption of messages from the same starting point without reconfiguring the entire machine.
+
+**Important:** This is a mechanical operation that only affects rotor positions. All state management (history, statistics, configuration tracking) is handled by the engine layer.
 
 ## Trace Generation
 
@@ -140,11 +209,41 @@ machine.reset();
 
 ## Important Notes
 
-1. **No Validation**: Machine assumes all inputs are valid (validated by engine)
-2. **Deterministic**: Same input + same initial state → same output
-3. **Stateful**: Rotor positions change with each character processed
-4. **Index-Based Internally**: Uses integer indices; keyboard handles char conversion
-5. **Left→Right Storage**: All rotor lists use left→right indexing
+### Design Principles
+
+**No Validation:**
+- Machine assumes all inputs are pre-validated by the engine
+- Invalid inputs may cause undefined behavior or exceptions
+- **Rationale:** Keeps domain model pure and focused on mechanics
+
+**Deterministic Behavior:**
+- Same input + same initial state → same output (always)
+- No randomness in any encryption operation
+- Enables exact replay and verification
+
+**Stateful Operation:**
+- Rotor positions change with each character processed
+- State changes are permanent until explicit reset
+- Current state can be captured via `getCodeState()`
+
+**Index-Based Processing:**
+- Internal operations use integer indices, not characters
+- Keyboard component handles character↔index conversion
+- **Rationale:** Simplifies rotor wiring logic and signal transformations
+
+**Left→Right Storage:**
+- All rotor lists use left→right indexing (0=leftmost)
+- Matches user mental model and display conventions
+- Signal processing iterates in physical direction (right→left forward, left→right backward)
+
+### Thread Safety
+
+**Not Thread-Safe:**
+- Machine maintains mutable state (rotor positions)
+- Designed for single-threaded use within engine
+- Concurrent access requires external synchronization
+
+**Recommendation:** For multi-user scenarios (e.g., web server), create separate machine instances per session.
 
 ## Related Documentation
 
