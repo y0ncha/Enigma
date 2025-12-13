@@ -344,7 +344,7 @@ public class EngineImpl implements Engine {
                         "Cannot save snapshot: No machine specification loaded. " +
                                 "Fix: Load an XML specification and configure the machine before saving.");
             }
-            MachineState state = machineData(); // uses ogCodeState + stringsProcessed etc.
+            MachineState state = machineData(); // uses curCodeState + stringsProcessed etc.
             EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
             EngineSnapshotJson.save(snapshot, basePath);
         }catch (Exception e){
