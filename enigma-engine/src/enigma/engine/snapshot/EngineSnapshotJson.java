@@ -37,38 +37,26 @@ public final class EngineSnapshotJson {
      */
     public static void save(EngineSnapshot snapshot, String basePath) {
         if (snapshot == null) {
-            throw new EngineException(
-                    "Cannot save engine snapshot: snapshot is null. " +
-                            "Fix: Ensure the engine is fully initialized before saving.");
+            throw new EngineException("Snapshot is null");
         }
         if (basePath == null || basePath.isBlank()) {
-            throw new EngineException(
-                    "Cannot save engine snapshot: path is empty. " +
-                            "Fix: Provide a full path (folder + file name without extension).");
+            throw new EngineException("Path is empty");
         }
 
         String fullPath = basePath + SNAPSHOT_SUFFIX;
         File target = new File(fullPath);
 
-        // Ensure parent directory exists (if any)
         File parent = target.getParentFile();
         if (parent == null || !parent.exists()) {
             throw new EngineException(
-                    String.format(
-                            "Cannot save engine snapshot: Folder '%s' does not exist. " +
-                                    "Fix: Create the folder or choose a different path.",
-                            basePath));
+                String.format("Folder '%s' does not exist", basePath));
         }
 
         try (FileWriter writer = new FileWriter(target)) {
             GSON.toJson(snapshot, writer);
         } catch (IOException e) {
             throw new EngineException(
-                    String.format(
-                            "Failed to save engine snapshot to file '%s'. Error: %s. " +
-                                    "Fix: Verify that the path is writable and you have permissions.",
-                            fullPath, e.getMessage()),
-                    e);
+                String.format("Unable to write to file '%s': %s", fullPath, e.getMessage()), e);
         }
     }
 
@@ -81,38 +69,26 @@ public final class EngineSnapshotJson {
      */
     public static EngineSnapshot load(String basePath) {
         if (basePath == null || basePath.isBlank()) {
-            throw new EngineException(
-                    "Cannot load engine snapshot: path is empty. " +
-                            "Fix: Provide a full path (folder + file name without extension).");
+            throw new EngineException("Path is empty");
         }
 
         String fullPath = basePath + SNAPSHOT_SUFFIX;
         File source = new File(fullPath);
         if (!source.isFile()) {
             throw new EngineException(
-                    String.format(
-                            "Cannot load engine snapshot: File '%s' does not exist. " +
-                                    "Fix: Check the path and make sure the snapshot was saved before.",
-                            fullPath));
+                String.format("File '%s' does not exist", fullPath));
         }
 
         try (FileReader reader = new FileReader(source)) {
             EngineSnapshot snapshot = GSON.fromJson(reader, EngineSnapshot.class);
             if (snapshot == null || snapshot.spec() == null) {
                 throw new EngineException(
-                        String.format(
-                                "Loaded snapshot from '%s' is invalid or empty. " +
-                                        "Fix: Re-create the snapshot or choose a different file.",
-                                fullPath));
+                    String.format("Snapshot from '%s' is invalid or empty", fullPath));
             }
             return snapshot;
         } catch (IOException e) {
             throw new EngineException(
-                    String.format(
-                            "Failed to load engine snapshot from file '%s'. Error: %s. " +
-                                    "Fix: Ensure the file is readable and not locked by another process.",
-                            fullPath, e.getMessage()),
-                    e);
+                String.format("Unable to read file '%s': %s", fullPath, e.getMessage()), e);
         }
     }
 }

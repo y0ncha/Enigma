@@ -340,11 +340,9 @@ public class EngineImpl implements Engine {
     public void saveSnapshot(String basePath) {
         try{
             if (spec == null) {
-                throw new EngineException(
-                        "Cannot save snapshot: No machine specification loaded. " +
-                                "Fix: Load an XML specification and configure the machine before saving.");
+                throw new EngineException("Machine specification is not loaded");
             }
-            MachineState state = machineData(); // uses curCodeState + stringsProcessed etc.
+            MachineState state = machineData();
             EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
             EngineSnapshotJson.save(snapshot, basePath);
         }catch (Exception e){

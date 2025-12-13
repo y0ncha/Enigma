@@ -132,7 +132,7 @@ public class RotorImpl implements Rotor {
             rotate();
         }
         if (getPosition() != pos) {
-            throw new IllegalStateException("Failed to reach position " + pos + " in rotor: " + id);
+            throw new IllegalStateException("Unable to reach position " + pos + " in rotor " + id);
         }
     }
 
