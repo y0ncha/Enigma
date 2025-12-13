@@ -28,7 +28,7 @@ public interface Engine {
      * @param path file-system path to machine XML
      * @throws RuntimeException if loading or validation fails
      */
-    void loadMachine(String path) throws Exception;
+    void loadMachine(String path);
 
     /**
      * Print or display current machine wiring/configuration data.
@@ -192,4 +192,8 @@ public interface Engine {
      * </pre>
      */
     void terminate();
+
+    void saveSnapshot(String basePath);
+
+    void loadSnapshot(String basePath);
 }

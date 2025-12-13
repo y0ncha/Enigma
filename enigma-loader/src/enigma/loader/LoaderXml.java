@@ -409,7 +409,7 @@ public class LoaderXml implements Loader {
         }
         if (bteRotors.getBTERotor().size() < rotorsInUse) {
             throw new EnigmaLoadingException(
-                    "<BTE-Rotors> section must include at least " + rotorsInUse + " rotor specifications, got "  + bteRotors.getBTERotor().size());
+                    "<BTE-Rotors> section must include at least " + rotorsInUse + " rotor specifications, got: "  + bteRotors.getBTERotor().size());
         }
     }
 
@@ -437,7 +437,7 @@ public class LoaderXml implements Loader {
      */
     private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
         if (notch < 1 || notch > alphabetSize) {
-            throw new EnigmaLoadingException("Notch position is out of bound");
+            throw new EnigmaLoadingException("Notch position is out of bounds");
         }
     }
 
@@ -455,7 +455,7 @@ public class LoaderXml implements Loader {
         int expectedCount = max - min + 1;
 
         if (min != 1 || expectedCount != ids.size()) {
-            throw new EnigmaLoadingException("Rotor IDs must form a consecutive starting from 1 (e.g., 1, 2, 3, 4) " + "Got " + ids);
+            throw new EnigmaLoadingException("Rotor IDs must form a contiguous sequence starting from 1 (e.g., 1, 2, 3, 4). Got " + ids);
         }
     }
 
@@ -504,7 +504,7 @@ public class LoaderXml implements Loader {
             String required = ROMAN_ORDER.get(i);
             if (!ids.contains(required)) {
                 throw new EnigmaLoadingException(
-                        "Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III)" + " Got  " + ids + " Missing  " + required);
+                        "Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III), " + "Got " + ids + " Missing  " + required);
             }
         }
     }

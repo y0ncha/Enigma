@@ -173,7 +173,7 @@ Example (required style):
 
 ### 7.2 Colon Spacing in Printed Messages
 
-- When printing labels and values, always include a space before the colon and one space after it.
+- When printing labels and values, always include **one space before and one space after the colon** (e.g., `Label : Value`). This is intentional and required, even though it differs from standard English style.
 - This rule applies to all user-facing output (console, logs shown to users, examples in documentation).
 
 Example (required style):

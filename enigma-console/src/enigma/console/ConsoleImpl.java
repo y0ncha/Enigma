@@ -88,18 +88,20 @@ public class ConsoleImpl implements Console {
             // Command 1 + 8: always enabled
             case LOAD_MACHINE_FROM_XML:
             case EXIT:
+            case LOAD_MACHINE_STATE_FROM_FILE:
                 return null;
             // Commands 2, 3, 4, 7: require a valid XML to be loaded first
             case SHOW_MACHINE_SPEC:
             case SET_MANUAL_CODE:
             case SET_AUTOMATIC_CODE:
             case SHOW_HISTORY_AND_STATS:
-                if (!machineLoaded) {  return "You must load a valid XML configuration first (Command 1)"; }
+            case SAVE_CURRENT_MACHINE_STATE_TO_FILE:
+                if (!machineLoaded) {  return "You must load a valid XML | File configuration first (Command 1 | 10)"; }
                 return null;
             // Commands 5, 6: require XML + code configuration (manual/automatic)
             case PROCESS_INPUT:
             case RESET_CODE:
-                if (!machineLoaded) { return "You must load a valid XML configuration first (Command 1)"; }
+                if (!machineLoaded) { return "You must load a valid XML | File configuration first (Command 1 | 10)"; }
                 if (!codeConfigured) { return "You must set a code configuration first (Command 3 or 4)"; }
                 return null;
             // Fallback (should not occur)
@@ -151,7 +153,7 @@ public class ConsoleImpl implements Console {
             }
             catch (IllegalArgumentException e) {
                 System.out.print(e.getMessage());
-                System.out.println("Enter a valid command number (1-8) :");
+                System.out.println("Enter a valid command number (1-10) :");
                 System.out.print("> ");
             }
         }
@@ -170,6 +172,8 @@ public class ConsoleImpl implements Console {
             case PROCESS_INPUT -> handleProcessInput();
             case RESET_CODE -> handleResetCode();
             case SHOW_HISTORY_AND_STATS -> handleShowHistoryAndStatistics();
+            case SAVE_CURRENT_MACHINE_STATE_TO_FILE -> handleSaveSnapshot();
+            case LOAD_MACHINE_STATE_FROM_FILE -> handleLoadSnapshot();
             case EXIT -> handleExit();
         }
     }
@@ -514,6 +518,77 @@ public class ConsoleImpl implements Console {
     private void handleExit() {
         enigma.terminate();
         exitRequested = true;
+    }
+    // ----------[ Command 9: Save current machine state to a JSON file ]----------
+    /**
+     * Bonus command: Save current machine state to a JSON file.
+     * Flow:
+     *  - ensure a machine is loaded (from XML or previous snapshot)
+     *  - ask user for full path (without extension)
+     *  - delegate to EngineImpl.saveSnapshot(basePath)
+     *  - on error: print message and let user retry or go back to main menu
+     */
+    private void handleSaveSnapshot() {
+        while (true) {
+            String basePath = Utilities.readNonEmptyLine(
+                    scanner,
+                    "Enter full path (folder + file name, without extension) for the snapshot file :");
+            try {
+                // We know enigma is EngineImpl, so we can safely cast here
+                enigma.saveSnapshot(basePath);
+                System.out.println("Machine snapshot was saved successfully.");
+                return;
+            } catch (EngineException e) {
+                System.out.println(e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "Do you want to try again with a different path? (Y/N): ")) {
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("Unexpected error: " + e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "An unexpected error occurred. Try again? (Y/N) : ")) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // [ Command 10: Load machine state from a previously saved JSON snapshot file ]
+    /**
+     * Bonus command: Load machine state from a previously saved JSON snapshot file.
+     * Flow:
+     *  - ask user for full path (without extension)
+     *  - delegate to EngineImpl.loadSnapshot(basePath)
+     *  - on success: mark machineLoaded=true, codeConfigured according to loaded state
+     */
+    private void handleLoadSnapshot() {
+        while (true) {
+            String basePath = Utilities.readNonEmptyLine(
+                    scanner,
+                    "Enter full path (folder + file name, without extension) of the snapshot to load :");
+            try {
+                enigma.loadSnapshot(basePath);
+                machineLoaded = true;
+                if (enigma.machineData().curCodeState() != null) {
+                    codeConfigured = true;
+                }
+                System.out.println("Machine snapshot loaded successfully.");
+                return;
+            } catch (EngineException e) {
+                System.out.println(e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "Do you want to try again with a different path? (Y/N): ")) {
+                    return;
+                }
+            } catch (Exception e) {
+                System.out.println("Unexpected error: " + e.getMessage());
+                if (!Utilities.askUserToRetry(scanner,
+                        "An unexpected error occurred. Try again? (Y/N) : ")) {
+                    return;
+                }
+            }
+        }
     }
 }
 

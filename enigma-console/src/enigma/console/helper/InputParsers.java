@@ -126,7 +126,7 @@ public class InputParsers {
             if (!Character.isLetter(c)) {
                 throw new IllegalArgumentException(
                         String.format(
-                                "Invalid position character: '%c', All Positions must be alphabet letters",
+                                "Invalid position character: '%c'. All Positions must be alphabet letters",
                                 c));
             }
             result.add(c);

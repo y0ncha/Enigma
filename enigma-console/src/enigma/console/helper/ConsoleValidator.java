@@ -143,7 +143,7 @@ public final class ConsoleValidator {
         }
         // Check even length (format requirement)
         if (plugboard.length() % 2 != 0) {
-            throw new IllegalArgumentException("Plugboard must have even length (pairs of characters), Got " + plugboard.length());
+            throw new IllegalArgumentException("Plugboard must have even length (pairs of characters). Got " + plugboard.length());
         }
     }
 }

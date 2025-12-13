@@ -88,7 +88,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Position count mismatch: Expected exactly %d initial positions, but got %d." +
-                    "Provided positions: %s. " +
+                    " Provided positions: %s. " +
                     "Fix: Provide exactly %d initial positions (one per rotor).",
                     required, positions.size(), positions, required));
         }
@@ -193,7 +193,7 @@ public final class EngineValidator {
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidConfigurationException(
                         String.format(
-                                "Position must me in the Alphabet, '%c' is not a valid position",
+                                "Position must be in the Alphabet, '%c' is not a valid position",
                                 c));
             }
         }
