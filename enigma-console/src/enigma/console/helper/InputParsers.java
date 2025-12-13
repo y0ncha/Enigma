@@ -6,51 +6,7 @@ import java.util.List;
 /**
  * Input parsing utilities for console user input.
  *
- * <p><b>Module:</b> enigma-console (parsing helpers)</p>
- *
- * <h2>Purpose</h2>
- * <p>InputParsers provides stateless parsing methods to convert raw user input
- * strings into structured types (lists, characters, etc.) needed for engine
- * configuration.</p>
- *
- * <h2>Parsing Methods</h2>
- * <ul>
- *   <li><b>parseRotorIds:</b> Parse comma-separated rotor IDs (e.g., "1,2,3" → [1, 2, 3])</li>
- *   <li><b>buildInitialPositions:</b> Convert position string to character list (e.g., "ABC" → ['A', 'B', 'C'])</li>
- *   <li><b>toRoman:</b> Convert integer to Roman numeral (e.g., 1 → "I", 2 → "II")</li>
- * </ul>
- *
- * <h2>Validation</h2>
- * <p>Parsing methods perform format validation:</p>
- * <ul>
- *   <li>Reject empty comma parts (e.g., "1,,3" is invalid)</li>
- *   <li>Reject non-numeric values (e.g., "1,abc,3" is invalid)</li>
- *   <li>Throw {@link IllegalArgumentException} with user-friendly messages</li>
- * </ul>
- *
- * <p>Semantic validation (rotor ID existence, position alphabet membership) is
- * performed by the engine, not by these parsers.</p>
- *
- * <h2>Usage Example</h2>
- * <pre>
- * // Parse rotor IDs from user input
- * String input = scanner.nextLine(); // "1,2,3"
- * List&lt;Integer&gt; rotorIds = InputParsers.parseRotorIds(input);
- * // rotorIds = [1, 2, 3]
- *
- * // Parse positions
- * String positions = scanner.nextLine(); // "ABC"
- * List&lt;Character&gt; posList = InputParsers.buildInitialPositions(positions);
- * // posList = ['A', 'B', 'C']
- *
- * // Convert to Roman numeral for display
- * String roman = InputParsers.toRoman(2); // "II"
- * </pre>
- *
- * <h2>Thread Safety</h2>
- * <p>All methods are static and stateless. Thread-safe.</p>
- *
- * @since 1.0
+ * <p>Converts raw user input strings into structured types with format validation.</p>
  */
 public class InputParsers {
     // Prevent instantiation

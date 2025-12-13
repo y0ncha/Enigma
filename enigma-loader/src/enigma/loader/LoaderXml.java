@@ -17,48 +17,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * Loads and parses Enigma machine specifications from XML files.
+ * Loads and validates Enigma machine specifications from XML files.
  *
- * <p><b>Module:</b> enigma-loader (XML → MachineSpec)</p>
- *
- * <h2>Responsibilities</h2>
- * <ul>
- *   <li>Unmarshal XML into generated JAXB objects</li>
- *   <li>Validate alphabet (even-length, unique characters)</li>
- *   <li>Validate rotors (IDs 1..N, full permutations, notch in range)</li>
- *   <li>Validate reflectors (Roman IDs, symmetric mapping, bijectivity)</li>
- *   <li>Translate into {@link MachineSpec}, {@link RotorSpec}, {@link ReflectorSpec}</li>
- * </ul>
- *
- * <h2>Critical Design Point: Wire Ordering</h2>
- * <p><b>The loader must NOT reorder wires or change XML-defined order.</b></p>
- * <ul>
- *   <li>Rotor columns are stored in XML row order (top→bottom as parsed)</li>
- *   <li>Reflector mapping is constructed from XML pairs without reordering</li>
- *   <li>This ensures the mechanical model matches the specification exactly</li>
- * </ul>
- *
- * <h2>Validation Rules</h2>
- * <ul>
- *   <li><b>Alphabet:</b> even-length, non-empty, unique chars</li>
- *   <li><b>Rotor IDs:</b> contiguous sequence 1..N (e.g., 1,2,3,4,5)</li>
- *   <li><b>Rotor columns:</b> each column must be full permutation (bijectivity)</li>
- *   <li><b>Notch:</b> 1-based index in [1, alphabetSize]</li>
- *   <li><b>Reflector IDs:</b> Roman numerals starting from I (I, II, III, ...)</li>
- *   <li><b>Reflector mapping:</b> symmetric, no self-mapping, covers all indices</li>
- * </ul>
- *
- * <h2>Invariants After Loading</h2>
- * <ul>
- *   <li>All rotors and reflectors reference valid alphabet characters</li>
- *   <li>Rotor columns form valid permutations</li>
- *   <li>Reflector mappings are symmetric: mapping[i] = j ⟹ mapping[j] = i</li>
- * </ul>
- *
- * <p>Validation errors are reported as {@link EnigmaLoadingException} with
- * detailed error messages indicating the problem location.</p>
- *
- * @since 1.0
+ * <p>Parses XML and validates alphabet, rotors, and reflectors according
+ * to structural requirements. Preserves XML-defined wire ordering.</p>
  */
 public class LoaderXml implements Loader {
 
