@@ -47,7 +47,7 @@ public class EngineImpl implements Engine {
     private MachineHistory history;
     private boolean isSnapshot = false;
     private MachineSpec spec;
-    private CodeState curCodeState = enigma.shared.state.CodeState.notConfigured();
+    private CodeState ogCodeState = enigma.shared.state.CodeState.notConfigured();
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
