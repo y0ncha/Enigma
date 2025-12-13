@@ -193,7 +193,7 @@ public final class EngineValidator {
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidConfigurationException(
                         String.format(
-                                "Position must me in the Alphabet, '%c' is not a valid position",
+                                "Position must be in the Alphabet, '%c' is not a valid position",
                                 c));
             }
         }
