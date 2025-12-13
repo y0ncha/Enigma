@@ -1,5 +1,6 @@
 package enigma.engine;
 
+import enigma.loader.exception.EnigmaLoadingException;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
@@ -191,4 +192,8 @@ public interface Engine {
      * </pre>
      */
     void terminate();
+
+    void saveSnapshot(String basePath);
+
+    void loadSnapshot(String basePath);
 }

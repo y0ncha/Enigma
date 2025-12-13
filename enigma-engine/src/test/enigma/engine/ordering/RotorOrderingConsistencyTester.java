@@ -75,7 +75,7 @@ public class RotorOrderingConsistencyTester {
             System.out.println("  ✓ Machine loaded successfully");
         } catch (Exception e) {
             System.err.println("  ✗ Failed to load machine: " + e.getMessage());
-            System.err.println("  Note: This test requires XML test files to be present.");
+            System.err.println("  Note : This test requires XML test files to be present.");
             return false;
         }
         System.out.println();
@@ -198,8 +198,8 @@ public class RotorOrderingConsistencyTester {
         // Check which rotors advanced according to the trace
         List<Integer> advancedIndices = signalTrace.advancedIndices();
         System.out.println();
-        System.out.println("  Advanced rotor indices: " + advancedIndices);
-        System.out.println("  Note: Indices are in left→right format (0=leftmost, 2=rightmost)");
+        System.out.println("  Advanced rotor indices : " + advancedIndices);
+        System.out.println("  Note : Indices are in left→right format (0=leftmost, 2=rightmost)");
         
         // The rightmost rotor should always be in the advanced list
         boolean rightmostInAdvanced = advancedIndices.contains(2);

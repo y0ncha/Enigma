@@ -11,8 +11,9 @@ package enigma.console.helper;
  *
  * <h2>Output Methods</h2>
  * <ul>
- *   <li><b>printError:</b> Print error message with [ERROR] prefix</li>
- *   <li><b>printInfo:</b> Print info message with [INFO] prefix</li>
+ *   <li><b>printError:</b> Print error message (no automatic prefix)</li>
+ *   <li><b>printInfo:</b> Print info message (no automatic prefix)</li>
+ *   <li><b>printFix:</b> Print fix suggestion message (no automatic prefix)</li>
  * </ul>
  *
  * <h2>Input Methods</h2>
@@ -46,28 +47,6 @@ public final class Utilities {
     }
 
     /**
-     * Print an error message with [ERROR] prefix.
-     *
-     * <p>Format: {@code [ERROR] message}</p>
-     *
-     * @param message error message to display
-     */
-    public static void printError(String message) {
-        System.out.println("[ERROR] " + message);
-    }
-
-    /**
-     * Print an info message with [INFO] prefix.
-     *
-     * <p>Format: {@code [INFO] message}</p>
-     *
-     * @param message info message to display
-     */
-    public static void printInfo(String message) {
-        System.out.println("[INFO] " + message);
-    }
-
-    /**
      * Read and validate an integer from user with retry loop.
      *
      * <p>Continues prompting until valid integer is entered.
@@ -82,13 +61,13 @@ public final class Utilities {
             System.out.print(prompt);
             String line = scanner.nextLine().trim();
             if (line.isEmpty()) {
-                printError("No input provided. Please enter a number.");
+                System.out.print("No input provided. Please enter a number.");
                 continue;
             }
             try {
                 return Integer.parseInt(line);
             } catch (NumberFormatException e) {
-                printError("Invalid input. Please enter a valid integer number.");
+                System.out.println("Invalid input. Please enter a valid integer number");
             }
         }
     }
@@ -109,7 +88,7 @@ public final class Utilities {
             System.out.print("> ");
             String line = scanner.nextLine().trim();
             if (line.isEmpty()) {
-                Utilities.printError("Input cannot be empty. Please try again.");
+                System.out.println("Input cannot be empty. Please try again");
                 continue;
             }
             return line;
@@ -135,7 +114,7 @@ public final class Utilities {
             if (line.equals("N") || line.equals("NO")) {
                 return false;
             }
-            printError("Please answer with 'Y' or 'N'.");
+            System.out.println("Please answer with 'Y' or 'N'");
         }
     }
 

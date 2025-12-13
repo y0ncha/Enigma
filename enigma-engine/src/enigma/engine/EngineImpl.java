@@ -5,8 +5,9 @@ import enigma.engine.exception.MachineNotLoadedException;
 import enigma.engine.exception.MachineNotConfiguredException;
 import enigma.engine.factory.CodeFactoryImpl;
 import enigma.engine.history.MachineHistory;
+import enigma.engine.snapshot.EngineSnapshot;
+import enigma.engine.snapshot.EngineSnapshotJson;
 import enigma.loader.Loader;
-import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
 import enigma.machine.MachineImpl;
@@ -44,7 +45,7 @@ public class EngineImpl implements Engine {
     private final Loader loader;
     private final CodeFactory codeFactory;
     private MachineHistory history;
-
+    private boolean isSnapshot = false;
     private MachineSpec spec;
     private CodeState ogCodeState = enigma.shared.state.CodeState.notConfigured();
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
@@ -83,22 +84,11 @@ public class EngineImpl implements Engine {
      * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
      */
     @Override
-    public void loadMachine(String path) {
-        try {
-            spec = loader.loadSpecs(path);
-            this.history = new MachineHistory();
-            this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
-            this.stringsProcessed = 0;
-        }
-        catch (EnigmaLoadingException e) {
-            throw new EngineException(
-                String.format(
-                    "Failed to load machine specification from XML file: %s. " +
-                    "Error: %s. " +
-                    "Fix: Ensure the XML file exists, is well-formed, and satisfies all validation rules.",
-                    path, e.getMessage()),
-                e);
-        }
+    public void loadMachine(String path) throws Exception {
+        spec = loader.loadSpecs(path);
+        this.history = new MachineHistory();
+        this.curCodeState = enigma.shared.state.CodeState.notConfigured();
+        this.stringsProcessed = 0;
     }
 
     /**
@@ -120,7 +110,7 @@ public class EngineImpl implements Engine {
         int rotors = spec == null ? 0 : spec.rotorsById().size();
         int reflectors = spec == null ? 0 : spec.reflectorsById().size();
         CodeState currCodeState = machine.getCodeState();
-        return new MachineState(rotors, reflectors, stringsProcessed, this.ogCodeState, currCodeState );
+        return new MachineState(rotors, reflectors, stringsProcessed, this.curCodeState, currCodeState );
     }
 
     /**
@@ -138,9 +128,7 @@ public class EngineImpl implements Engine {
     @Override
     public void configManual(CodeConfig config) {
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot configure machine: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before configuring.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
         // validate config against spec
         EngineValidator.validateCodeConfig(spec, config);
@@ -150,8 +138,10 @@ public class EngineImpl implements Engine {
         machine.setCode(code);
 
         // record config in history
-        ogCodeState = machine.getCodeState();
-        history.recordConfig(ogCodeState);
+        if (!isSnapshot){
+            curCodeState = machine.getCodeState();
+        }
+        history.recordConfig(curCodeState);
     }
 
 
@@ -171,9 +161,7 @@ public class EngineImpl implements Engine {
     @Override
     public void configRandom() {
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot generate random configuration: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before generating random configuration.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
         CodeConfig config = generateRandomConfig(spec);
         configManual(config);
@@ -199,18 +187,12 @@ public class EngineImpl implements Engine {
      */
     @Override
     public ProcessTrace process(String input) {
-        // Validate machine is loaded
+
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                "Cannot process message: No machine specification loaded. " +
-                "Fix: Load a machine specification using loadMachine(path) before processing messages.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
-        
-        // Validate machine is configured
         if (!machine.isConfigured()) {
-            throw new MachineNotConfiguredException(
-                "Cannot process message: Machine is not configured. " +
-                "Fix: Configure the machine using configManual(config) or configRandom() before processing messages.");
+            throw new MachineNotConfiguredException("Machine is not configured");
         }
         
         // Validate input is not null and contains only valid characters
@@ -237,22 +219,14 @@ public class EngineImpl implements Engine {
 
     /**
      * Reset the currently-configured machine to its initial state for the current code.
-     *
-     * @throws MachineNotLoadedException if no machine specification has been loaded
-     * @throws MachineNotConfiguredException if the machine has not been configured with a code
      */
     @Override
     public void reset() {
         if (spec == null) {
-            throw new MachineNotLoadedException(
-                    "Cannot reset machine: No machine specification loaded. " +
-                            "Fix: Load a machine specification using loadMachine(path) before resetting.");
+            throw new MachineNotLoadedException("No machine loaded");
         }
-
         if (!machine.isConfigured()) {
-            throw new MachineNotConfiguredException(
-                    "Cannot reset machine: Machine is not configured. " +
-                            "Fix: Configure the machine using configManual(config) or configRandom() before resetting.");
+            throw new MachineNotConfiguredException("Machine is not configured");
         }
         machine.reset();
     }
@@ -274,6 +248,9 @@ public class EngineImpl implements Engine {
      */
     @Override
     public String history() {
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
+        }
         return history.toString();
     }
 
@@ -286,6 +263,9 @@ public class EngineImpl implements Engine {
     @Override
     @Deprecated
     public MachineSpec getMachineSpec() {
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
+        }
         return spec;
     }
 
@@ -347,5 +327,75 @@ public class EngineImpl implements Engine {
 
         // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
+    }
+
+    /**
+     * Bonus: Save the current machine state (spec + code + history + statistics)
+     * into a JSON snapshot file.
+     *
+     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
+     * @throws EngineException if no spec is loaded or snapshot saving fails
+     */
+    @Override
+    public void saveSnapshot(String basePath) {
+        try{
+            if (spec == null) {
+                throw new EngineException(
+                        "Cannot save snapshot: No machine specification loaded. " +
+                                "Fix: Load an XML specification and configure the machine before saving.");
+            }
+            MachineState state = machineData(); // uses curCodeState + stringsProcessed etc.
+            EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
+            EngineSnapshotJson.save(snapshot, basePath);
+        }catch (Exception e){
+            throw new EngineException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Bonus: Load a machine state from a previously saved JSON snapshot file.
+     *
+     * <p>This method REPLACES the current machine specification, history and
+     * counters with the loaded data.</p>
+     *
+     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
+     * @throws EngineException if loading fails or snapshot is invalid
+     */
+    @Override
+    public void loadSnapshot(String basePath) {
+        try {
+            // 1) Load snapshot from JSON file
+            EngineSnapshot snapshot = EngineSnapshotJson.load(basePath);
+            // 2) Replace machine specification
+            this.spec = snapshot.spec();
+            // 3) Replace history
+            this.history = snapshot.history() != null
+                    ? snapshot.history()
+                    : new MachineHistory();
+            // 4) Restore machine runtime state
+            MachineState state = snapshot.machineState();
+            if (state != null) {
+                this.stringsProcessed = state.stringsProcessed();
+                this.curCodeState = state.ogCodeState();
+                CodeState theCurCodeState = state.curCodeState();
+                boolean hasCurrent =
+                        theCurCodeState != null &&
+                                theCurCodeState != CodeState.NOT_CONFIGURED;
+                if (hasCurrent) {
+                    // Machine was configured when snapshot was taken
+                    isSnapshot = true;
+                    configManual(theCurCodeState.toCodeConfig());
+                    isSnapshot = false;
+                }
+            } else {
+                // Defensive fallback in damaged snapshot file
+                this.stringsProcessed = 0;
+                this.curCodeState = CodeState.NOT_CONFIGURED;
+                machine.reset();
+            }
+        } catch (Exception e) {
+            // Wrap everything in EngineException with meaningful message
+            throw new EngineException(e.getMessage());
+        }
     }
 }

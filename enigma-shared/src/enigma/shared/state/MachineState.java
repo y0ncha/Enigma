@@ -119,7 +119,6 @@ public record MachineState(
                 (ogCodeState == null || ogCodeState == CodeState.NOT_CONFIGURED ? "<not configured>" : ogCodeState.toString()) +
                 "\n" +
                 "Current Configuration  : " +
-                (curCodeState == null || curCodeState == CodeState.NOT_CONFIGURED ? "<not configured>" : curCodeState.toString()) +
-                "\n";
+                (curCodeState == null || curCodeState == CodeState.NOT_CONFIGURED ? "<not configured>" : curCodeState.toString());
     }
 }

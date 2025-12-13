@@ -87,11 +87,11 @@ public final class ConsoleValidator {
         try {
             commandId = Integer.parseInt(trimmed);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid input. Please enter a number between 1 and 8.");
+            throw new IllegalArgumentException("Unknown command number, ");
         }
         ConsoleCommand cmd = ConsoleCommand.fromId(commandId);
         if (cmd == null) {
-            throw new IllegalArgumentException("Unknown command number. Please choose a number between 1 and 8.");
+            throw new IllegalArgumentException("Unknown command number, ");
         }
         return cmd;
     }
@@ -143,7 +143,7 @@ public final class ConsoleValidator {
         }
         // Check even length (format requirement)
         if (plugboard.length() % 2 != 0) {
-            throw new IllegalArgumentException("Plugboard must have even length (pairs of characters). Got length: " + plugboard.length());
+            throw new IllegalArgumentException("Plugboard must have even length (pairs of characters). Got " + plugboard.length());
         }
     }
 }

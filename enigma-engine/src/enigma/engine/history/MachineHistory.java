@@ -88,12 +88,11 @@ import java.util.*;
  */
 public final class MachineHistory {
 
-    // Original code -> all message runs under that code
-    private final Map<CodeState, List<MessageRecord>> history = new LinkedHashMap<>();
+    // Original code (as compact string) -> all message runs under that code
+    private final Map<String, List<MessageRecord>> history = new LinkedHashMap<>();
 
     // The original code currently in effect
     private CodeState currentOriginalCode;
-
     /**
      * Records a new original code configuration and sets it as the current grouping key.
      *
@@ -128,9 +127,13 @@ public final class MachineHistory {
         // Set the currently active original code state
         currentOriginalCode = codeState;
 
-        // Ensure this codeState has an entry in the history map
-        history.computeIfAbsent(codeState, k -> new ArrayList<>());
+        // Use the compact string representation as the map key
+        String key = codeState.toString();
+
+        // Ensure this code has an entry in the history map
+        history.computeIfAbsent(key, k -> new ArrayList<>());
     }
+
 
     /**
      * Records a processed message under the current original code.
@@ -162,11 +165,15 @@ public final class MachineHistory {
                     "Cannot record message: No original code has been configured yet.");
         }
 
+        // Use the same string key as in recordConfig()
+        String key = currentOriginalCode.toString();
+
         // Defensive — should never happen if recordConfig() is correct
-        List<MessageRecord> messages = history.computeIfAbsent(currentOriginalCode, k -> new ArrayList<>());
+        List<MessageRecord> messages = history.computeIfAbsent(key, k -> new ArrayList<>());
 
         messages.add(new MessageRecord(input, output, durationNanos));
     }
+
 
     /**
      * Generates a formatted string representation of the complete processing history.
@@ -195,19 +202,21 @@ public final class MachineHistory {
         StringBuilder sb = new StringBuilder();
         boolean printedAny = false;
 
-        for (Map.Entry<CodeState, List<MessageRecord>> entry : history.entrySet()) {
-            CodeState code = entry.getKey();
+        for (Map.Entry<String, List<MessageRecord>> entry : history.entrySet()) {
+            String code = entry.getKey();               // already in compact format
             List<MessageRecord> records = entry.getValue();
-
-            if (records.isEmpty()) {
-                // Instructions: only show codes that actually processed messages
-                continue;
-            }
 
             printedAny = true;
 
             // Print the original code (instruction §7: "present the code used")
             sb.append(code).append(System.lineSeparator());
+
+            // If no strings were processed, print a message
+            if (records.isEmpty()) {
+               sb.append("  ")
+                       .append("No messages processed")
+                       .append(System.lineSeparator());
+            }
 
             // Print each record with numbering starting at 1
             for (int i = 0; i < records.size(); i++) {
@@ -219,12 +228,10 @@ public final class MachineHistory {
                         .append(r.toString())   // uses our new format
                         .append(System.lineSeparator());
             }
-
             sb.append(System.lineSeparator());
         }
-
         if (!printedAny) {
-            return "No history available. No messages were processed.";
+            return "No history recorded - no messages have been processed yet.";
         }
         return sb.toString().trim();
     }

@@ -119,6 +119,47 @@ All validation logic must reside in the engine and loader:
 // ---------------------------------------------------------
 ```
 
+### 7.1 Try/Catch and If/Else Block Formatting
+
+- Place the `catch` or `else` clause on a new line immediately after the closing brace `}` of the preceding `try` or `if` block.
+- Do not place `catch`/`else` on the same line as the closing brace.
+- Keep indentation and spacing consistent with the surrounding code.
+
+Example (required style):
+
+```
+       try {
+            enigma.reset();
+            System.out.println("Code has been reset to original configuration");
+        }
+        catch (EngineException e) {
+            System.out.println("Failed to reset code : " + e.getMessage());
+        }
+```
+
+- The same rule applies to `if/else` chains:
+
+```
+        if (condition) {
+            // ...
+        }
+        else {
+            // ...
+        }
+```
+
+### 7.2 Colon Spacing in Printed Messages
+
+- When printing labels and values, always include **one space before and one space after the colon** (e.g., `Label : Value`). This is intentional and required, even though it differs from standard English style.
+- This rule applies to all user-facing output (console, logs shown to users, examples in documentation).
+
+Example (required style):
+
+```
+    Note : This test requires XML test files to be present.
+    Advanced rotor indices : [0, 1, 2]
+```
+
 ---
 
 # 8. Pull Request Checklist

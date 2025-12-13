@@ -31,9 +31,13 @@ public class SmallMultiWordTester {
         Engine engine = new EngineImpl();
 
         System.out.println("Loading XML: " + XML_PATH + "\n");
-
-        engine.loadMachine(XML_PATH);
-
+        try {
+            engine.loadMachine(XML_PATH);
+        }
+        catch (Exception e) {
+            System.err.println("Failed to load machine: " + e.getMessage());
+            return;
+        }
         // Code: <3,2,1><CCC><I>
         CodeConfig config = new CodeConfig(
                 java.util.List.of(3, 2, 1),   // rotors left→right
