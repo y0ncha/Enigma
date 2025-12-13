@@ -570,7 +570,7 @@ public class ConsoleImpl implements Console {
         while (true) {
             String basePath = Utilities.readNonEmptyLine(
                     scanner,
-                    "Enter full path (folder + file name, without extension) of the snapshot to load:");
+                    "Enter full path (folder + file name, without extension) of the snapshot to load :");
             try {
                 enigma.loadSnapshot(basePath);
                 machineLoaded = true;
