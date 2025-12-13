@@ -88,7 +88,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Position count mismatch: Expected exactly %d initial positions, but got %d." +
-                    "Provided positions: %s. " +
+                    " Provided positions: %s. " +
                     "Fix: Provide exactly %d initial positions (one per rotor).",
                     required, positions.size(), positions, required));
         }
