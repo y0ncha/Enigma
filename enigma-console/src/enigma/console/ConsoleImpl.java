@@ -556,9 +556,7 @@ public class ConsoleImpl implements Console {
         }
     }
 
-    // =========================
-    //  Command 10: Load machine state from a previously saved JSON snapshot file
-    // =========================
+    // [ Command 10: Load machine state from a previously saved JSON snapshot file ]
     /**
      * Bonus command: Load machine state from a previously saved JSON snapshot file.
      * Flow:
