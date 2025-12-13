@@ -149,10 +149,55 @@ static String parseReflectorChoice(int choice, List<ReflectorSpec> reflectors)
 **Purpose**: Helper methods for console output formatting.
 
 **Methods**:
-- `printInfo(String)`: Print informational message
-- `printError(String)`: Print error message
+- `printInfo(String)`: Print informational message with [INFO] tag
+- `printError(String)`: Print error message with [ERROR] tag
 - `printSuccess(String)`: Print success message
-- Display formatting helpers
+- Display formatting helpers for traces and history
+
+## Format Validation Constraints
+
+The console enforces **format-level constraints** on user input before delegating to the engine. Format validation checks syntactic structure without understanding semantic meaning.
+
+### What Console Validates (Format Only)
+
+**Command Input:**
+- Command must be numeric
+- Command must be in range [1, 8] (available commands)
+
+**Rotor ID Input:**
+- Rotor ID list must be parseable as comma-separated integers
+- Each rotor ID must be a valid integer
+- No empty parts (e.g., "1,,3" is invalid)
+
+**Position Input:**
+- Position string must contain only A-Z characters (uppercase)
+- Position string length must equal rotor count
+- **Note:** Does NOT validate alphabet membership (engine's responsibility)
+
+**Reflector Input:**
+- Reflector choice must be numeric
+- Reflector choice must be in range [1, N] where N is number of available reflectors
+
+**Plugboard Input:**
+- Plugboard string must have even length (character pairs)
+- **Note:** Does NOT validate alphabet membership, duplicates, or self-mapping (engine's responsibility)
+
+### What Console Does NOT Validate (Semantics)
+
+The console **never** validates semantic rules or business logic:
+
+- ❌ **Rotor IDs exist** in machine spec
+- ❌ **Rotor IDs are unique** (no duplicates)
+- ❌ **Reflector ID exists** in machine spec
+- ❌ **Position characters** are in machine alphabet
+- ❌ **Input characters** are in machine alphabet
+- ❌ **Plugboard characters** are in machine alphabet
+- ❌ **Plugboard has no duplicates**
+- ❌ **Plugboard has no self-mappings**
+
+**Rationale:** Format validation is syntactic (can this be parsed?). Semantic validation is contextual (does this make sense for the loaded machine?). The console handles parsing; the engine handles meaning.
+
+**Design Principle:** Each constraint is validated at exactly one layer. Format checks happen in console; semantic checks happen in engine. No duplication.
 
 ## Validation Boundaries
 

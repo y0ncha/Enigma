@@ -31,6 +31,80 @@ This module provides the public API for interacting with the Enigma machine syst
 - ❌ Display output or interact with users (console's responsibility)
 - ❌ Format validation (console's responsibility - parsing, A-Z checks, length)
 
+## Constraints Enforced by Engine
+
+### Referential Integrity Constraints
+The engine enforces referential integrity between user configurations and the loaded specification:
+
+**Configuration → Specification:**
+- Selected rotor IDs must exist in `spec.rotors`
+- Selected rotor IDs must be unique (no duplicates)
+- Number of rotor IDs must equal `spec.rotorsInUse`
+- Selected reflector ID must exist in `spec.reflectors`
+- Position characters must exist in `spec.alphabet`
+- Plugboard characters must exist in `spec.alphabet`
+
+**Messages → Alphabet:**
+- All input characters must exist in `spec.alphabet`
+- No forbidden control characters (newline, tab, ESC, ASCII 0-31, 127)
+
+### State Transition Constraints
+The engine enforces valid state transitions:
+
+**Loading:**
+- A machine specification must be successfully loaded before configuration
+- Loading a new specification clears all configuration and history (transactional)
+- Invalid XML never modifies the current specification
+
+**Configuration:**
+- A specification must be loaded before manual or random configuration
+- Configuration records an "original code" for reset and history grouping
+- Reconfiguration creates a new original code entry
+
+**Processing:**
+- A specification must be loaded before processing
+- A code must be configured before processing
+- Processing advances rotor positions but never modifies the specification
+
+**Reset:**
+- A code must be configured before reset
+- Reset returns positions to original values but preserves history
+
+**Terminate:**
+- Clears all state but does not exit the application
+- Returns engine to uninitialized state
+
+### Semantic Constraints
+Beyond referential integrity, the engine enforces semantic rules:
+
+**Plugboard Constraints:**
+- Even-length string (character pairs)
+- No character appears more than once
+- No character maps to itself
+- All characters in the machine alphabet
+
+**Uniqueness Constraints:**
+- Rotor IDs in configuration must be unique
+- Alphabet characters must be unique (enforced at load time by loader)
+- Reflector IDs must be unique (enforced at load time by loader)
+
+### Invariants Maintained by Engine
+
+**History Grouping:**
+- All messages processed after a configuration are grouped by the original code
+- Original code captures rotor IDs and initial positions at configuration time
+- History persists through reset but clears on load or terminate
+
+**State Consistency:**
+- Engine state is always consistent (either fully initialized or fully uninitialized)
+- No partial initialization states exist
+- Invalid operations throw exceptions before modifying state
+
+**DTO Immutability:**
+- All returned DTOs are immutable snapshots
+- Modifications to returned DTOs do not affect engine state
+- Engine never exposes internal mutable objects
+
 ## Key Components
 
 ### Engine (`EngineImpl`)
@@ -118,31 +192,52 @@ String historyReport = engine.history();
 - Name is historical; consider it "clear state"
 
 ### EngineValidator
-**Purpose**: Stateless validation helper for engine operations.
+**Purpose**: Stateless validation helper enforcing semantic constraints.
 
-**Validation Categories**:
+**Validation Philosophy:**
+- **Semantic validation**: Validates meaning relative to the loaded machine specification
+- **Relative validation**: Checks existence in spec, not against hardcoded lists
+- **Clear error messages**: What's wrong, where it occurred, and how to fix it
+- **No duplication**: Each constraint validated exactly once (not in console or loader)
 
-1. **Code Configuration Validation**:
-   - Null checks (rotor IDs, positions, reflector)
-   - Count matching (rotor count = positions count = spec requirement)
-   - Rotor IDs exist in spec
-   - Rotor IDs are unique
-   - Reflector exists in spec (Roman numeral format)
-   - Positions are valid alphabet characters
-   - Plugboard validation (even length, no duplicates, no self-mapping)
+**Validation Categories:**
 
-2. **Input Message Validation**:
-   - All characters in machine alphabet
-   - No forbidden characters:
-     - Newline (`\n`)
-     - Tab (`\t`)
-     - ESC (ASCII 27)
-     - All non-printable characters (ASCII 0-31, 127)
+#### 1. Code Configuration Validation
+Validates configuration against the loaded machine specification:
 
-**Validation Philosophy**:
-- **Semantic validation**: Checks against loaded machine spec
-- **Relative validation**: Rotor/reflector IDs checked against spec, not hardcoded
-- **Clear error messages**: What's wrong, where, and how to fix
+- **Null checks**: Rotor IDs list, positions list, reflector ID must be non-null
+- **Count matching**: Number of rotor IDs = number of positions = spec.rotorsInUse
+- **Rotor existence**: All selected rotor IDs must exist in spec.rotors
+- **Rotor uniqueness**: No rotor ID may appear more than once in configuration
+- **Reflector existence**: Selected reflector ID must exist in spec.reflectors
+- **Position validity**: All position characters must exist in spec.alphabet
+- **Plugboard format**: Even length string (pairs of characters)
+- **Plugboard semantics**: No duplicate characters, no self-mapping, all characters in alphabet
+
+**When Validated:** Before creating a Code via CodeFactory (in `configManual()`)
+
+#### 2. Input Message Validation
+Validates input messages before processing:
+
+- **Alphabet membership**: Every character must exist in the machine's alphabet
+- **Forbidden characters**: Rejects control and non-printable characters:
+  - Newline (`\n`, ASCII 10)
+  - Tab (`\t`, ASCII 9)
+  - Escape (ESC, ASCII 27)
+  - All control characters (ASCII 0-31, 127)
+
+**When Validated:** Before processing each message (in `process()`)
+
+**Rationale for Forbidden Characters:** Control characters can cause display issues, break formatting, and are not part of the historical Enigma character set.
+
+#### 3. State Precondition Validation
+Validates engine state before operations:
+
+- **Machine loaded**: Spec must be loaded before configuration
+- **Machine configured**: Code must be set before processing messages
+- **Non-null inputs**: All operation parameters must be non-null
+
+**When Validated:** At the start of each operation that requires preconditions
 
 ### MachineHistory
 **Purpose**: Records and organizes processing history by original code configuration.
@@ -194,28 +289,56 @@ Each `MessageRecord` contains:
 
 ## Validation Boundaries
 
-### Engine Validates (Semantic):
-- Rotor IDs exist in loaded spec
-- Rotor IDs are unique
-- Reflector ID exists in loaded spec
-- Positions are valid alphabet characters
-- Input characters are in alphabet
-- Plugboard pairs are valid
+The system enforces a three-layer validation architecture to prevent duplication and ensure each constraint is validated at exactly one layer.
 
-### Engine Does NOT Validate (Format):
-- Command parsing (console responsibility)
-- Rotor ID list format (console parses)
-- Position string length matching rotor count before parsing (console responsibility)
-- Reflector choice in range before ID lookup (console responsibility)
+### Engine Validates (Semantic - Relative to Spec)
+The engine performs **semantic validation** — checking whether inputs make sense in the context of the loaded machine specification:
 
-### Loader Validates (XML Structure):
-- File extension (.xml)
-- Alphabet: even length, unique characters
-- Rotor IDs: contiguous 1..N
-- Rotor mappings: bijective
-- Notch: in alphabet range
-- Reflector IDs: Roman numerals I, II, III, IV, V in order
+- **Rotor IDs exist** in loaded spec (not hardcoded lists)
+- **Rotor IDs are unique** (no rotor used twice)
+- **Reflector ID exists** in loaded spec
+- **Position characters** are in the machine's alphabet
+- **Input characters** are in the machine's alphabet
+- **Plugboard characters** are in the machine's alphabet
+- **Plugboard semantics**: No duplicates, no self-mapping
+- **State preconditions**: Machine loaded before config, configured before processing
+
+**Why Relative Validation?** The engine validates against the **loaded specification**, not hardcoded values. This allows the engine to work with any valid machine specification without code changes.
+
+**Example:** The engine checks if reflector "II" exists in the currently loaded spec's reflectors list, not whether "II" is a valid Roman numeral (that's the loader's job).
+
+### Engine Does NOT Validate (Format)
+The engine **does not** perform format validation. Format checks are the console's responsibility:
+
+- ❌ Command parsing (numeric, in range)
+- ❌ Rotor ID list format (comma-separated integers)
+- ❌ Position string length matching rotor count (before semantic check)
+- ❌ Reflector choice in available range (before ID lookup)
+- ❌ Plugboard string even length (format only; semantics validated by engine)
+
+**Rationale:** Format validation is syntactic, not semantic. The console handles string parsing and basic type checking before delegating to the engine.
+
+### Loader Validates (XML Structure)
+The loader performs **structural validation** — checking that XML files are well-formed and internally consistent:
+
+- File extension is `.xml`
+- Alphabet: even length, unique characters, ASCII only
+- Rotor IDs: contiguous sequence 1..N
+- Rotor mappings: bijective (complete permutations)
+- Notch positions: in alphabet range [1, alphabetSize]
+- Reflector IDs: valid Roman numerals (I, II, III, IV, V), contiguous, unique
 - Reflector mappings: symmetric, no self-mapping, complete coverage
+- Rotors-in-use count: ≤ number of defined rotors
+
+**Rationale:** Structural validation happens at load time and ensures the specification itself is valid. Runtime validation (by engine) then checks user choices against this valid specification.
+
+### Validation Principle: Single Point of Truth
+Each constraint is validated at **exactly one layer**:
+- **Format** → Console
+- **Semantics** → Engine
+- **Structure** → Loader
+
+**No duplication.** Each layer trusts that lower layers have done their job, but the engine always validates semantic correctness even if the console skips format checks (defense in depth).
 
 ## State Snapshots
 
