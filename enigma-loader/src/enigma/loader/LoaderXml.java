@@ -504,7 +504,7 @@ public class LoaderXml implements Loader {
             String required = ROMAN_ORDER.get(i);
             if (!ids.contains(required)) {
                 throw new EnigmaLoadingException(
-                        "Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III)" + " Got  " + ids + " Missing  " + required);
+                        "Reflector IDs must form a contiguous Roman sequence starting from I (e.g., I, II, III), " + "Got " + ids + " Missing  " + required);
             }
         }
     }
