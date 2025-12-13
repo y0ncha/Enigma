@@ -137,7 +137,6 @@ public class EngineImpl implements Engine {
             throw new MachineNotConfiguredException("Machine is not configured");
         }
         
-        // Validate input is not null and contains only valid characters
         EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
@@ -153,7 +152,6 @@ public class EngineImpl implements Engine {
 
         this.stringsProcessed++;
 
-        // Record processed message with duration in nanoseconds
         history.recordMessage(input, output.toString(), duration);
 
         return new ProcessTrace(output.toString(), List.copyOf(traces));
@@ -174,13 +172,10 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Terminate the engine and release any resources. This implementation currently
-     * has no resources to release; method exists for interface completeness.
+     * {@inheritDoc}
      */
     @Override
     public void terminate() {
-        // Nothing to clean up.
-        // Included for interface completeness (console may call it before exiting).
     }
 
     /**
@@ -229,43 +224,30 @@ public class EngineImpl implements Engine {
     // ---------------------------------------------------------
 
     /**
-     * Generate a random {@link CodeConfig} from the loaded {@link MachineSpec}.
+     * Generate a random configuration from the loaded specification.
      *
-     * <p>Sampling rules:</p>
-     * <ul>
-     *   <li>Pick exactly the number of rotors specified by {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
-     *   <li>Pick one reflector ID at random</li>
-     *   <li>Generate random starting positions as chars (left→right)</li>
-     * </ul>
-     * <p>The returned {@link CodeConfig} uses left→right ordering for rotors and
-     * positions (user-facing conventions).</p>
-     *
-     * @param spec machine specification (must be non-null)
-     * @return randomly sampled {@link CodeConfig}
+     * @param spec machine specification
+     * @return randomly sampled configuration
      */
     private CodeConfig generateRandomConfig(MachineSpec spec) {
         SecureRandom random = new SecureRandom();
 
-        // Shuffle available rotor IDs and pick exactly ROTORS_IN_USE of them in random order (left → right)
         int needed = spec.getRotorsInUse();
         List<Integer> rotorPool = new ArrayList<>(spec.rotorsById().keySet());
         Collections.shuffle(rotorPool, random);
-        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, needed)); // left→right
+        List<Integer> chosenRotors = new ArrayList<>(rotorPool.subList(0, needed));
 
-        // Generate random starting positions as characters (left → right)
         int alphaSize = spec.alphabet().size();
         List<Character> positions = new ArrayList<>(needed);
         for (int i = 0; i < needed; i++) {
-            int randIndex = random.nextInt(alphaSize);        // 0 .. alphaSize-1
-            char posChar = spec.alphabet().charAt(randIndex); // map index → symbol
+            int randIndex = random.nextInt(alphaSize);
+            char posChar = spec.alphabet().charAt(randIndex);
             positions.add(posChar);
         }
 
-        // Pick a random reflector
         List<String> reflectorIds = new ArrayList<>(spec.reflectorsById().keySet());
         String reflectorId = reflectorIds.get(random.nextInt(reflectorIds.size()));
 
-        // rotorIds (left→right), positions as chars (left→right), reflectorId
         return new CodeConfig(chosenRotors, positions, reflectorId);
     }
 
@@ -302,15 +284,11 @@ public class EngineImpl implements Engine {
     @Override
     public void loadSnapshot(String basePath) {
         try {
-            // 1) Load snapshot from JSON file
             EngineSnapshot snapshot = EngineSnapshotJson.load(basePath);
-            // 2) Replace machine specification
             this.spec = snapshot.spec();
-            // 3) Replace history
             this.history = snapshot.history() != null
                     ? snapshot.history()
                     : new MachineHistory();
-            // 4) Restore machine runtime state
             MachineState state = snapshot.machineState();
             if (state != null) {
                 this.stringsProcessed = state.stringsProcessed();
@@ -320,19 +298,16 @@ public class EngineImpl implements Engine {
                         theCurCodeState != null &&
                                 theCurCodeState != CodeState.NOT_CONFIGURED;
                 if (hasCurrent) {
-                    // Machine was configured when snapshot was taken
                     isSnapshot = true;
                     configManual(theCurCodeState.toCodeConfig());
                     isSnapshot = false;
                 }
             } else {
-                // Defensive fallback in damaged snapshot file
                 this.stringsProcessed = 0;
                 this.curCodeState = CodeState.NOT_CONFIGURED;
                 machine.reset();
             }
         } catch (Exception e) {
-            // Wrap everything in EngineException with meaningful message
             throw new EngineException(e.getMessage());
         }
     }
