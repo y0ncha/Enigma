@@ -59,29 +59,52 @@ It is strict by design to maintain alignment with course requirements.
 
 ---
 
-# 4. Validation Rules (Must Match Engine Behavior)
+# 4. Validation Rules and Layer Responsibilities
 
-All validation logic must reside in the engine and loader:
+All validation logic is distributed across three layers with strict separation of concerns:
 
-### XML Validation
-- Even alphabet size
-- Rotor IDs consecutive
-- Rotor mappings bijective
-- No reflector maps X→X
-- Roman reflector IDs unique
-- `rotors-count` <= available rotors
-- Forbidden chars: newline, tab, ESC
-- Invalid XML leaves current machine untouched
+### Validation Layer Architecture
 
-### Code Configuration Validation
-- Rotor count must match spec
-- Rotor IDs must exist
-- Initial positions valid in alphabet
-- Reflector must exist
-- Plugboard: even length, no duplicates, no self-mapping
+**Console (Format Validation):**
+- Command parsing (numeric, in range)
+- Rotor ID list format (comma-separated integers)
+- Position string format (A-Z characters, correct length)
+- Reflector choice format (numeric, in range)
+- Plugboard format (even length)
+- **Never validates:** Alphabet membership, rotor/reflector existence, semantic rules
 
-### Input Validation
-- All characters must be in alphabet
+**Engine (Semantic Validation):**
+- Rotor IDs exist in loaded spec and are unique
+- Reflector ID exists in loaded spec
+- Position characters are in machine alphabet
+- Input characters are in machine alphabet
+- Plugboard semantics (no duplicates, no self-mapping, alphabet membership)
+- State preconditions (machine loaded before config, configured before processing)
+- **Never validates:** XML structure, format parsing
+
+**Loader (Structural Validation):**
+- File extension is `.xml`
+- Alphabet: even length, unique characters, ASCII only
+- Rotor IDs: contiguous sequence 1..N
+- Rotor mappings: bijective (complete permutations)
+- Notch positions: within alphabet range
+- Reflector IDs: Roman numerals (I, II, III, IV, V), contiguous, unique
+- Reflector mappings: symmetric, no self-mapping, complete coverage
+- Rotors-in-use: ≤ available rotors
+- **Never validates:** User configurations, runtime input
+
+### Validation Principles
+
+1. **Single Point of Truth:** Each constraint validated at exactly one layer
+2. **No Duplication:** Same rule never checked in multiple layers
+3. **Clear Error Messages:** What's wrong, where it occurred, how to fix
+4. **Fail Fast:** Invalid input rejected before any state changes
+5. **Transactional:** Invalid XML never modifies engine state
+
+### Forbidden Characters
+The following characters are explicitly rejected in alphabets and input:
+- Newline (`\n`), Tab (`\t`), ESC (ASCII 27)
+- All non-printable control characters (ASCII 0-31, 127)
 
 ---
 

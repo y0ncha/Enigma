@@ -287,25 +287,108 @@ DTOs contain **no business logic**, only:
 Shared module has **no dependencies** on other enigma modules. This prevents circular dependencies and keeps module boundaries clean.
 
 ### Semantic Naming
-- **Spec**: Immutable specification from XML (RotorSpec, ReflectorSpec, MachineSpec)
-- **Config**: User-provided configuration (CodeConfig)
-- **State**: Runtime state snapshot (CodeState, MachineState)
-- **Trace**: Detailed processing trace (SignalTrace, ProcessTrace, RotorTrace, ReflectorTrace)
-- **Record**: Historical record (MessageRecord)
+DTOs follow consistent naming conventions to indicate their purpose:
 
-## Left→Right Convention
+- **Spec**: Immutable specification loaded from XML
+  - `MachineSpec`, `RotorSpec`, `ReflectorSpec`
+  - Represents the machine definition, not runtime state
+  
+- **Config**: User-provided configuration
+  - `CodeConfig`
+  - Represents user choices for machine setup
+  
+- **State**: Runtime state snapshot
+  - `CodeState`, `MachineState`
+  - Captures current or original machine state at a point in time
+  
+- **Trace**: Detailed processing trace
+  - `SignalTrace`, `ProcessTrace`, `RotorTrace`, `ReflectorTrace`
+  - Records the transformation path of characters through the machine
+  
+- **Record**: Historical record
+  - `MessageRecord`
+  - Preserves information about past operations
 
-**All rotor-related lists use left→right ordering:**
-- `CodeConfig.rotorIds`: [1,2,3] means leftmost=1, rightmost=3
-- `CodeConfig.positions`: ['A','B','C'] means leftmost='A', rightmost='C'
-- `CodeState.rotorIds`: Same as CodeConfig
-- `CodeState.positions`: Same as CodeConfig
-- `SignalTrace.windowBefore/After`: "ABC" means leftmost='A', rightmost='C'
+### Ordering Convention — Left→Right Throughout
 
-This matches:
-- User's visual perspective of the machine
-- Physical left-to-right arrangement
-- Console input and display
+**Critical Design Principle:** All rotor-related lists use **left→right ordering** consistently across all DTOs.
+
+**Rotor Indexing:**
+- Index 0 = leftmost rotor (visible in left window position)
+- Index size-1 = rightmost rotor (steps every character)
+
+**Applied In:**
+- `CodeConfig.rotorIds`: [1,2,3] means leftmost=1, middle=2, rightmost=3
+- `CodeConfig.positions`: ['A','B','C'] means leftmost='A', middle='B', rightmost='C'
+- `CodeState.rotorIds`: Same ordering as CodeConfig
+- `CodeState.positions`: Same ordering as CodeConfig
+- `SignalTrace.windowBefore/After`: "ABC" means leftmost='A', middle='B', rightmost='C'
+
+**Consistency Benefits:**
+- Matches user's visual perspective of the machine
+- Aligns with physical left-to-right window arrangement
+- Simplifies console input and display logic
+- Eliminates index confusion and reversal bugs
+- Consistent across all layers: console → engine → machine
+
+**Example:**
+User configures: "Rotors 3,2,1 at positions ODX"
+- DTO storage: `rotorIds=[3,2,1]`, `positions=['O','D','X']`
+- Machine interpretation: leftmost=3@O, middle=2@D, rightmost=1@X
+- Display output: "ODX" (left to right)
+
+## DTO Design Constraints and Guarantees
+
+### Immutability Guarantees
+
+**Record Immutability:**
+- All DTO classes are Java records (immutable by default)
+- Fields are final and cannot be reassigned
+- No setter methods exist
+- Defensive copies in constructors where needed
+
+**Array Exception:**
+- `RotorSpec.rightColumn`, `RotorSpec.leftColumn` (char arrays)
+- `ReflectorSpec.mapping` (int array)
+- **Warning:** Arrays are mutable for efficiency; callers must treat as immutable
+- **Future consideration:** May use immutable collections in later versions
+
+**Thread-Safety:**
+- All DTOs are thread-safe (immutable state)
+- Can be safely shared between threads without synchronization
+- No concurrent modification issues
+- Safe for use in multi-threaded server environments
+
+### No Business Logic Constraint
+
+DTOs are **pure data containers** with zero business logic:
+
+**Allowed:**
+- Data fields (final, immutable)
+- Record-generated methods (`equals()`, `hashCode()`, `toString()`)
+- Optional custom `toString()` for debugging/display formatting
+
+**Forbidden:**
+- Validation logic (delegated to validators in engine/loader layers)
+- Transformation logic (delegated to factories and processors)
+- Computation logic (delegated to business logic layers)
+- State mutation (immutability is a hard constraint)
+
+**Rationale:** Keeping DTOs logic-free maintains clean separation between data and behavior, simplifies testing, and prevents coupling between layers.
+
+### Module Independence
+
+**Zero Dependencies on Other Enigma Modules:**
+- Shared module depends only on Java standard library
+- Never imports from enigma-machine, enigma-engine, enigma-loader, or enigma-console
+- Prevents circular dependencies
+- Allows any module to depend on shared without coupling issues
+
+**Benefits:**
+- Clear module boundaries
+- Simplified dependency graph
+- Easier testing and maintenance
+- Modules communicate only through shared contracts
 
 ## Thread Safety
 
