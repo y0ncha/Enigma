@@ -87,7 +87,7 @@ public class EngineImpl implements Engine {
     public void loadMachine(String path) throws Exception {
         spec = loader.loadSpecs(path);
         this.history = new MachineHistory();
-        this.curCodeState = enigma.shared.state.CodeState.notConfigured();
+        this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
         this.stringsProcessed = 0;
     }
 
@@ -110,7 +110,7 @@ public class EngineImpl implements Engine {
         int rotors = spec == null ? 0 : spec.rotorsById().size();
         int reflectors = spec == null ? 0 : spec.reflectorsById().size();
         CodeState currCodeState = machine.getCodeState();
-        return new MachineState(rotors, reflectors, stringsProcessed, this.curCodeState, currCodeState );
+        return new MachineState(rotors, reflectors, stringsProcessed, this.ogCodeState, currCodeState );
     }
 
     /**
@@ -139,9 +139,9 @@ public class EngineImpl implements Engine {
 
         // record config in history
         if (!isSnapshot){
-            curCodeState = machine.getCodeState();
+            ogCodeState = machine.getCodeState();
         }
-        history.recordConfig(curCodeState);
+        history.recordConfig(ogCodeState);
     }
 
 
@@ -341,10 +341,9 @@ public class EngineImpl implements Engine {
         try{
             if (spec == null) {
                 throw new EngineException(
-                        "Cannot save snapshot: No machine specification loaded. " +
-                                "Fix: Load an XML specification and configure the machine before saving.");
+                        "Cannot save snapshot: No machine specification loaded.");
             }
-            MachineState state = machineData(); // uses curCodeState + stringsProcessed etc.
+            MachineState state = machineData(); // uses ogCodeState, + stringsProcessed etc.
             EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
             EngineSnapshotJson.save(snapshot, basePath);
         }catch (Exception e){
@@ -376,21 +375,21 @@ public class EngineImpl implements Engine {
             MachineState state = snapshot.machineState();
             if (state != null) {
                 this.stringsProcessed = state.stringsProcessed();
-                this.curCodeState = state.ogCodeState();
-                CodeState theCurCodeState = state.curCodeState();
+                this.ogCodeState = state.ogCodeState();
+                CodeState snapshotCodeState = state.ogCodeState();
                 boolean hasCurrent =
-                        theCurCodeState != null &&
-                                theCurCodeState != CodeState.NOT_CONFIGURED;
+                        snapshotCodeState != null &&
+                                snapshotCodeState != CodeState.NOT_CONFIGURED;
                 if (hasCurrent) {
                     // Machine was configured when snapshot was taken
                     isSnapshot = true;
-                    configManual(theCurCodeState.toCodeConfig());
+                    configManual(snapshotCodeState.toCodeConfig());
                     isSnapshot = false;
                 }
             } else {
                 // Defensive fallback in damaged snapshot file
                 this.stringsProcessed = 0;
-                this.curCodeState = CodeState.NOT_CONFIGURED;
+                this.ogCodeState = CodeState.NOT_CONFIGURED;
                 machine.reset();
             }
         } catch (Exception e) {

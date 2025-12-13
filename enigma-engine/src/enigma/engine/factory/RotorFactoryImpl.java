@@ -43,8 +43,7 @@ public class RotorFactoryImpl implements RotorFactory {
     public RotorFactoryImpl(Alphabet alphabet) {
         if (alphabet == null) {
             throw new InvalidConfigurationException(
-                "Rotor factory initialization failed: Alphabet is missing. " +
-                "Fix: Ensure the machine specification is properly loaded.");
+                "Rotor factory initialization failed: Alphabet is missing");
         }
         this.alphabet = alphabet;
     }

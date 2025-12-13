@@ -30,8 +30,7 @@ public final class EngineValidator {
     private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                    "Configuration validation failed: Machine specification is missing. " +
-                            "Fix: Load a machine specification before configuring.");
+                    "Configuration validation failed: Machine specification is missing");
         }
     }
 
@@ -41,8 +40,7 @@ public final class EngineValidator {
 
         if (config == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Configuration details are missing. " +
-                "Fix: Provide complete configuration details.");
+                "Configuration validation failed: Configuration details are missing");
         }
 
         List<Integer> rotorIds = config.rotorIds();
@@ -61,18 +59,15 @@ public final class EngineValidator {
     public static void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         if (rotorIds == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Rotor IDs are missing. " +
-                "Fix: Provide a list of rotor IDs (e.g., [1, 2, 3]).");
+                "Configuration validation failed: Rotor IDs are missing.");
         }
         if (positions == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Initial positions are missing. " +
-                "Fix: Provide a list of initial positions (e.g., ['A', 'A', 'A']).");
+                "Configuration validation failed: Initial positions are missing.");
         }
         if (reflectorId == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Reflector ID is missing. " +
-                "Fix: Provide a reflector ID (e.g., 'I', 'II', etc.).");
+                "Configuration validation failed: Reflector ID is missing.");
         }
     }
 
@@ -88,8 +83,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Position count mismatch: Expected exactly %d initial positions, but got %d." +
-                    " Provided positions: %s. " +
-                    "Fix: Provide exactly %d initial positions (one per rotor).",
+                    " Provided positions: %s. ",
                     required, positions.size(), positions, required));
         }
     }
@@ -112,8 +106,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                     String.format(
                             "Position count mismatch: Expected exactly %d initial positions, but got %d. " +
-                                    "Provided positions: %s. " +
-                                    "Fix: Provide exactly %d initial positions (one per rotor).",
+                                    "Provided positions: %s. ",
                             required, positions.size(), positions, required));
         }
     }
@@ -138,9 +131,8 @@ public final class EngineValidator {
         if (rotorIds.size() != required) {
             throw new InvalidConfigurationException(
                     String.format(
-                            "Invalid rotor selection: Exactly %d rotors must be selected, but got %d. " +
-                                    "Provided rotor IDs: %s. " +
-                                    "Fix: Select exactly %d rotor IDs from the available rotors in the machine specification.",
+                            "Invalid rotor selection: Exactly %d rotors must be selected, but got %d\n" +
+                                    "Provided rotor IDs: %s",
                             required, rotorIds.size(), rotorIds, required
                     )
             );
@@ -171,8 +163,7 @@ public final class EngineValidator {
     public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) {
             throw new InvalidConfigurationException(
-                "Invalid reflector ID: reflectorId must be non-empty. " +
-                "Fix: Provide a valid reflector ID (e.g., 'I', 'II', 'III', etc.).");
+                "Invalid reflector ID: reflectorId must be non-empty.");
         }
 
         if (spec.getReflectorById(reflectorId) == null) {
@@ -180,8 +171,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Invalid reflector ID: Reflector '%s' does not exist in the machine specification. " +
-                    "Available reflector IDs: %s. " +
-                    "Fix: Choose from the available reflector IDs listed above.",
+                    "Available reflector IDs: %s. ",
                     reflectorId, availableReflectorIds));
         }
     }
@@ -223,8 +213,7 @@ public final class EngineValidator {
 
         if (input == null) {
             throw new InvalidMessageException(
-                "Message validation failed: Input message is missing. " +
-                "Fix: Provide a message to process.");
+                "Message validation failed: Input message is missing.");
         }
 
         String alphabet = spec.alphabet().getLetters();
@@ -238,8 +227,7 @@ public final class EngineValidator {
                 throw new InvalidMessageException(
                     String.format(
                         "Invalid character in message: Control character %s detected at position %d. " +
-                        "Input: \"%s\". " +
-                        "Fix: Remove all control characters (newline, tab, ESC, etc.) from the message.",
+                        "Input: \"%s\".",
                         controlName, i, truncateForDisplay(input, 50)));
             }
 
@@ -248,8 +236,7 @@ public final class EngineValidator {
                     String.format(
                         "Invalid character in message: Character '%c' at position %d is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Input: \"%s\". " +
-                        "Fix: Use only characters from the machine alphabet.",
+                        "Input: \"%s\".",
                         c, i, alphabet, truncateForDisplay(input, 50)));
             }
         }
@@ -378,8 +365,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Invalid plugboard configuration: Length must be even (pairs of characters), but got length %d. " +
-                    "Plugboard: \"%s\". " +
-                    "Fix: Provide pairs of characters (e.g., \"ABCD\" for A↔B and C↔D).",
+                    "Plugboard: \"%s\".",
                     plugboard.length(), plugboard));
         }
 
@@ -397,8 +383,7 @@ public final class EngineValidator {
                 throw new InvalidConfigurationException(
                     String.format(
                         "Invalid plugboard pair: Letter '%c' cannot be mapped to itself (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\". " +
-                        "Fix: Each pair must consist of two different letters.",
+                        "Plugboard: \"%s\".",
                         first, pair, i, plugboard));
             }
 
@@ -407,16 +392,14 @@ public final class EngineValidator {
                 throw new InvalidConfigurationException(
                     String.format(
                         "Duplicate plugboard letter: Letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\". " +
-                        "Fix: Each letter can only appear once in the plugboard configuration.",
+                        "Plugboard: \"%s\".",
                         first, pair, i, plugboard));
             }
             if (!seenChars.add(second)) {
                 throw new InvalidConfigurationException(
                     String.format(
                         "Duplicate plugboard letter: Letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\". " +
-                        "Fix: Each letter can only appear once in the plugboard configuration.",
+                        "Plugboard: \"%s\". ",
                         second, pair, i, plugboard));
             }
 
@@ -426,8 +409,7 @@ public final class EngineValidator {
                     String.format(
                         "Invalid plugboard character: Character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\". " +
-                        "Fix: Use only characters from the machine alphabet.",
+                        "Plugboard: \"%s\". ",
                         first, pair, i, alphabet, plugboard));
             }
             if (!spec.alphabet().contains(second)) {
@@ -435,8 +417,7 @@ public final class EngineValidator {
                     String.format(
                         "Invalid plugboard character: Character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\". " +
-                        "Fix: Use only characters from the machine alphabet.",
+                        "Plugboard: \"%s\". ",
                         second, pair, i, alphabet, plugboard));
             }
         }

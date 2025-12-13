@@ -38,13 +38,11 @@ public final class EngineSnapshotJson {
     public static void save(EngineSnapshot snapshot, String basePath) {
         if (snapshot == null) {
             throw new EngineException(
-                    "Cannot save engine snapshot: snapshot is null. " +
-                            "Fix: Ensure the engine is fully initialized before saving.");
+                    "Cannot save engine snapshot: snapshot is null");
         }
         if (basePath == null || basePath.isBlank()) {
             throw new EngineException(
-                    "Cannot save engine snapshot: path is empty. " +
-                            "Fix: Provide a full path (folder + file name without extension).");
+                    "Cannot save engine snapshot: path is empty");
         }
 
         String fullPath = basePath + SNAPSHOT_SUFFIX;
