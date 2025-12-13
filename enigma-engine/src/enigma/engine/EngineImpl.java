@@ -348,7 +348,7 @@ public class EngineImpl implements Engine {
             EngineSnapshot snapshot = new EngineSnapshot(spec, state, history);
             EngineSnapshotJson.save(snapshot, basePath);
         }catch (Exception e){
-            throw new EngineException(e.getMessage());
+            throw new EngineException(e.getMessage(), e);
         }
     }
 
