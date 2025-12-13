@@ -24,18 +24,12 @@ import java.security.SecureRandom;
 import java.util.*;
 
 /**
- * Engine implementation — orchestration and validation delegation.
- * One-line: load machine specs, validate configs and run the machine.
- * Responsibilities:
- * <ul>
- *   <li>Load machine specifications from XML and keep the current {@link MachineSpec}.</li>
- *   <li>Validate and apply {@link CodeConfig} instances (manual or random) to the internal {@link Machine}.</li>
- *   <li>Process input strings through the configured {@link Machine} and return trace information.</li>
- *   <li>Maintain a small runtime history of configurations and processed messages.</li>
- * </ul>
+ * Coordinates machine loading, validation, and message processing.
  *
- * Threading/concurrency: callers are responsible for synchronization if the same EngineImpl
- * instance is accessed concurrently (methods are not synchronized internally).
+ * <p>Manages machine specification, configuration, history tracking,
+ * and delegates to machine components for actual encryption.</p>
+ *
+ * <p>Not thread-safe. Callers must synchronize concurrent access.</p>
  */
 public class EngineImpl implements Engine {
 
@@ -51,11 +45,7 @@ public class EngineImpl implements Engine {
     private int stringsProcessed = 0; // number of processed messages (snapshot counter)
 
     /**
-     * Construct an Engine that uses the default XML {@link Loader} and
-     * the default {@link CodeFactory} implementation.
-     *
-     * <p>The engine creates an internal {@link Machine} instance which
-     * is configured later when a {@link Code} is assigned (manual or random).</p>
+     * Create an engine with default loader and factory implementations.
      */
     public EngineImpl() {
         this.machine = new MachineImpl();
@@ -70,18 +60,7 @@ public class EngineImpl implements Engine {
 
 
     /**
-     * Load and validate a machine specification from an XML file and store it in the engine.
-     *
-     * <p>Example:
-     * <pre>engine.loadMachine("enigma-loader/src/test/resources/xml/ex1-sanity-paper-enigma.xml");</pre>
-     *
-     * Important (concise):
-     * - Does NOT configure the runtime {@link Machine}; call {@link #configManual(CodeConfig)} or {@link #configRandom()} to apply a {@link Code}.
-     * - The {@link Loader} performs schema and structural validation (alphabet, rotors, reflector pairs).
-     * - Caller must handle concurrency; the last successful load overwrites the engine spec.
-     *
-     * @param path absolute or relative path to the Enigma XML file
-     * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
+     * {@inheritDoc}
      */
     @Override
     public void loadMachine(String path) throws Exception {
@@ -114,30 +93,18 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Configure machine with a manual {@link CodeConfig}.
-     *
-     * <p>Validates the config against the loaded spec, then delegates to
-     * {@link CodeFactory#create(MachineSpec, CodeConfig)} to build the runtime
-     * {@link Code}. The code is assigned to the internal machine via
-     * {@link Machine#setCode(Code)}.</p>
-     *
-     * @param config configuration with rotor IDs, positions (chars), reflector ID
-     * @throws enigma.engine.exception.InvalidConfigurationException if validation fails
-     * @throws MachineNotLoadedException if spec is not loaded
+     * {@inheritDoc}
      */
     @Override
     public void configManual(CodeConfig config) {
         if (spec == null) {
             throw new MachineNotLoadedException("No machine loaded");
         }
-        // validate config against spec
         EngineValidator.validateCodeConfig(spec, config);
 
-        // create code and assign to machine
         Code code = codeFactory.create(spec, config);
         machine.setCode(code);
 
-        // record config in history
         if (!isSnapshot){
             curCodeState = machine.getCodeState();
         }
@@ -146,17 +113,7 @@ public class EngineImpl implements Engine {
 
 
     /**
-     * Generate a random, valid {@link CodeConfig} and configure the machine.
-     *
-     * <p>Sampling strategy:</p>
-     * <ul>
-     *   <li>Pick the number of rotors indicated by the loaded {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
-     *   <li>Generate random char positions (left→right) from alphabet</li>
-     *   <li>Pick one random reflector ID</li>
-     * </ul>
-     * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
-     *
-     * @throws MachineNotLoadedException when spec is not loaded
+     * {@inheritDoc}
      */
     @Override
     public void configRandom() {
@@ -168,22 +125,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Process the provided input string through the currently configured
-     * machine/code with detailed debugging information.
-     *
-     * <p>Processing notes:
-     * <ul>
-     *   <li>Input is validated via {@link EngineValidator#validateInputInAlphabet(MachineSpec, String)}</li>
-     *   <li>Each character is processed through the {@link Machine#process(char)} method and a per-character
-     *       {@link SignalTrace} is recorded.</li>
-     *   <li>The method updates the engine's processed counter and records the message in {@link MachineHistory}.</li>
-     * </ul>
-     *
-     * @param input the input text to process
-     * @return detailed debug trace of the processing steps
-     * @throws MachineNotLoadedException if machine specification is not loaded
-     * @throws MachineNotConfiguredException if machine is not configured
-     * @throws enigma.engine.exception.InvalidMessageException if input is null or contains invalid characters
+     * {@inheritDoc}
      */
     @Override
     public ProcessTrace process(String input) {
@@ -242,9 +184,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Return a human-readable representation of engine history.
-     *
-     * @return textual history of recorded configurations and processed messages
+     * {@inheritDoc}
      */
     @Override
     public String history() {
