@@ -455,7 +455,7 @@ public class LoaderXml implements Loader {
         int expectedCount = max - min + 1;
 
         if (min != 1 || expectedCount != ids.size()) {
-            throw new EnigmaLoadingException("Rotor IDs must form a consecutive starting from 1 (e.g., 1, 2, 3, 4) " + "Got " + ids);
+            throw new EnigmaLoadingException("Rotor IDs must form a contiguous sequence starting from 1 (e.g., 1, 2, 3, 4). Got " + ids);
         }
     }
 
