@@ -65,9 +65,9 @@ public class RotorImpl implements Rotor {
 
         this.alphabetSize = alphabetSize;
 
-        if (rightColumn == null || leftColumn == null) throw new IllegalArgumentException("right/left column must not be null");
+        if (rightColumn == null || leftColumn == null) throw new IllegalArgumentException("Rotor columns cannot be null");
         if (rightColumn.length != this.alphabetSize || leftColumn.length != this.alphabetSize)
-            throw new IllegalArgumentException("Rotor column lengths must equal alphabet size");
+            throw new IllegalArgumentException("Rotor columns must match alphabet size");
 
         this.wires = new LinkedList<>();
         // Build wires list using provided row-ordered char columns (top->bottom)
@@ -132,7 +132,7 @@ public class RotorImpl implements Rotor {
             rotate();
         }
         if (getPosition() != pos) {
-            throw new IllegalStateException("Failed to reach position " + pos + " in rotor: " + id);
+            throw new IllegalStateException("Unable to reach position " + pos + " in rotor " + id);
         }
     }
 
@@ -163,10 +163,9 @@ public class RotorImpl implements Rotor {
      */
     private int encodeForward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
-            throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
+            throw new IllegalArgumentException("Entry index out of range: " + entryIndex);
         }
 
-        // Forward path: RIGHT value at row → find its location in LEFT column
         char inChar = wires.get(entryIndex).right();
 
         for (int i = 0; i < wires.size(); i++) {
@@ -174,7 +173,7 @@ public class RotorImpl implements Rotor {
                 return i;
             }
         }
-        throw new IllegalStateException("Forward encoding: symbol not found in left column: " + inChar);
+        throw new IllegalStateException("Symbol not found in left column: " + inChar);
     }
 
     /**
@@ -192,10 +191,9 @@ public class RotorImpl implements Rotor {
      */
     private int encodeBackward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
-            throw new IllegalArgumentException("Invalid entry index: " + entryIndex);
+            throw new IllegalArgumentException("Entry index out of range: " + entryIndex);
         }
 
-        // Backward path: LEFT value at row → find its location in RIGHT column
         char inChar = wires.get(entryIndex).left();
 
         for (int i = 0; i < wires.size(); i++) {
@@ -203,7 +201,7 @@ public class RotorImpl implements Rotor {
                 return i;
             }
         }
-        throw new IllegalStateException("Backward encoding: symbol not found in right column: " + inChar);
+        throw new IllegalStateException("Symbol not found in right column: " + inChar);
     }
 
     /**

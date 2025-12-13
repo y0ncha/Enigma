@@ -10,17 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * EngineValidator — stateless validation helpers for engine configuration.
- * One-line: validate a CodeConfig against a MachineSpec.
- * Usage:
- * <pre>
- * EngineValidator.validateCodeConfig(spec, config);
- * </pre>
+ * Validates engine configurations and input messages against machine specifications.
  *
- * Important invariants:
- * - Methods are static and side-effect free.
- * - Throw domain-specific exceptions (InvalidConfigurationException, InvalidMessageException) on validation failure.
- * - All error messages include: what is wrong, where (specific ID/index), and how to fix.
+ * <p>Provides static validation methods for code configurations and message input.
+ * All methods are side-effect free and throw domain-specific exceptions when
+ * validation rules are violated.</p>
+ *
+ * @since 1.0
  */
 public final class EngineValidator {
 
@@ -30,7 +26,7 @@ public final class EngineValidator {
     private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
-                    "Configuration validation failed: Machine specification is missing");
+                    "Machine specification is missing");
         }
     }
 
@@ -40,7 +36,7 @@ public final class EngineValidator {
 
         if (config == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Configuration details are missing");
+                "Configuration details are missing");
         }
 
         List<Integer> rotorIds = config.rotorIds();
@@ -59,15 +55,15 @@ public final class EngineValidator {
     public static void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         if (rotorIds == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Rotor IDs are missing.");
+                "Rotor IDs are missing");
         }
         if (positions == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Initial positions are missing.");
+                "Initial positions are missing");
         }
         if (reflectorId == null) {
             throw new InvalidConfigurationException(
-                "Configuration validation failed: Reflector ID is missing.");
+                "Reflector ID is missing");
         }
     }
 
@@ -88,52 +84,42 @@ public final class EngineValidator {
         }
     }
     /**
-     * Validates that the number of initial positions matches the number of rotors required by the machine specification.
+     * Validate initial position count matches required rotor count.
      *
-     * @param spec      the machine specification containing the required number of rotors
-     * @param positions the list of initial positions to validate
-     * @throws InvalidConfigurationException if the number of positions does not match the number of rotors in use
-     * Usage:
-     * <pre>
-     * EngineValidator.validatePositionCounts(spec, positions);
-     * </pre>
+     * @param spec the machine specification
+     * @param positions list of initial positions
+     * @throws InvalidConfigurationException if position count is incorrect
+     * @since 1.0
      */
     public static void validatePositionCounts(MachineSpec spec, List<Character> positions) {
-        // Validate spec
         specIsNull(spec);
         int required = spec.getRotorsInUse();
         if (positions.size() != required) {
             throw new InvalidConfigurationException(
                     String.format(
-                            "Position count mismatch: Expected exactly %d initial positions, but got %d. " +
-                                    "Provided positions: %s. ",
-                            required, positions.size(), positions, required));
+                            "Expected exactly %d initial positions, got %d. " +
+                                    "Provided positions: %s",
+                            required, positions.size(), positions));
         }
     }
+
     /**
-     * Validates that the number of selected rotors matches the required rotor count.
+     * Validate rotor count matches required count.
      *
-     * <p>
-     * This method checks that the provided list of rotor IDs matches the number of rotors
-     * required by the machine specification. If the count does not match, an
-     * {@link InvalidConfigurationException} is thrown with a detailed error message.
-     * </p>
-     *
-     * @param spec      the machine specification (must not be {@code null})
-     * @param rotorIds  the list of selected rotor IDs (must not be {@code null})
-     * @throws InvalidConfigurationException if the number of selected rotors does not match the required count,
-     *                                       or if {@code spec} is {@code null}
+     * @param spec the machine specification
+     * @param rotorIds list of rotor IDs
+     * @throws InvalidConfigurationException if rotor count is incorrect
+     * @since 1.0
      */
     public static void validateRotorCount(MachineSpec spec, List<Integer> rotorIds) {
-        // Validate spec
         specIsNull(spec);
         int required = spec.getRotorsInUse();
         if (rotorIds.size() != required) {
             throw new InvalidConfigurationException(
                     String.format(
-                            "Invalid rotor selection: Exactly %d rotors must be selected, but got %d\n" +
+                            "Exactly %d rotors must be selected, got %d. " +
                                     "Provided rotor IDs: %s",
-                            required, rotorIds.size(), rotorIds, required
+                            required, rotorIds.size(), rotorIds
                     )
             );
         }
@@ -146,16 +132,14 @@ public final class EngineValidator {
         Set<Integer> availableRotorIds = new HashSet<>(spec.rotorsById().keySet());
 
         for (int id : rotorIds) {
-            // Check for duplicates
             if (!seen.add(id)) {
                 throw new InvalidConfigurationException(
                         String.format(
-                                "Duplicate rotor ID detected: Rotor %d appears more than once in the configuration", id));
+                                "Rotor %d appears more than once in the configuration", id));
             }
 
-            // Check if rotor exists in spec
             if (spec.getRotorById(id) == null) {
-                throw new InvalidConfigurationException("Invalid rotor ID: Rotor " + id + " does not exist in the machine specification (Available rotors " + availableRotorIds + ")");
+                throw new InvalidConfigurationException("Rotor " + id + " does not exist in the machine specification (available rotors: " + availableRotorIds + ")");
             }
         }
     }
@@ -163,19 +147,27 @@ public final class EngineValidator {
     public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) {
             throw new InvalidConfigurationException(
-                "Invalid reflector ID: reflectorId must be non-empty.");
+                "Reflector ID must be non-empty");
         }
 
         if (spec.getReflectorById(reflectorId) == null) {
             Set<String> availableReflectorIds = spec.reflectorsById().keySet();
             throw new InvalidConfigurationException(
                 String.format(
-                    "Invalid reflector ID: Reflector '%s' does not exist in the machine specification. " +
-                    "Available reflector IDs: %s. ",
+                    "Reflector '%s' does not exist in the machine specification. " +
+                    "Available reflector IDs: %s",
                     reflectorId, availableReflectorIds));
         }
     }
 
+    /**
+     * Validate that position characters are in the machine alphabet.
+     *
+     * @param spec machine specification containing the alphabet
+     * @param positions initial position characters to validate
+     * @throws InvalidConfigurationException if any position is not in the alphabet
+     * @since 1.0
+     */
     public static void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
         String alphabet = spec.alphabet().getLetters();
 
@@ -183,29 +175,22 @@ public final class EngineValidator {
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidConfigurationException(
                         String.format(
-                                "Position must be in the Alphabet, '%c' is not a valid position",
+                                "Position '%c' is not in the alphabet",
                                 c));
             }
         }
     }
 
     /**
-     * Validate that input message contains only valid alphabet characters.
+     * Validate input message contains only valid alphabet characters.
      *
-     * <p>Validation rules:
-     * <ul>
-     *   <li>All characters in {@code input} must be present in the machine alphabet (obtained from {@code spec}).</li>
-     *   <li>ISO control characters (newline, tab, ESC, etc.) are rejected because they are not printable and
-     *       would interfere with processing and logging.</li>
-     * </ul>
+     * <p>Rejects control characters (newline, tab, ESC) and characters
+     * not present in the machine alphabet.</p>
      *
-     * <p>Failure behavior: this method throws {@link InvalidMessageException} with a clear, actionable message
-     * describing the offending character (or control name), its index, a truncated view of the input, and a fix.
-     *
-     * @param spec machine specification containing the alphabet; must be non-null
-     * @param input input message to validate; must be non-null
-     * @throws InvalidMessageException if {@code spec} or {@code input} is null, if the input contains ISO control
-     *                                 characters, or if it contains characters not present in the machine alphabet
+     * @param spec machine specification containing the alphabet
+     * @param input input message to validate
+     * @throws InvalidMessageException if input contains invalid characters
+     * @since 1.0
      */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
         // Validate spec
@@ -213,7 +198,7 @@ public final class EngineValidator {
 
         if (input == null) {
             throw new InvalidMessageException(
-                "Message validation failed: Input message is missing.");
+                "Input message is missing");
         }
 
         String alphabet = spec.alphabet().getLetters();
@@ -221,42 +206,31 @@ public final class EngineValidator {
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
 
-            // Reject control characters explicitly (newline, tab, escape, etc.)
             if (Character.isISOControl(c)) {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
                     String.format(
-                        "Invalid character in message: Control character %s detected at position %d. " +
-                        "Input: \"%s\".",
+                        "Control character %s detected at position %d. " +
+                        "Input: \"%s\"",
                         controlName, i, truncateForDisplay(input, 50)));
             }
 
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidMessageException(
                     String.format(
-                        "Invalid character in message: Character '%c' at position %d is not in the machine alphabet. " +
+                        "Character '%c' at position %d is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Input: \"%s\".",
+                        "Input: \"%s\"",
                         c, i, alphabet, truncateForDisplay(input, 50)));
             }
         }
     }
     
     /**
-     * Get a human-friendly name for a control character for use in error messages.
-     *
-     * <p>Maps common control code points to readable identifiers (for clarity):
-     * <ul>
-     *   <li>0  -> "NULL"</li>
-     *   <li>9  -> "TAB"</li>
-     *   <li>10 -> "NEWLINE (\\n)"</li>
-     *   <li>13 -> "CARRIAGE RETURN (\\r)"</li>
-     *   <li>27 -> "ESC"</li>
-     * </ul>
-     * Any other ISO control character returns the generic "CONTROL" label.
+     * Return human-readable name for control characters.
      *
      * @param c control character to describe
-     * @return a short, human-readable name for the control character
+     * @return descriptive name for the control character
      */
     private static String getControlCharacterName(char c) {
         return switch ((int) c) {
@@ -270,17 +244,11 @@ public final class EngineValidator {
     }
     
     /**
-     * Truncate a string for display with ellipsis if it exceeds {@code maxLen} characters.
+     * Truncate string for display, escaping control characters.
      *
-     * <p>Before truncation, control and non-printable characters are escaped to visible sequences
-     * using {@link #escapeControlChars(String)} so the returned representation is safe for logs
-     * and error messages. If the escaped representation is longer than {@code maxLen}, it is cut
-     * and suffixed with "..." to indicate truncation.
-     *
-     * @param str original string to prepare for display (may be null)
-     * @param maxLen maximum length of the returned string before appending ellipsis
-     * @return an escaped and possibly truncated representation suitable for error messages;
-     *         returns {@code null} if {@code str} is {@code null}
+     * @param str string to prepare for display
+     * @param maxLen maximum length before truncation
+     * @return escaped and possibly truncated string
      */
     private static String truncateForDisplay(String str, int maxLen) {
         if (str == null) {
@@ -297,20 +265,10 @@ public final class EngineValidator {
     }
 
     /**
-     * Replace ISO control and other non-printable characters with visible escape sequences.
+     * Replace control characters with visible escape sequences.
      *
-     * <p>Examples:
-     * <ul>
-     *   <li>newline -> "\\n"</li>
-     *   <li>tab -> "\\t"</li>
-     *   <li>ESC -> "\\u001B"</li>
-     *   <li>other control characters -> "\\uXXXX" (hex code)</li>
-     * </ul>
-     * The result is safe to include in logs and error messages where raw control characters
-     * would otherwise be invisible or disruptive.</p>
-     *
-     * @param s input string to escape (assumed non-null by callers)
-     * @return string where control/non-printable characters are replaced with readable escape sequences
+     * @param s input string to escape
+     * @return string with control characters escaped
      */
     private static String escapeControlChars(String s) {
         StringBuilder sb = new StringBuilder();
@@ -337,19 +295,11 @@ public final class EngineValidator {
     /**
      * Validate plugboard configuration string.
      *
-     * <p>Plugboard validation rules:</p>
-     * <ul>
-     *   <li>Must be even-length (pairs of characters)</li>
-     *   <li>No character may appear more than once</li>
-     *   <li>No character may be mapped to itself (e.g., "AA")</li>
-     *   <li>All characters must exist in the machine alphabet</li>
-     * </ul>
-     *
-     * <p>This method is prepared for Exercise 2 when plugboard is added to CodeConfig.
-     * For now, it can be called with null or empty string to indicate no plugboard.</p>
+     * <p>Validates even length, no duplicates, no self-mapping, and
+     * all characters in alphabet.</p>
      *
      * @param spec machine specification containing the alphabet
-     * @param plugboard plugboard configuration string (e.g., "ABCD" maps A↔B and C↔D), may be null or empty
+     * @param plugboard plugboard configuration string, may be null or empty
      */
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
         // Validate spec
@@ -360,98 +310,83 @@ public final class EngineValidator {
             return;
         }
 
-        // Check even length
         if (plugboard.length() % 2 != 0) {
             throw new InvalidConfigurationException(
                 String.format(
-                    "Invalid plugboard configuration: Length must be even (pairs of characters), but got length %d. " +
-                    "Plugboard: \"%s\".",
+                    "Plugboard length must be even (pairs of characters), got length %d. " +
+                    "Plugboard: \"%s\"",
                     plugboard.length(), plugboard));
         }
 
         Set<Character> seenChars = new HashSet<>();
         String alphabet = spec.alphabet().getLetters();
 
-        // Process pairs
         for (int i = 0; i < plugboard.length(); i += 2) {
             char first = plugboard.charAt(i);
             char second = plugboard.charAt(i + 1);
             String pair = "" + first + second;
 
-            // Check for self-mapping
             if (first == second) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Invalid plugboard pair: Letter '%c' cannot be mapped to itself (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\".",
+                        "Plugboard letter '%c' cannot map to itself (pair \"%s\" at position %d). " +
+                        "Plugboard: \"%s\"",
                         first, pair, i, plugboard));
             }
 
-            // Check for duplicate characters
             if (!seenChars.add(first)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Duplicate plugboard letter: Letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\".",
+                        "Plugboard letter '%c' appears more than once (pair \"%s\" at position %d). " +
+                        "Plugboard: \"%s\"",
                         first, pair, i, plugboard));
             }
             if (!seenChars.add(second)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Duplicate plugboard letter: Letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\". ",
+                        "Plugboard letter '%c' appears more than once (pair \"%s\" at position %d). " +
+                        "Plugboard: \"%s\"",
                         second, pair, i, plugboard));
             }
 
-            // Check characters are in alphabet
             if (!spec.alphabet().contains(first)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Invalid plugboard character: Character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
+                        "Plugboard character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\". ",
+                        "Plugboard: \"%s\"",
                         first, pair, i, alphabet, plugboard));
             }
             if (!spec.alphabet().contains(second)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Invalid plugboard character: Character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
+                        "Plugboard character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\". ",
+                        "Plugboard: \"%s\"",
                         second, pair, i, alphabet, plugboard));
             }
         }
     }
     /**
-     * Validates the rotor configuration for the machine.
-     * <p>
-     * Checks that the number of rotors matches the machine's required count,
-     * that all specified rotor IDs exist in the machine specification, and that
-     * there are no duplicate rotor IDs.
+     * Validate rotor configuration: count, existence, and uniqueness.
      *
-     * @param spec     the machine specification to validate against (must not be null)
-     * @param rotorIds the list of rotor IDs to validate (must not be null)
-     * @throws InvalidConfigurationException if the rotor configuration is invalid,
-     *         including incorrect rotor count, non-existent rotor IDs, or duplicate IDs.
-     * @see #validateRotorCount(MachineSpec, List)
-     * @see #validateRotorIdsExistenceAndUniqueness(MachineSpec, List)
+     * @param spec the machine specification
+     * @param rotorIds list of rotor IDs to validate
+     * @throws InvalidConfigurationException if rotor configuration is invalid
+     * @since 1.0
      */
     public static void validateRotors(MachineSpec spec, List<Integer> rotorIds) {
         validateRotorCount(spec, rotorIds);
         validateRotorIdsExistenceAndUniqueness(spec, rotorIds);
     }
+
     /**
-     * Validates the initial positions for the rotors against the machine specification.
-     * <p>
-     * Checks that the number of positions matches the required rotor count and that
-     * each position character is present in the machine's alphabet.
+     * Validate initial positions: count and alphabet membership.
      *
-     * @param spec      the machine specification to validate against (must not be null)
-     * @param positions the list of initial rotor positions (must not be null)
-     * @throws InvalidConfigurationException if the number of positions is incorrect or
-     *         if any position character is not in the machine's alphabet
-     * @see #validatePositionCounts(MachineSpec, List)
-     * @see #validatePositionsInAlphabet(MachineSpec, List)
+     * @param spec the machine specification
+     * @param positions list of initial rotor positions
+     * @throws InvalidConfigurationException if positions are invalid
+     * @since 1.0
      */
     public static void validatePositions(MachineSpec spec, List<Character> positions) {
         validatePositionCounts(spec, positions);

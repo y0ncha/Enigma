@@ -80,18 +80,19 @@ public final class ConsoleValidator {
      */
     public static ConsoleCommand parseCommand(String raw) {
         if (raw == null || raw.trim().isEmpty()) {
-            throw new IllegalArgumentException("No input provided. Please enter a number.");
+            throw new IllegalArgumentException("Please enter a number");
         }
         final String trimmed = raw.trim();
         int commandId;
         try {
             commandId = Integer.parseInt(trimmed);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Unknown command number, ");
+        }
+        catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Command must be a number");
         }
         ConsoleCommand cmd = ConsoleCommand.fromId(commandId);
         if (cmd == null) {
-            throw new IllegalArgumentException("Unknown command number, ");
+            throw new IllegalArgumentException("Command number not recognized");
         }
         return cmd;
     }
@@ -113,7 +114,7 @@ public final class ConsoleValidator {
      */
     public static void ensureReflectorChoiceInRange(int choice, int reflectorsCount) {
         if (choice < 1 || choice > reflectorsCount) {
-            throw new IllegalArgumentException("Reflector choice must be between 1 and " + reflectorsCount + ".");
+            throw new IllegalArgumentException("Reflector choice must be between 1 and " + reflectorsCount);
         }
     }
 
