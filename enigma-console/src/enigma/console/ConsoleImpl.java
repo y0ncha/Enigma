@@ -519,9 +519,7 @@ public class ConsoleImpl implements Console {
         enigma.terminate();
         exitRequested = true;
     }
-    // =========================
-    //  Command 9: Save current machine state to a JSON file
-    // =========================
+    // ----------[ Command 9: Save current machine state to a JSON file ]----------
     /**
      * Bonus command: Save current machine state to a JSON file.
      * Flow:
