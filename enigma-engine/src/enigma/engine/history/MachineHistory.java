@@ -88,12 +88,6 @@ import java.util.*;
  */
 public final class MachineHistory {
 
-//    // Original code -> all message runs under that code
-//    private final Map<CodeState, List<MessageRecord>> history = new LinkedHashMap<>();
-//
-//    // The original code currently in effect
-//    private CodeState currentOriginalCode;
-
     // Original code (as compact string) -> all message runs under that code
     private final Map<String, List<MessageRecord>> history = new LinkedHashMap<>();
 
