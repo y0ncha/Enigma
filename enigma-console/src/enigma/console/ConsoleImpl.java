@@ -547,7 +547,7 @@ public class ConsoleImpl implements Console {
             } catch (Exception e) {
                 System.out.println("Unexpected error: " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
-                        "An unexpected error occurred. Try again? (Y/N): ")) {
+                        "An unexpected error occurred. Try again? (Y/N) : ")) {
                     return;
                 }
             }
