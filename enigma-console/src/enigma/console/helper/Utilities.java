@@ -88,7 +88,7 @@ public final class Utilities {
             System.out.print("> ");
             String line = scanner.nextLine().trim();
             if (line.isEmpty()) {
-                System.out.print("Input cannot be empty. Please try again");
+                System.out.println("Input cannot be empty. Please try again");
                 continue;
             }
             return line;
