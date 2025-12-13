@@ -534,7 +534,7 @@ public class ConsoleImpl implements Console {
         while (true) {
             String basePath = Utilities.readNonEmptyLine(
                     scanner,
-                    "Enter full path (folder + file name, without extension) for the snapshot file:");
+                    "Enter full path (folder + file name, without extension) for the snapshot file :");
             try {
                 // We know enigma is EngineImpl, so we can safely cast here
                 enigma.saveSnapshot(basePath);
