@@ -93,8 +93,8 @@ public final class EngineValidator {
     /**
      * Validates that the number of selected rotors matches the required rotor count.
      *
-     * @param spec      the machine specification (must not be null)
-     * @param rotorIds  the list of selected rotor IDs (must not be null)
+     * @param spec      the machine specification
+     * @param rotorIds  the list of selected rotor IDs
      * @throws InvalidConfigurationException if the number of selected rotors does not match the required count
      */
     public static void validateRotorCount(MachineSpec spec, List<Integer> rotorIds) {

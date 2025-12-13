@@ -65,14 +65,14 @@ public interface Engine {
     /**
      * Returns the current machine specification loaded by the engine.
      *
-     * @return the loaded {@link MachineSpec}, or {@code null} if no machine is loaded
+     * @return the loaded {@link MachineSpec}, or nothing if no machine is loaded
      */
     MachineSpec getMachineSpec();
 
     /**
      * Returns the current code configuration applied to the machine.
      *
-     * @return the current {@link CodeConfig}, or {@code null} if not configured
+     * @return the current {@link CodeConfig}, or nothing if not configured
      */
     CodeConfig getCurrentCodeConfig();
 

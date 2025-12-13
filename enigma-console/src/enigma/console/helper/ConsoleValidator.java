@@ -22,7 +22,7 @@ public final class ConsoleValidator {
      *   <li>Integer maps to a known command</li>
      * </ul>
      *
-     * @param raw raw user input (maybe null, empty, or invalid)
+     * @param raw raw user input (may be empty or invalid)
      * @return validated ConsoleCommand
      * @throws IllegalArgumentException if input is invalid with a user-friendly message
      */

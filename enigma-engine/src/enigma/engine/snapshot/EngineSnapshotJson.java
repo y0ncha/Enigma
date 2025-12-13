@@ -37,7 +37,7 @@ public final class EngineSnapshotJson {
      */
     public static void save(EngineSnapshot snapshot, String basePath) {
         if (snapshot == null) {
-            throw new EngineException("Snapshot is null");
+            throw new EngineException("Snapshot is not available");
         }
         if (basePath == null || basePath.isBlank()) {
             throw new EngineException("Path is empty");

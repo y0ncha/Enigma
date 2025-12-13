@@ -82,7 +82,7 @@ public class EngineImpl implements Engine {
      *   <li>The current runtime code state (may change as the machine processes input)</li>
      * </ul>
      *
-     * @return a {@link MachineState} snapshot; fields may be null if not applicable (e.g. no spec loaded)
+     * @return a {@link MachineState} snapshot
      */
     @Override
     public MachineState machineData() {
@@ -192,7 +192,7 @@ public class EngineImpl implements Engine {
     /**
      * Deprecated accessor for the loaded MachineSpec. Prefer using EngineState APIs.
      *
-     * @return the currently loaded {@link MachineSpec}, or null if none loaded
+     * @return the currently loaded {@link MachineSpec}
      * @deprecated kept for backward compatibility with older tests/console
      */
     @Override
@@ -207,7 +207,7 @@ public class EngineImpl implements Engine {
     /**
      * Deprecated convenience to expose the current {@link CodeConfig} from the machine.
      *
-     * @return the currently-configured {@link CodeConfig} or null if the machine is not configured
+     * @return the currently-configured {@link CodeConfig} if machine is configured
      * @deprecated use history or machine state inspection APIs instead
      */
     @Override
