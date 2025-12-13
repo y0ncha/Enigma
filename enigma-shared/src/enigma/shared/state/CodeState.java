@@ -174,8 +174,7 @@ public record CodeState(
         // Guard against using the sentinel NOT_CONFIGURED as a real config
         if (this == NOT_CONFIGURED) {
             throw new IllegalStateException(
-                    "Cannot convert NOT_CONFIGURED state to CodeConfig. " +
-                            "Fix: Configure the machine before exporting a CodeConfig.");
+                    "Cannot convert NOT_CONFIGURED state to CodeConfig.");
         }
 
         // Convert positions string (e.g. "ODX") to List<Character> ['O','D','X']
