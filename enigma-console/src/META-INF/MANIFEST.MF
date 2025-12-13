@@ -3,5 +3,5 @@ Main-Class: enigma.console.Main
 Class-Path: enigma-engine_jar.jar enigma-loader_jar.jar enigma-machine_j
  ar.jar enigma-shared_jar.jar lib/angus-activation.jar lib/jakarta.activ
  ation-api.jar lib/jakarta.xml.bind-api.jar lib/jaxb-core.jar lib/jaxb-i
- mpl.jar lib/jaxb-jxc.jar lib/jaxb-xjc.jar
+ mpl.jar lib/jaxb-jxc.jar lib/jaxb-xjc.jar lib/gson-2.10.1.jar
 
