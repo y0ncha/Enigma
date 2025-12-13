@@ -437,7 +437,7 @@ public class LoaderXml implements Loader {
      */
     private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
         if (notch < 1 || notch > alphabetSize) {
-            throw new EnigmaLoadingException("Notch position is out of bound");
+            throw new EnigmaLoadingException("Notch position is out of bounds");
         }
     }
 
