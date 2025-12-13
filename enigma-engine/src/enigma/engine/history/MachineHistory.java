@@ -212,15 +212,17 @@ public final class MachineHistory {
             String code = entry.getKey();               // already in compact format
             List<MessageRecord> records = entry.getValue();
 
-            if (records.isEmpty()) {
-                // Instructions: only show codes that actually processed messages
-                continue;
-            }
-
             printedAny = true;
 
             // Print the original code (instruction §7: "present the code used")
             sb.append(code).append(System.lineSeparator());
+
+            // If no strings were processed, print a message
+            if (records.isEmpty()) {
+               sb.append("  ")
+                       .append("No messages processed")
+                       .append(System.lineSeparator());
+            }
 
             // Print each record with numbering starting at 1
             for (int i = 0; i < records.size(); i++) {
@@ -232,7 +234,6 @@ public final class MachineHistory {
                         .append(r.toString())   // uses our new format
                         .append(System.lineSeparator());
             }
-
             sb.append(System.lineSeparator());
         }
         if (!printedAny) {
