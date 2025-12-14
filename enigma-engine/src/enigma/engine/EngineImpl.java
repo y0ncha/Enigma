@@ -397,4 +397,16 @@ public class EngineImpl implements Engine {
             throw new EngineException(e.getMessage());
         }
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Implementation note: prints the machine to System.out only when the
+     * machine is configured. This method intentionally does not modify any
+     * engine or machine state.</p>
+     */
+    @Override
+    public void printMachine() {
+        if (machine.isConfigured()) System.out.print(machine);
+    }
 }

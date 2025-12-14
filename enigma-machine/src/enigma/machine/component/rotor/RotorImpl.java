@@ -103,7 +103,6 @@ public class RotorImpl implements Rotor {
     public int getId() {
         return id;
     }
-    }
 
     // ---------------------------------------------------------
     // Core encoding logic using wires list

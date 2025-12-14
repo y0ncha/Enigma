@@ -300,12 +300,8 @@ public class MachineImpl implements Machine {
 
         StringBuilder out = new StringBuilder();
 
-        out.append("\n+----------------------------------------------------------+\n");
-        out.append("|                      ENIGMA MACHINE                      |\n");
-        out.append("+----------------------------------------------------------+\n\n");
-
-        // Header for wiring table
-        out.append("Detailed Wiring (Right Column → Left Column)\n\n");
+        out.append("A Look Under the Hood (Right Column → Left Column)\n");
+        out.append("--------------------------------------------------------\n\n");
 
         int numRows = kb.size();
 

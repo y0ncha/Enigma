@@ -372,7 +372,7 @@ public class LoaderXml implements Loader {
         }
         if (bteRotors.getBTERotor().size() < rotorsInUse) {
             throw new EnigmaLoadingException(
-                    "<BTE-Rotors> section must include at least " + rotorsInUse + " rotor specifications, got: "  + bteRotors.getBTERotor().size());
+                    "<BTE-Rotors> section must include at least " + rotorsInUse + " rotor specifications, got "  + bteRotors.getBTERotor().size());
         }
     }
 

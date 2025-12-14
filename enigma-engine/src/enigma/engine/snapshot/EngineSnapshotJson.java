@@ -53,8 +53,7 @@ public final class EngineSnapshotJson {
         if (parent == null || !parent.exists()) {
             throw new EngineException(
                     String.format(
-                            "Cannot save engine snapshot: Folder '%s' does not exist. " +
-                                    "Fix: Create the folder or choose a different path.",
+                            "Cannot save engine snapshot: Folder '%s' does not exist",
                             basePath));
         }
 
@@ -63,8 +62,7 @@ public final class EngineSnapshotJson {
         } catch (IOException e) {
             throw new EngineException(
                     String.format(
-                            "Failed to save engine snapshot to file '%s'. Error: %s. " +
-                                    "Fix: Verify that the path is writable and you have permissions.",
+                            "Failed to save engine snapshot to file '%s': %s",
                             fullPath, e.getMessage()),
                     e);
         }
@@ -80,8 +78,7 @@ public final class EngineSnapshotJson {
     public static EngineSnapshot load(String basePath) {
         if (basePath == null || basePath.isBlank()) {
             throw new EngineException(
-                    "Cannot load engine snapshot: path is empty. " +
-                            "Fix: Provide a full path (folder + file name without extension).");
+                    "Cannot load engine snapshot: path is empty");
         }
 
         String fullPath = basePath + SNAPSHOT_SUFFIX;
@@ -89,8 +86,7 @@ public final class EngineSnapshotJson {
         if (!source.isFile()) {
             throw new EngineException(
                     String.format(
-                            "Cannot load engine snapshot: File '%s' does not exist. " +
-                                    "Fix: Check the path and make sure the snapshot was saved before.",
+                            "Cannot load engine snapshot: File '%s' does not exist",
                             fullPath));
         }
 
@@ -99,16 +95,14 @@ public final class EngineSnapshotJson {
             if (snapshot == null || snapshot.spec() == null) {
                 throw new EngineException(
                         String.format(
-                                "Loaded snapshot from '%s' is invalid or empty. " +
-                                        "Fix: Re-create the snapshot or choose a different file.",
+                                "Loaded snapshot from '%s' is invalid or empty",
                                 fullPath));
             }
             return snapshot;
         } catch (IOException e) {
             throw new EngineException(
                     String.format(
-                            "Failed to load engine snapshot from file '%s'. Error: %s. " +
-                                    "Fix: Ensure the file is readable and not locked by another process.",
+                            "Failed to load engine snapshot from file '%s': %s",
                             fullPath, e.getMessage()),
                     e);
         }

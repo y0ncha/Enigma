@@ -56,7 +56,8 @@ public class ConsoleImpl implements Console {
             dispatchCommand(command);
             System.out.println();
         }
-        System.out.println("===============================================================");
+        System.out.println("===============================================================\n");
+        enigma.printMachine();
         System.out.println("Goodbye!");
     }
 
@@ -271,7 +272,6 @@ public class ConsoleImpl implements Console {
                 catch (IllegalArgumentException e) {
                     // Known validation error
                     System.out.println(e.getMessage());
-                    System.out.println("Check the rotor IDs and try again");
                     if (!Utilities.askUserToRetry(scanner,
                             "Do you want to try again with a different rotor list? (Y/N) : ")) {
                         return; // back to main menu
@@ -532,7 +532,7 @@ public class ConsoleImpl implements Console {
         while (true) {
             String basePath = Utilities.readNonEmptyLine(
                     scanner,
-                    "Enter full path (folder + file name, without extension) for the snapshot file :");
+                    "Enter full path (folder, without extension) for the snapshot file :");
             try {
                 // We know enigma is EngineImpl, so we can safely cast here
                 enigma.saveSnapshot(basePath);

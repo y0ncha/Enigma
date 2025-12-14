@@ -111,4 +111,17 @@ public interface Engine {
      * @param basePath base file path for snapshot
      */
     void loadSnapshot(String basePath);
+
+    /**
+     * Print a human-readable representation of the currently configured machine.
+     *
+     * <p>
+     * Implementations should print a concise, read-only textual representation
+     * of the runtime machine (rotors, reflector and current rotor positions)
+     * to System.out. This method is intended for debugging and console UIs.
+     * If no machine is loaded or the machine is not configured the implementation
+     * may choose to print nothing or indicate that the machine is not configured.
+     * </p>
+     */
+    void printMachine();
 }
