@@ -376,14 +376,14 @@ public class EngineImpl implements Engine {
             if (state != null) {
                 this.stringsProcessed = state.stringsProcessed();
                 this.ogCodeState = state.ogCodeState();
-                CodeState snapshotCodeState = state.ogCodeState();
+                CodeState theCurCodeState = state.curCodeState();
                 boolean hasCurrent =
-                        snapshotCodeState != null &&
-                                snapshotCodeState != CodeState.NOT_CONFIGURED;
+                        theCurCodeState != null &&
+                                theCurCodeState != CodeState.NOT_CONFIGURED;
                 if (hasCurrent) {
                     // Machine was configured when snapshot was taken
                     isSnapshot = true;
-                    configManual(snapshotCodeState.toCodeConfig());
+                    configManual(theCurCodeState.toCodeConfig());
                     isSnapshot = false;
                 }
             } else {
