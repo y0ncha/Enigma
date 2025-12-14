@@ -3,40 +3,11 @@ package enigma.machine.component.rotor;
 import java.util.LinkedList;
 
 /**
- * Canonical runtime rotor implementation using the mechanical column-rotation model.
+ * Rotor implementation using column-rotation model.
  *
- * <p>This implementation represents the physical Enigma rotor wiring as two parallel
- * columns of alphabet indices:</p>
- * <ul>
- *   <li>{@code rightColumn} — the keyboard-facing contacts (entry side)</li>
- *   <li>{@code leftColumn} — the reflector-facing contacts (exit side on forward path)</li>
- * </ul>
- *
- * <p>At construction, {@code rightColumn} contains the identity sequence [0,1,2,...,N-1]
- * while {@code leftColumn} holds the wiring permutation from the specification. Rotation
- * is simulated by physically shifting the first row to the bottom of both columns,
- * exactly as a real Enigma rotor wheel would rotate.</p>
- *
- * <h2>Signal Processing</h2>
- * <ul>
- *   <li><b>Forward (FORWARD direction):</b> An entry index yields a symbol from
- *       {@code rightColumn}. We find that symbol's position in {@code leftColumn}
- *       and return that position as the exit index.</li>
- *   <li><b>Backward (BACKWARD direction):</b> An entry index yields a symbol from
- *       {@code leftColumn}. We find that symbol's position in {@code rightColumn}
- *       and return that position as the exit index.</li>
- * </ul>
- *
- * <h2>Stepping Behavior</h2>
- * <p>The {@link #advance()} method rotates both columns once and returns {@code true}
- * if the new top position equals the rotor's notch index, indicating that the next
- * rotor (to the left) should also advance.</p>
- *
- * <h2>Position</h2>
- * <p>The rotor's current position is defined as the value at the top of
- * {@code rightColumn} (i.e., {@code rightColumn.get(0)}). This represents
- * the letter visible in the machine window and determines the rotor's
- * electrical alignment with the rest of the circuit.</p>
+ * <p>Maintains wiring as parallel left and right columns that rotate
+ * physically to simulate mechanical rotor behavior. Supports forward
+ * and backward signal processing with stepping and notch detection.</p>
  *
  * @since 1.0
  */
@@ -48,18 +19,13 @@ public class RotorImpl implements Rotor {
     private final int id;
 
     /**
-     * Construct a rotor from row-ordered right/left columns and a notch index.
+     * Construct rotor from column arrays and notch position.
      *
-     * <p>The {@code rightColumn} and {@code leftColumn} arrays contain the character
-     * values for each row in top→bottom order as parsed from the XML
-     * <BTE-Positioning> entries. Both arrays must have the same length equal to the
-     * alphabet size.</p>
-     *
-     * @param rightColumn row-ordered right-column character values from the alphabet
-     * @param leftColumn row-ordered left-column character values from the alphabet
-     * @param notchIndex index at which the rotor triggers stepping of the next rotor (0..N-1)
-     * @param alphabetSize machine alphabet size used for bounds
-     * @param id rotor identifier for debugging/tracing
+     * @param rightColumn right-side wiring in row order
+     * @param leftColumn left-side wiring in row order
+     * @param notchIndex notch position triggering next rotor step
+     * @param alphabetSize alphabet size for validation
+     * @param id rotor identifier
      */
     public RotorImpl(char[] rightColumn, char[] leftColumn, int notchIndex, int alphabetSize, int id) {
 
@@ -85,14 +51,11 @@ public class RotorImpl implements Rotor {
     // ---------------------------------------------------------
 
     /**
-     * Advance the rotor by one step (rotate wires list).
+     * {@inheritDoc}
      *
-     * <p>This method simulates the physical rotation of the rotor wheel by
-     * moving the first row to the bottom. After rotation, the method checks
-     * whether the new top position equals the notch index.</p>
+     * <p>Rotates rotor and returns true if notch is now engaged.</p>
      *
-     * @return {@code true} if the notch is engaged after stepping (i.e., the
-     *         next rotor to the left should also advance); {@code false} otherwise
+     * @return true if next rotor should advance, false otherwise
      */
     @Override
     public boolean advance() {
@@ -102,7 +65,7 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Process a signal through the rotor in the given direction.
+     * {@inheritDoc}
      */
     @Override
     public int process(int index, Direction direction) {
@@ -112,18 +75,15 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Get the current rotor position (the letter visible in the window).
-     *
-     * <p>The position is defined as the right value of the top wire.</p>
+     * {@inheritDoc}
      */
     @Override
     public char getPosition() {
-        // return the right-side character at the top row
         return wires.getFirst().right();
     }
 
     /**
-     * Set the rotor to a specific position by rotating until the top right matches.
+     * {@inheritDoc}
      */
     @Override
     public void setPosition(char pos) {
@@ -137,11 +97,12 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Get the rotor's identifier.
+     * {@inheritDoc}
      */
     @Override
     public int getId() {
         return id;
+    }
     }
 
     // ---------------------------------------------------------
@@ -149,17 +110,10 @@ public class RotorImpl implements Rotor {
     // ---------------------------------------------------------
 
     /**
-     * Encode signal in forward direction (right→left).
+     * Transform signal forward through rotor (keyboard to reflector).
      *
-     * <p>Forward path logic:</p>
-     * <ol>
-     *   <li>Get right-side symbol at entryIndex row</li>
-     *   <li>Find that symbol in left-side column</li>
-     *   <li>Return the row index where it was found</li>
-     * </ol>
-     *
-     * @param entryIndex row index on right side (0..alphabetSize-1)
-     * @return exit row index on left side
+     * @param entryIndex entry row index
+     * @return exit row index
      */
     private int encodeForward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
@@ -177,17 +131,10 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Encode signal in backward direction (left→right).
+     * Transform signal backward through rotor (reflector to keyboard).
      *
-     * <p>Backward path logic:</p>
-     * <ol>
-     *   <li>Get left-side symbol at entryIndex row</li>
-     *   <li>Find that symbol in right-side column</li>
-     *   <li>Return the row index where it was found</li>
-     * </ol>
-     *
-     * @param entryIndex row index on left side (0..alphabetSize-1)
-     * @return exit row index on right side
+     * @param entryIndex entry row index
+     * @return exit row index
      */
     private int encodeBackward(int entryIndex) {
         if (entryIndex < 0 || entryIndex >= alphabetSize) {
@@ -205,7 +152,7 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Physically rotate the rotor by moving the top row to the bottom.
+     * Rotate rotor by moving top row to bottom.
      */
     private void rotate() {
         Wire top = wires.removeFirst();
@@ -213,10 +160,7 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Get the wire at a specific row index.
-     *
-     * @param row row index (0..alphabetSize-1)
-     * @return Wire at that row
+     * {@inheritDoc}
      */
     @Override
     public Wire getWire(int row) {
@@ -224,13 +168,7 @@ public class RotorImpl implements Rotor {
     }
 
     /**
-     * Distance from the current rotor position to the notch.
-     *
-     * <p>Computed as the number of single-step rotations (top->bottom) required
-     * to bring the notch character to the top row starting from the current
-     * visible position.</p>
-     *
-     * @return distance in range [0..alphabetSize-1]
+     * {@inheritDoc}
      */
     @Override
     public int notchDist() {
