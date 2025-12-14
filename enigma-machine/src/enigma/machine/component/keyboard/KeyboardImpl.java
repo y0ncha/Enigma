@@ -49,7 +49,7 @@ public class KeyboardImpl implements Keyboard {
     @Override
     public char toChar(int idx) {
         if (!idxInbound(idx)) {
-            throw new IllegalArgumentException("Invalid index for this machine: " + idx);
+            throw new IllegalArgumentException("Index out of range: " + idx);
         }
         return alphabet.charAt(idx);
     }
@@ -64,7 +64,7 @@ public class KeyboardImpl implements Keyboard {
     @Override
     public int toIdx(char ch) {
         if (!charInbound(ch)) {
-            throw new IllegalArgumentException("Invalid character for this machine: " + ch);
+            throw new IllegalArgumentException("Character not in alphabet: " + ch);
         }
         return alphabet.indexOf(ch);
     }

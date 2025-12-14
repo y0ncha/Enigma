@@ -17,46 +17,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * Loads and parses Enigma machine specifications from XML files.
+ * Loads and validates Enigma machine specifications from XML files.
  *
- * <p><b>Module:</b> enigma-loader (XML → MachineSpec)</p>
- *
- * <h2>Responsibilities</h2>
- * <ul>
- *   <li>Unmarshal XML into generated JAXB objects</li>
- *   <li>Validate alphabet (even-length, unique characters)</li>
- *   <li>Validate rotors (IDs 1..N, full permutations, notch in range)</li>
- *   <li>Validate reflectors (Roman IDs, symmetric mapping, bijectivity)</li>
- *   <li>Translate into {@link MachineSpec}, {@link RotorSpec}, {@link ReflectorSpec}</li>
- * </ul>
- *
- * <h2>Critical Design Point: Wire Ordering</h2>
- * <p><b>The loader must NOT reorder wires or change XML-defined order.</b></p>
- * <ul>
- *   <li>Rotor columns are stored in XML row order (top→bottom as parsed)</li>
- *   <li>Reflector mapping is constructed from XML pairs without reordering</li>
- *   <li>This ensures the mechanical model matches the specification exactly</li>
- * </ul>
- *
- * <h2>Validation Rules</h2>
- * <ul>
- *   <li><b>Alphabet:</b> even-length, non-empty, unique chars</li>
- *   <li><b>Rotor IDs:</b> contiguous sequence 1..N (e.g., 1,2,3,4,5)</li>
- *   <li><b>Rotor columns:</b> each column must be full permutation (bijectivity)</li>
- *   <li><b>Notch:</b> 1-based index in [1, alphabetSize]</li>
- *   <li><b>Reflector IDs:</b> Roman numerals starting from I (I, II, III, ...)</li>
- *   <li><b>Reflector mapping:</b> symmetric, no self-mapping, covers all indices</li>
- * </ul>
- *
- * <h2>Invariants After Loading</h2>
- * <ul>
- *   <li>All rotors and reflectors reference valid alphabet characters</li>
- *   <li>Rotor columns form valid permutations</li>
- *   <li>Reflector mappings are symmetric: mapping[i] = j ⟹ mapping[j] = i</li>
- * </ul>
- *
- * <p>Validation errors are reported as {@link EnigmaLoadingException} with
- * detailed error messages indicating the problem location.</p>
+ * <p>Unmarshals XML to JAXB objects, validates alphabet, rotors, and reflectors,
+ * and constructs machine specification. Preserves XML wire ordering exactly.</p>
  *
  * @since 1.0
  */
@@ -66,19 +30,19 @@ public class LoaderXml implements Loader {
     private final int rotorsInUse;
 
     /**
-     * Create a loader that expects exactly {@code rotorsInUse} rotors in the machine.
+     * Create loader expecting specified rotor count.
      *
-     * @param rotorsInUse expected number of rotors (typically 3)
+     * @param rotorsInUse expected number of rotors
      */
     public LoaderXml(int rotorsInUse) {
         this.rotorsInUse = rotorsInUse;
     }
 
     /**
-     * Default constructor uses the conventional 3 rotors-in-use.
+     * Create loader with default 3 rotors.
      */
     public LoaderXml() {
-        this(3); // default is hardcoded
+        this(3);
     }
 
     /**
@@ -111,11 +75,11 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Read and unmarshal the XML file to the generated JAXB root object.
+     * Unmarshal XML file to JAXB root object.
      *
-     * @param filePath path to the XML file
-     * @return the JAXB root object representing the XML
-     * @throws EnigmaLoadingException when file not found, wrong extension or parsing fails
+     * @param filePath path to XML file
+     * @return JAXB root object
+     * @throws EnigmaLoadingException if file not found, wrong extension, or parsing fails
      */
     private BTEEnigma loadRoot(String filePath) throws EnigmaLoadingException {
         Path path = Paths.get(filePath);
@@ -134,17 +98,16 @@ public class LoaderXml implements Loader {
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
-            throw new EnigmaLoadingException("Parsing failed for file '" + filePath + "': " + e.getMessage(), e);
+            throw new EnigmaLoadingException("Unable to parse file '" + filePath + "': " + e.getMessage(), e);
         }
     }
 
     /**
-     * Extract and validate the alphabet string from the JAXB root, returning an
-     * {@link Alphabet} instance.
+     * Extract and validate alphabet from JAXB root.
      *
      * @param root JAXB root object
-     * @return Alphabet built from cleaned XML ABC content
-     * @throws EnigmaLoadingException on validation failure
+     * @return validated alphabet instance
+     * @throws EnigmaLoadingException if alphabet validation fails
      */
     private Alphabet extractAlphabet(BTEEnigma root) throws EnigmaLoadingException {
         String rawAbc = root.getABC();

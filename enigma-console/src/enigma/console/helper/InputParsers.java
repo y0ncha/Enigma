@@ -81,15 +81,16 @@ public class InputParsers {
             String trimmed = part.trim();
             if (trimmed.isEmpty()) {
                 throw new IllegalArgumentException(
-                        "Rotor ids must be decimal numbers separated by commas. "
-                                + "Empty values are not allowed.");
+                        "Rotor IDs must be decimal numbers separated by commas. " +
+                                "Empty values not allowed");
             }
             try {
                 result.add(Integer.parseInt(trimmed));
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        "Rotor ids must be decimal numbers separated by commas. "
-                                + "Invalid value: '" + trimmed + "'.");
+                        "Rotor IDs must be decimal numbers separated by commas. " +
+                                "Invalid value: '" + trimmed + "'");
             }
         }
         return result;
@@ -112,21 +113,18 @@ public class InputParsers {
      * @throws IllegalArgumentException if the input format is invalid
      */
     public static List<Character> parsePositions(String line) {
-        // Basic null/empty validation
         if (line == null || line.isBlank()) {
             throw new IllegalArgumentException(
-                    "Positions must contain at least one character, Empty input is not allowed");
+                    "Positions must contain at least one character");
         }
-        // Trim input and convert to uppercase for consistency
         String cleaned = line.trim().toUpperCase();
         List<Character> result = new ArrayList<>();
-        // Validate each character and collect
         for (int i = 0; i < cleaned.length(); i++) {
             char c = cleaned.charAt(i);
             if (!Character.isLetter(c)) {
                 throw new IllegalArgumentException(
                         String.format(
-                                "Invalid position character: '%c'. All Positions must be alphabet letters",
+                                "Position character '%c' is not a letter. All positions must be alphabet letters",
                                 c));
             }
             result.add(c);
