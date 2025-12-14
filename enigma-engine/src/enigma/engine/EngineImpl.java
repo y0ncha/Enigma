@@ -376,14 +376,14 @@ public class EngineImpl implements Engine {
             if (state != null) {
                 this.stringsProcessed = state.stringsProcessed();
                 this.ogCodeState = state.ogCodeState();
-                CodeState snapshotCodeState = state.ogCodeState();
+                CodeState theCurCodeState = state.curCodeState();
                 boolean hasCurrent =
-                        snapshotCodeState != null &&
-                                snapshotCodeState != CodeState.NOT_CONFIGURED;
+                        theCurCodeState != null &&
+                                theCurCodeState != CodeState.NOT_CONFIGURED;
                 if (hasCurrent) {
                     // Machine was configured when snapshot was taken
                     isSnapshot = true;
-                    configManual(snapshotCodeState.toCodeConfig());
+                    configManual(theCurCodeState.toCodeConfig());
                     isSnapshot = false;
                 }
             } else {
@@ -396,5 +396,17 @@ public class EngineImpl implements Engine {
             // Wrap everything in EngineException with meaningful message
             throw new EngineException(e.getMessage());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Implementation note: prints the machine to System.out only when the
+     * machine is configured. This method intentionally does not modify any
+     * engine or machine state.</p>
+     */
+    @Override
+    public void printMachine() {
+        if (machine.isConfigured()) System.out.print(machine);
     }
 }
