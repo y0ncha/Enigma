@@ -35,7 +35,7 @@ public class LoaderXml implements Loader {
      * @param rotorsInUse expected number of rotors
      */
     public LoaderXml(int rotorsInUse) {
-        this.rotorsInUse = rotorsInUse;
+        this.rotorsInUse = rotorsInUse; // todo remove ctors, only default empty needed
     }
 
     /**
@@ -63,6 +63,8 @@ public class LoaderXml implements Loader {
     @Override
     public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
+
+        // todo extract rotorsInUse
 
         Alphabet alphabet = extractAlphabet(root);
 
