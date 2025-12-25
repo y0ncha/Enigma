@@ -43,6 +43,9 @@ public class ConsoleImpl implements Console {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void run() {
         System.out.println();

@@ -62,9 +62,6 @@ public class CodeFactoryImpl implements CodeFactory {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>This is the primary factory method that creates codes using the
-     * mechanical rotor model.</p>
      */
     @Override
     public Code create(MachineSpec spec, CodeConfig config) {

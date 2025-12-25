@@ -51,10 +51,7 @@ public class ReflectorImpl implements Reflector {
     }
 
     /**
-     * Transform the input index through the reflector's symmetric mapping.
-     *
-     * @param index input index (0..alphabetSize-1)
-     * @return paired index via symmetric mapping
+     * {@inheritDoc}
      */
     @Override
     public int process(int index) {
@@ -62,9 +59,7 @@ public class ReflectorImpl implements Reflector {
     }
 
     /**
-     * Get the reflector's identifier.
-     *
-     * @return reflector ID (e.g., "I", "II")
+     * {@inheritDoc}
      */
     @Override
     public String getId() {
