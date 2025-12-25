@@ -1,6 +1,7 @@
 package enigma.machine;
 
 import enigma.machine.component.code.Code;
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.machine.component.keyboard.Keyboard;
 import enigma.machine.component.keyboard.KeyboardImpl;
@@ -33,7 +34,6 @@ public class MachineImpl implements Machine {
     private Code code;
     private Keyboard keyboard;
 
-
     // ---------------------------------------------------------
     // Constructor
     // ---------------------------------------------------------
@@ -43,7 +43,6 @@ public class MachineImpl implements Machine {
      * @since 1.0
      */
     public MachineImpl() {
-        this.keyboard = null;
         this.code = null;
     }
 
@@ -64,18 +63,24 @@ public class MachineImpl implements Machine {
      */
     @Override
     public SignalTrace process(char input) {
-        ensureConfigured();
+        assertConfigured();
 
         String windowBefore = buildWindowString();
         List<Integer> advancedIndices = advance();
 
+        // 1. Keyboard key -> index translation
         int intermediate = keyboard.toIdx(input);
 
+        // 2. Plugboard swap
+        intermediate = plugboardTransition(intermediate);
+
+        // 3. Rotor step
         List<RotorTrace> forwardSteps = forwardTransform(intermediate);
         if (!forwardSteps.isEmpty()) {
             intermediate = forwardSteps.getLast().exitIndex();
         }
 
+        // 4. Reflector step
         int reflectEntry = intermediate;
         int reflectExit = code.getReflector().process(reflectEntry);
         ReflectorTrace reflectorStep = new ReflectorTrace(
@@ -84,14 +89,20 @@ public class MachineImpl implements Machine {
         );
         intermediate = reflectExit;
 
+        // 5. Rotor step (backwards)
         List<RotorTrace> backwardSteps = backwardTransform(intermediate);
         if (!backwardSteps.isEmpty()) {
             intermediate = backwardSteps.getLast().exitIndex();
         }
 
+        // 6. Plugboard swap (backwards)
+        intermediate = plugboardTransition(intermediate);
+
+        // 7. Index -> key translation
         char outputChar = keyboard.toChar(intermediate);
         String windowAfter = buildWindowString();
 
+        // Return detailed trace
         return new SignalTrace(
                 input,
                 outputChar,
@@ -107,7 +118,7 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     // State Checkers
     // ---------------------------------------------------------
-    private void ensureConfigured() {
+    private void assertConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured");
         }
@@ -137,7 +148,7 @@ public class MachineImpl implements Machine {
      */
     @Override
     public void reset() {
-        ensureConfigured();
+        assertConfigured();
         code.reset();
     }
 
@@ -145,6 +156,23 @@ public class MachineImpl implements Machine {
     // Helpers
     // ---------------------------------------------------------
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int plugboardTransition(int input) {
+        Plugboard plugboard = code.getPlugboard();
+        return plugboard.swap(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void plug(char a, char b) {
+        Plugboard plugboard = code.getPlugboard();
+        plugboard.plug(keyboard.toIdx(a),keyboard.toIdx(b));
+    }
 
     /**
      * {@inheritDoc}

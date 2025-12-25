@@ -1,6 +1,7 @@
 package enigma.machine.component.code;
 
 import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
 import enigma.shared.dto.config.CodeConfig;
@@ -41,6 +42,13 @@ public interface Code {
      * @return reflector instance
      */
     Reflector getReflector();
+
+    /**
+     * Active plugboard for character substitution.
+     *
+     * @return plugboard instance
+     */
+    Plugboard getPlugboard();
 
     /**
      * Rotor IDs corresponding to the rotors list (left→right, index 0 = leftmost).

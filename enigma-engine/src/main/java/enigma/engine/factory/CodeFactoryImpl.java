@@ -1,5 +1,6 @@
 package enigma.engine.factory;
 
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
@@ -59,6 +60,7 @@ public class CodeFactoryImpl implements CodeFactory {
 
     private RotorFactory rotorFactory;
     private ReflectorFactory reflectorFactory;
+    private PlugboardFactory plugboardFactory;
 
     /**
      * {@inheritDoc}
@@ -68,12 +70,16 @@ public class CodeFactoryImpl implements CodeFactory {
         Alphabet alphabet = spec.alphabet();
         this.rotorFactory = new RotorFactoryImpl(alphabet);
         this.reflectorFactory = new ReflectorFactoryImpl(alphabet);
+        this.plugboardFactory = new PlugboardFactoryImpl(alphabet);
 
         // Build rotors in left→right order
         List<Rotor> rotors = buildRotors(spec, config);
 
         // Build reflector
         Reflector reflector = buildReflector(spec, config);
+
+        // Build plugboard
+        Plugboard plugboard = buildPlugboard();
 
         // Assemble code (preserving left→right order)
         return new CodeImpl(
@@ -82,7 +88,8 @@ public class CodeFactoryImpl implements CodeFactory {
                 reflector,
                 new ArrayList<>(config.rotorIds()),
                 new ArrayList<>(config.positions()),
-                config.reflectorId()
+                config.reflectorId(),
+                plugboard
         );
     }
 
@@ -134,5 +141,10 @@ public class CodeFactoryImpl implements CodeFactory {
     private Reflector buildReflector(MachineSpec spec, CodeConfig config) {
         ReflectorSpec reflectorSpec = spec.getReflectorById(config.reflectorId());
         return this.reflectorFactory.create(reflectorSpec);
+    }
+
+    // TODO document
+    private Plugboard buildPlugboard() {
+        return this.plugboardFactory.create();
     }
 }

@@ -53,6 +53,24 @@ public interface Machine {
     CodeConfig getConfig();
 
     /**
+     * Perform a plugboard transition for the given input character.
+     *
+     * @param input input character as an integer (0-25)
+     * @return output character after plugboard transition as an integer (0-25)
+     * @since 1.0
+     */
+    int plugboardTransition(int input);
+
+    /**
+     * Add a plugboard connection between two characters.
+     *
+     * @param a first character to connect
+     * @param b second character to connect
+     * @since 1.0
+     */
+    void plug(char a, char b);
+
+    /**
      * Get detailed current code state snapshot.
      *
      * <p>Returns a {@link CodeState} containing rotor IDs, current positions,

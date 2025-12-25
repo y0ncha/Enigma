@@ -1,6 +1,7 @@
 package enigma.machine.component.code;
 
 import enigma.machine.component.alphabet.Alphabet;
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
 import enigma.shared.dto.config.CodeConfig;
@@ -25,6 +26,7 @@ public class CodeImpl implements Code {
     private final Alphabet alphabet;
     private final List<Rotor> rotors;        // left → right (index 0 = leftmost)
     private final Reflector reflector;
+    private final Plugboard plugboard;
 
     // metadata (config)
     private final List<Integer> rotorIds;    // left → right (index 0 = leftmost)
@@ -44,15 +46,19 @@ public class CodeImpl implements Code {
      * @param positions rotor start positions as characters from the alphabet
      * @param reflectorId reflector identifier
      */
-    public CodeImpl(Alphabet alphabet, List<Rotor> rotors,
+    public CodeImpl(Alphabet alphabet,
+                    List<Rotor> rotors,
                     Reflector reflector,
                     List<Integer> rotorIds,
                     List<Character> positions,
-                    String reflectorId) {
-        this.alphabet = alphabet;
+                    String reflectorId,
+                    Plugboard plugboard) {
 
+        this.alphabet = alphabet;
         this.rotors = List.copyOf(rotors);
         this.reflector = reflector;
+        this.plugboard = plugboard;
+
         this.rotorIds = List.copyOf(rotorIds);
         this.positions = List.copyOf(positions);
         this.reflectorId = reflectorId;
@@ -69,6 +75,10 @@ public class CodeImpl implements Code {
     public Reflector getReflector() {
         return reflector;
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public Plugboard getPlugboard() { return plugboard; }
 
     /** {@inheritDoc} */
     @Override
@@ -108,6 +118,5 @@ public class CodeImpl implements Code {
             char pos = positions.get(i);
             r.setPosition(pos);
         }
-
     }
 }
