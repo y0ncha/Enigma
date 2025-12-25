@@ -70,7 +70,6 @@ public class EngineImpl implements Engine {
     // Engine API (as described in assignment / instructions)
     // ---------------------------------------------------------
 
-
     /**
      * Load and validate a machine specification from an XML file and store it in the engine.
      *
@@ -145,7 +144,6 @@ public class EngineImpl implements Engine {
         }
         history.recordConfig(ogCodeState);
     }
-
 
     /**
      * Generate a random, valid {@link CodeConfig} and configure the machine.
@@ -263,7 +261,6 @@ public class EngineImpl implements Engine {
      * @deprecated kept for backward compatibility with older tests/console
      */
     @Override
-    @Deprecated
     public MachineSpec getMachineSpec() {
         if (spec == null) {
             throw new MachineNotLoadedException("No machine loaded");
@@ -278,13 +275,33 @@ public class EngineImpl implements Engine {
      * @deprecated use history or machine state inspection APIs instead
      */
     @Override
-    @Deprecated
     public CodeConfig getCurrentCodeConfig() {
         if (!machine.isConfigured()) {
             return null;
         }
         return machine.getConfig();
     }
+
+    /**
+     * Set up the plugboard connections from a string of character pairs.
+     *
+     * <p>Example: "ABCD" connects A↔B and C↔D.</p>
+     *
+     * @param connections string of character pairs for plugboard connections
+     * @throws MachineNotLoadedException if no machine is loaded
+     */
+    @Override
+    public void setPlugboard(String connections) {
+        if (spec == null) {
+            throw new MachineNotLoadedException("No machine loaded");
+        }
+        for(int i = 0; i < connections.length(); i += 2) {
+            char a = connections.charAt(i);
+            char b = connections.charAt(i + 1);
+            machine.plug(a, b);
+        }
+    }
+
 
     // ---------------------------------------------------------
     // Flow helpers: machine creation and random code generation
