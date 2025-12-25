@@ -88,9 +88,6 @@ public class CodeImpl implements Code {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Queries each rotor for its distance to notch and returns the results
-     * in left→right order.</p>
      */
     @Override
     public List<Integer> getNotchDist() {
@@ -103,9 +100,6 @@ public class CodeImpl implements Code {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Iterates through all rotors and restores each to its original position
-     * from the {@code positions} list captured at code creation time.</p>
      */
     @Override
     public void reset() {

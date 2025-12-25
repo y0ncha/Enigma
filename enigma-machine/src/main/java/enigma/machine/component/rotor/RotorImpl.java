@@ -160,10 +160,6 @@ public class RotorImpl implements Rotor {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Returns the wire from the internal wires list at the specified row.
-     * The wire contains the current right-side and left-side characters for
-     * that row based on the rotor's current rotational state.</p>
      */
     @Override
     public Wire getWire(int row) {
@@ -172,10 +168,6 @@ public class RotorImpl implements Rotor {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Scans the wires list from top to bottom to find the row where the
-     * right-side character matches the notch character, then returns the
-     * index of that row as the distance to notch.</p>
      */
     @Override
     public int notchDist() {
