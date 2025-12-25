@@ -727,7 +727,7 @@ All constraint violations throw exceptions with clear messages. No warnings or p
 
 ## 9.1 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for:
 - Code style and formatting rules
 - Javadoc conventions
 - Architecture boundaries

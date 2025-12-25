@@ -39,10 +39,6 @@ logs/
 Thumbs.db
 desktop.ini
 
-# Distribution artifacts
-enigma-machine-server-ex3.jar
-ex-machine-enigma2.jar
-
 # Local configuration and secrets
 .env
 .env.*
