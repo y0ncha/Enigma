@@ -71,7 +71,41 @@ public interface Code {
      */
     CodeConfig getConfig();
 
+    /**
+     * Get distance to notch position for each rotor.
+     *
+     * <p>Returns a list of distances (in steps) from each rotor's current
+     * position to its notch position. This information is useful for
+     * predicting when rotors will step and for displaying machine state.</p>
+     *
+     * <p><b>Ordering:</b> The returned list corresponds to rotors in
+     * left→right order (index 0 = leftmost rotor).</p>
+     *
+     * @return immutable list of distances to notch for each rotor
+     * @since 1.0
+     */
     List<Integer> getNotchDist();
 
+    /**
+     * Reset all rotor positions to their original values.
+     *
+     * <p>Returns each rotor to the position it had when this code was first
+     * configured. This allows re-encryption of messages from the same starting
+     * point without changing the rotor selection or reflector.</p>
+     *
+     * <p><b>What resets:</b></p>
+     * <ul>
+     *   <li>Rotor positions return to original values</li>
+     * </ul>
+     *
+     * <p><b>What does NOT reset:</b></p>
+     * <ul>
+     *   <li>Rotor selection (rotor IDs remain the same)</li>
+     *   <li>Reflector selection</li>
+     *   <li>Plugboard configuration (if applicable)</li>
+     * </ul>
+     *
+     * @since 1.0
+     */
     void reset();
 }

@@ -86,6 +86,12 @@ public class CodeImpl implements Code {
         return new CodeConfig(rotorIds, positions, reflectorId);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Queries each rotor for its distance to notch and returns the results
+     * in left→right order.</p>
+     */
     @Override
     public List<Integer> getNotchDist() {
         List<Integer> notchDist = new ArrayList<>();
@@ -95,6 +101,12 @@ public class CodeImpl implements Code {
         return notchDist;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Iterates through all rotors and restores each to its original position
+     * from the {@code positions} list captured at code creation time.</p>
+     */
     @Override
     public void reset() {
         for (int i = 0; i < rotors.size(); i++) {

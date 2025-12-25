@@ -92,7 +92,36 @@ public interface Rotor {
      */
     int getId();
 
+    /**
+     * Get the wire at a specific row position.
+     *
+     * <p>Returns the {@link Wire} object at the given row index, which contains
+     * the right-side (keyboard-facing) and left-side (reflector-facing) contact
+     * characters for that row.</p>
+     *
+     * <p><b>Usage:</b> This method is primarily used for debugging, testing,
+     * and display purposes to inspect the rotor's internal wiring structure.</p>
+     *
+     * @param row row index (0..alphabetSize-1)
+     * @return Wire object containing right and left contact characters for the row
+     * @throws IndexOutOfBoundsException if row is outside valid range
+     * @since 1.0
+     */
     Wire getWire(int row);
 
+    /**
+     * Calculate the distance (in steps) from the current position to the notch.
+     *
+     * <p>Returns how many steps are remaining until this rotor reaches its notch
+     * position. When the rotor is at the notch position, this returns 0. This
+     * information is useful for predicting when the rotor will trigger the next
+     * rotor to step (double-stepping mechanism).</p>
+     *
+     * <p><b>Example:</b> If the current position is 2 steps before the notch,
+     * this method returns 2. After advancing twice, it will return 0.</p>
+     *
+     * @return number of steps until notch is reached (0..alphabetSize-1)
+     * @since 1.0
+     */
     int notchDist();
 }
