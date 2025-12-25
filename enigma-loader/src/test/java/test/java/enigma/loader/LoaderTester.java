@@ -1,4 +1,4 @@
-package test.enigma.loader;
+package test.java.enigma.loader;
 
 import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.Loader;
