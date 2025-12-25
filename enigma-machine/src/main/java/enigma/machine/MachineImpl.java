@@ -2,7 +2,6 @@ package enigma.machine;
 
 import enigma.machine.component.code.Code;
 import enigma.machine.component.plugboard.Plugboard;
-import enigma.machine.component.plugboard.PlugboardImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.machine.component.keyboard.Keyboard;
 import enigma.machine.component.keyboard.KeyboardImpl;
@@ -34,8 +33,6 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     private Code code;
     private Keyboard keyboard;
-    private Plugboard plugboard;
-
 
     // ---------------------------------------------------------
     // Constructor
@@ -46,9 +43,7 @@ public class MachineImpl implements Machine {
      * @since 1.0
      */
     public MachineImpl() {
-        this.keyboard = null;
         this.code = null;
-        this.plugboard = null;
     }
 
     // ---------------------------------------------------------
@@ -65,7 +60,6 @@ public class MachineImpl implements Machine {
     public void setCode(Code code) {
         this.code = code;
         this.keyboard = new KeyboardImpl(code.getAlphabet());
-        this.plugboard = new PlugboardImpl(code.getAlphabet().size());
     }
 
     /**
@@ -90,7 +84,7 @@ public class MachineImpl implements Machine {
         int intermediate = keyboard.toIdx(input);
 
         // 2. Plugboard swap
-        intermediate = plugboard.swap(intermediate);
+        intermediate = plugboardTransition(intermediate);
 
         // 3. Rotor step
         List<RotorTrace> forwardSteps = forwardTransform(intermediate);
@@ -114,7 +108,7 @@ public class MachineImpl implements Machine {
         }
 
         // 6. Plugboard swap (backwards)
-        intermediate = plugboard.swap(intermediate);
+        intermediate = plugboardTransition(intermediate);
 
         // 7. Index -> key translation
         char outputChar = keyboard.toChar(intermediate);
@@ -158,6 +152,7 @@ public class MachineImpl implements Machine {
         return code.getConfig();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void reset() {
         assertConfigured();
@@ -168,6 +163,23 @@ public class MachineImpl implements Machine {
     // Helpers
     // ---------------------------------------------------------
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int plugboardTransition(int input) {
+        Plugboard plugboard = code.getPlugboard();
+        return plugboard.swap(input);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void plug(char a, char b) {
+        Plugboard plugboard = code.getPlugboard();
+        plugboard.plug(keyboard.toIdx(a),keyboard.toIdx(b));
+    }
 
     @Override
     public CodeState getCodeState() {

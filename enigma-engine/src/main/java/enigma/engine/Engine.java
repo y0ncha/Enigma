@@ -1,5 +1,6 @@
 package enigma.engine;
 
+import enigma.engine.exception.MachineNotLoadedException;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
 import enigma.shared.dto.config.CodeConfig;
@@ -97,6 +98,16 @@ public interface Engine {
      * Does not terminate application or prevent reuse.</p>
      */
     void terminate();
+
+    /**
+     * Set up the plugboard connections from a string of character pairs.
+     *
+     * <p>Example: "ABCD" connects A↔B and C↔D.</p>
+     *
+     * @param connections string of character pairs for plugboard connections
+     * @throws MachineNotLoadedException if no machine is loaded
+     */
+    void setPlugboard(String connections);
 
     /**
      * Save current engine state to snapshot file.
