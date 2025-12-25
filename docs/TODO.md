@@ -92,7 +92,7 @@
     - Check printing: Removed `System.out` from engine/machine/loader. Console is now responsible for printing machine state.
 - [x] **Run Build**
     - Run `mvn clean package` (Verified with `build` tool).
-    - Verify `enigma-machine-ex2.jar` is created in `enigma-console/target/`.
+    - Verify `enigma-machine-ex2.jar` is created in root `target/`.
 
 # Phase 5: Unit Testing & Final Polish
 - [x] **Migrate Tests**
