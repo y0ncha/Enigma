@@ -79,7 +79,7 @@ public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
         List<Character> positions,    // starting positions as characters (left→right), e.g. ['O','D','X']
         String reflectorId           // e.g. "I"
-        // String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
+        // String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none // todo uncomment and implement plugboard string to object
 ) {
     /**
      * Returns a compact string representation of the configuration.
