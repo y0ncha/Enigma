@@ -25,7 +25,8 @@ public class SmallSingleCharTester {
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
             java.util.List.of(3, 2, 1),   // rotors left→right
             java.util.List.of('C', 'C', 'C'),   // "CCC" (A=0,B=1,C=2)
-            "I"                           // reflector
+            "I",                           // reflector
+            ""
     );
 
     public static void main(String[] args) {

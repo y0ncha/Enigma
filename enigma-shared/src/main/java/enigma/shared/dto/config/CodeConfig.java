@@ -78,8 +78,8 @@ import java.util.stream.Collectors;
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
         List<Character> positions,    // starting positions as characters (left→right), e.g. ['O','D','X']
-        String reflectorId           // e.g. "I"
-        // String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none // todo uncomment and implement plugboard string to object
+        String reflectorId,           // e.g. "I"
+        String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
 ) {
     /**
      * Returns a compact string representation of the configuration.
@@ -93,13 +93,48 @@ public record CodeConfig(
      */
     @Override
     public String toString() {
-        return "<%s><%s><%s>"
-                .formatted(
-                        rotorIds.toString().replaceAll("[\\[\\] ]", ""),
-                        positions == null ? "" : positions.stream()
-                                .map(String::valueOf)
-                                .collect(Collectors.joining()),
-                        reflectorId
-                );
+
+        // Format rotor IDs as comma-separated string without brackets/spaces
+        String rotorStr = rotorIds().toString().replaceAll("[\\[\\] ]", "");
+
+        // Format positions as concatenated string of characters
+        String positionStr = positions() == null ? "" :
+                positions()
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining());
+
+        // Reflector ID or empty if null
+        String reflectorStr = reflectorId() == null ? "" : reflectorId();
+
+        // Build final string
+        StringBuilder result = new StringBuilder();
+        result.append("<").append(rotorStr).append(">")
+                .append("<").append(positionStr).append(">")
+                .append("<").append(reflectorStr).append(">");
+
+        // Optionally include plugboard if configured
+        if (plugboard != null && !plugboard.isEmpty()) {
+            result.append("<").append(formatPlugboard()).append(">");
+        }
+
+        return result.toString();
+    }
+
+    /** Formats the plugboard string into pairs separated by commas.
+     * Example: "ABCD" -> "A|B,C|D"
+     * @return formatted plugboard string
+     */
+    private String formatPlugboard() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < plugboard.length(); i += 2) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(plugboard.charAt(i))
+                    .append("|")
+                    .append(plugboard.charAt(i + 1));
+        }
+        return sb.toString();
     }
 }

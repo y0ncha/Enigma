@@ -27,7 +27,8 @@ public class PaperSingleCharTester {
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
             java.util.List.of(1, 2, 3),   // rotors left→right
             java.util.List.of('O', 'D', 'X'),
-            "I"                           // reflector
+            "I",
+            ""
     );
 
     public static void main(String[] args) {

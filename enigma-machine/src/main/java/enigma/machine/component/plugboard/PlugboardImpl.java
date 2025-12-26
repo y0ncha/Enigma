@@ -57,4 +57,19 @@ public class PlugboardImpl implements Plugboard {
         mapping[a] = b;
         mapping[b] = a;
     }
+
+    /**
+     * Format plugboard mapping as string of pairs.
+     * Example: "ABCDEF" for plugs A↔B, C↔D, E↔F
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < mapping.length; i++) {
+            if (mapping[i] != i && i < mapping[i]) { // Avoid duplicates
+                sb.append((char) ('A' + i)).append((char) ('A' + mapping[i]));
+            }
+        }
+        return sb.toString();
+    }
 }

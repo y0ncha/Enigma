@@ -170,7 +170,8 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 2),  // Only 2 rotors instead of 3
                 List.of('A', 'A'),
-                "I"
+                "I",
+                    ""
             );
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected InvalidConfigurationException but no exception was thrown\n");
@@ -200,7 +201,8 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 1, 2),  // Duplicate rotor 1
                 List.of('A', 'A', 'A'),
-                "I"
+                "I",
+                    ""
             );
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected InvalidConfigurationException but no exception was thrown\n");
@@ -230,7 +232,8 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 2, 999),  // Rotor 999 doesn't exist
                 List.of('A', 'A', 'A'),
-                "I"
+                "I",
+                    ""
             );
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected InvalidConfigurationException but no exception was thrown\n");
@@ -260,7 +263,8 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 2, 3),
                 List.of('A', 'A', 'A'),
-                "X"  // Reflector X doesn't exist
+                "X",  // Reflector X doesn't exist
+                    ""
             );
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected InvalidConfigurationException but no exception was thrown\n");
@@ -290,7 +294,8 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 2, 3),
                 List.of('A', '?', 'A'),  // '?' is not in alphabet
-                "I"
+                "I",
+                    ""
             );
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected InvalidConfigurationException but no exception was thrown\n");
@@ -317,7 +322,7 @@ public class ExceptionMessageTester {
         try {
             Engine engine = new EngineImpl();
             engine.loadMachine(VALID_XML);
-            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I");
+            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I", "");
             engine.configManual(config);
             engine.process("ABC?DEF");  // '?' is not in alphabet
             System.out.println("✗ FAIL: Expected InvalidMessageException but no exception was thrown\n");
@@ -344,7 +349,7 @@ public class ExceptionMessageTester {
         try {
             Engine engine = new EngineImpl();
             engine.loadMachine(VALID_XML);
-            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I");
+            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I", "");
             engine.configManual(config);
             engine.process("ABC\nDEF");  // Newline character
             System.out.println("✗ FAIL: Expected InvalidMessageException but no exception was thrown\n");
@@ -370,7 +375,7 @@ public class ExceptionMessageTester {
         
         try {
             Engine engine = new EngineImpl();
-            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I");
+            CodeConfig config = new CodeConfig(List.of(1, 2, 3), List.of('A', 'A', 'A'), "I", "");
             engine.configManual(config);
             System.out.println("✗ FAIL: Expected MachineNotLoadedException but no exception was thrown\n");
         } catch (MachineNotLoadedException e) {

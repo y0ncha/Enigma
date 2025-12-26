@@ -38,7 +38,8 @@ public class PaperlMultiWordTester {
         CodeConfig config = new CodeConfig(
                 java.util.List.of(1, 2, 3),         // rotors left→right
                 java.util.List.of('O', 'D', 'X'),   // "ODX" (O=14, D=3, X=23)
-                "I"                                 // reflector
+                "I",                            // reflector
+                ""
         );
 
         System.out.println("Code configuration: " + config + "\n");
