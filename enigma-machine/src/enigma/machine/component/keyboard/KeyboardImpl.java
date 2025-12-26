@@ -40,11 +40,7 @@ public class KeyboardImpl implements Keyboard {
     }
 
     /**
-     * Convert an internal index to its corresponding alphabet character.
-     *
-     * @param idx internal index (0..alphabetSize-1)
-     * @return alphabet character at that index
-     * @throws IllegalArgumentException if index is out of bounds
+     * {@inheritDoc}
      */
     @Override
     public char toChar(int idx) {
@@ -55,11 +51,7 @@ public class KeyboardImpl implements Keyboard {
     }
 
     /**
-     * Convert an alphabet character to its corresponding internal index.
-     *
-     * @param ch character from the alphabet
-     * @return internal index (0..alphabetSize-1)
-     * @throws IllegalArgumentException if character is not in the alphabet
+     * {@inheritDoc}
      */
     @Override
     public int toIdx(char ch) {
