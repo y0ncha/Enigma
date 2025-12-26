@@ -317,7 +317,7 @@ public class MachineImpl implements Machine {
 
         StringBuilder out = new StringBuilder();
 
-        out.append("A Look Under the Hood (Right Column → Left Column)\n");
+        out.append("A Look Under the Hood\n");
         out.append("--------------------------------------------------------\n\n");
 
         int numRows = kb.size();

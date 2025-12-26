@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BTE-Enigma rotors-count="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Enigma-Ex1.xsd">	
+<BTE-Enigma rotors-count="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Enigma-Ex2.xsd">
 		<ABC>
 			ABCDEF
 		</ABC>

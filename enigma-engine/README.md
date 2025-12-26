@@ -129,6 +129,11 @@ engine.loadMachine("path/to/machine.xml");
 - **Does NOT configure machine** (requires separate config call)
 - Transactional: Invalid XML never overwrites existing spec
 
+**XML Schema Location**: Machine XML files should reference the schema located at:
+`enigma-loader/src/main/resources/schema/Enigma-Ex2.xsd`
+
+See the enigma-loader README for details on how XML files should reference the schema.
+
 #### 2. Configuration
 
 **Manual Configuration** (`configManual`):

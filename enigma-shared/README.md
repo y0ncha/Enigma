@@ -46,6 +46,9 @@ public record MachineSpec(
 - Used by: Engine (validation), Console (display options)
 - Immutable: Thread-safe, can be shared
 
+**XML Source**: Machine specifications are loaded from XML files that conform to the schema at:
+`enigma-loader/src/main/resources/schema/Enigma-Ex2.xsd`
+
 ### RotorSpec
 **Purpose**: Specification for a single rotor.
 

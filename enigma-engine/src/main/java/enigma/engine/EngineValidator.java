@@ -205,18 +205,15 @@ public final class EngineValidator {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
                     String.format(
-                        "Control character %s detected at position %d. " +
-                        "Input: \"%s\"",
-                        controlName, i, truncateForDisplay(input, 50)));
+                        "Control character %s detected at position %d",
+                        controlName, i));
             }
 
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidMessageException(
                     String.format(
-                        "Character '%c' at position %d is not in the machine alphabet. " +
-                        "Machine alphabet: %s. " +
-                        "Input: \"%s\"",
-                        c, i, alphabet, truncateForDisplay(input, 50)));
+                        "Character '%c' at position %d is not in the machine alphabet : %s",
+                        c, i, alphabet));
             }
         }
     }
@@ -236,27 +233,6 @@ public final class EngineValidator {
             case 27 -> "ESC";
             default -> "CONTROL";
         };
-    }
-    
-    /**
-     * Truncate string for display, escaping control characters.
-     *
-     * @param str string to prepare for display
-     * @param maxLen maximum length before truncation
-     * @return escaped and possibly truncated string
-     */
-    private static String truncateForDisplay(String str, int maxLen) {
-        if (str == null) {
-            return null;
-        }
-
-        // First, escape control/non-printable characters to visible markers (e.g., \n, \t, ESC)
-        String escaped = escapeControlChars(str);
-
-        if (escaped.length() <= maxLen) {
-            return escaped;
-        }
-        return escaped.substring(0, maxLen) + "...";
     }
 
     /**
@@ -431,7 +407,7 @@ public final class EngineValidator {
 
             if (alphabet.indexOf(a) == -1 || alphabet.indexOf(b) == -1) {
                 throw new IllegalArgumentException(
-                        "Plug characters must be part of the machine alphabet: " + alphabet
+                        "Plug characters must be part of the machine alphabet [" + alphabet + "]"
                 );
             }
 

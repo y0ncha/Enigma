@@ -191,7 +191,7 @@ public class ConsoleImpl implements Console {
                 return command;
             }
             catch (IllegalArgumentException e) {
-                System.out.print(e.getMessage());
+                System.out.print("Error : " + e.getMessage());
                 System.out.println("Enter a valid command number (1-10) :");
                 System.out.print("> ");
             }
@@ -282,6 +282,7 @@ public class ConsoleImpl implements Console {
         List<Integer> rotorIds;
         List<Character> positionsLst;
         String reflectorId;
+        String plugStr;
         while (keepTrying) {
 
 // ---------------------------------------------------------
@@ -289,13 +290,13 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
             while (true) {
                 int total = enigma.getMachineSpec().getTotalRotors();
+                int rotorsInUse = enigma.getMachineSpec().getRotorsInUse();
                 String available = IntStream.rangeClosed(1, total)
                         .mapToObj(String::valueOf)
                         .collect(Collectors.joining(", "));
                 System.out.println();
                 String rotorsLine = Utilities.readNonEmptyLine(scanner,
-                        "Enter rotor IDs as a comma-separated list (e.g. 23,542,231,545)\n" +
-                                "Note : The FIRST rotor you enter is the LEFTMOST rotor (e.g. in \"3,2,1\" → 3 is leftmost, 1 is rightmost)\n" +
+                        "Enter exactly " + rotorsInUse + " rotor IDs as a comma-separated list (e.g. in \"3,2,1\" → 3 is leftmost, 1 is rightmost)\n" +
                                 "Allowed rotor IDs : " + available
                         );
 
@@ -309,14 +310,14 @@ public class ConsoleImpl implements Console {
                 }
                 catch (IllegalArgumentException e) {
                     // Known validation error
-                    System.out.println(e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner,
                             "Do you want to try again with a different rotor list? (Y/N) : ")) {
                         return; // back to main menu
                     }
                 } catch (Exception e) {
                     // Unknown / unexpected error
-                    System.out.println(e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner,
                             "Try again? (Y/N) : ")) {
                         return; // back to main menu
@@ -338,13 +339,13 @@ public class ConsoleImpl implements Console {
                     break;
                 }
                 catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with different positions? (Y/N) : ")) {
                         return;
                     }
                 } catch (Exception e) {
                     // Unknown / unexpected error
-                    System.out.println("Unexpected error : " + e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner,
                             "An unexpected error occurred. Try again? (Y/N) : ")) {
                         return; // back to main menu
@@ -360,8 +361,9 @@ public class ConsoleImpl implements Console {
                 for (int i = 1; i <= reflectorsCount; i++) {
                     System.out.println(" " + i + ". " + InputParsers.toRoman(i));
                 }
-                int reflectorChoice = Utilities.readInt(scanner,
-                        "Choose reflector by number (1-" + reflectorsCount + ") : ");
+                System.out.println("Choose reflector by number (1-" + reflectorsCount + ") : ");
+                System.out.print("> ");
+                int reflectorChoice = Utilities.readInt(scanner, "");
                 try {
                     ConsoleValidator.ensureReflectorChoiceInRange(reflectorChoice, reflectorsCount);
                     reflectorId = InputParsers.toRoman(reflectorChoice);
@@ -369,14 +371,14 @@ public class ConsoleImpl implements Console {
                     break;
                 }
                 catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different reflector? (Y/N) : ")) {
                         return;
                     }
                 }
                 catch (Exception e) {
                     // Unknown / unexpected error
-                    System.out.println("Unexpected error : " + e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner,
                             "An unexpected error occurred. Try again? (Y/N) : ")) {
                         return; // back to main menu
@@ -387,28 +389,25 @@ public class ConsoleImpl implements Console {
 // 4) Plugboard choice (loop until valid or user exits)
 // ---------------------------------------------------------
             while (true) {
-                System.out.println(
-                        """
-                                Enter plug pairs as a continuous string (even length).
-                                Each two characters define one plug pair.
-                                Press ENTER for no plugs:"""
-                );
+                System.out.println("*Optional* - Enter plug pairs as a continuous string (even length), e.g. ABKC (A ↔ B, K ↔ C)");
+                System.out.println("Each letter may appear at most once, and a letter cannot be paired with itself : ");
+                System.out.print("> ");
+
                 String plugsInput = scanner.nextLine();
-                String cleanedPlugsInput = plugsInput.trim().toUpperCase();
+                plugStr = plugsInput.trim().toUpperCase();
                 try {
-                    EngineValidator.validatePlugs(cleanedPlugsInput, enigma.getMachineSpec().getAlphabet());
-                    //enigma.setPlugboards(cleanedPlugsInput)
+                    EngineValidator.validatePlugs(plugStr, enigma.getMachineSpec().getAlphabet());
                     break;
                 }
                 catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different Plugboard? (Y/N) : ")) {
                         return;
                     }
                 }
                 catch (Exception e) {
                     // Unknown / unexpected error
-                    System.out.println("Unexpected error : " + e.getMessage());
+                    System.out.println("Error : " + e.getMessage());
                     if (!Utilities.askUserToRetry(scanner,
                             "An unexpected error occurred. Try again? (Y/N) : ")) {
                         return; // back to main menu
@@ -419,9 +418,10 @@ public class ConsoleImpl implements Console {
 // 5) Build CodeConfig and delegate to engine
 // ---------------------------------------------------------
             try {
-                CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId, "TH"); // TODO get plugStr from user !
+                CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId, plugStr);
                 enigma.configManual(config);
                 codeConfigured = true;
+                System.out.println();
                 System.out.println("Manual code configuration was set successfully");
                 CodeState currentConfig = enigma.machineData().curCodeState();
                 if (currentConfig != null) {
@@ -438,7 +438,7 @@ public class ConsoleImpl implements Console {
             }
             catch (Exception e) {
                 // Unknown / unexpected error
-                System.out.println("Unexpected error : " + e.getMessage());
+                System.out.println("Error : " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner, "An unexpected error occurred. Try again? (Y/N) : ")) {
                     return; // back to main menu
                 }
@@ -608,13 +608,13 @@ public class ConsoleImpl implements Console {
                 System.out.println("Machine snapshot was saved successfully.");
                 return;
             } catch (EngineException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Error : " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different path? (Y/N): ")) {
                     return;
                 }
             } catch (Exception e) {
-                System.out.println("Unexpected error: " + e.getMessage());
+                System.out.println("Error : " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "An unexpected error occurred. Try again? (Y/N) : ")) {
                     return;
@@ -645,13 +645,13 @@ public class ConsoleImpl implements Console {
                 System.out.println("Machine snapshot loaded successfully.");
                 return;
             } catch (EngineException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Error : " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "Do you want to try again with a different path? (Y/N): ")) {
                     return;
                 }
             } catch (Exception e) {
-                System.out.println("Unexpected error: " + e.getMessage());
+                System.out.println("Error : " + e.getMessage());
                 if (!Utilities.askUserToRetry(scanner,
                         "An unexpected error occurred. Try again? (Y/N) : ")) {
                     return;

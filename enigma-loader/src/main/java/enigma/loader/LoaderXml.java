@@ -9,9 +9,15 @@ import jakarta.xml.bind.Unmarshaller;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,7 +61,7 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Unmarshal XML file to JAXB root object.
+     * Unmarshal XML file to JAXB root object with schema validation.
      *
      * @param filePath path to XML file
      * @return JAXB root object
@@ -69,16 +75,54 @@ public class LoaderXml implements Loader {
         }
 
         if (!filePath.toLowerCase().endsWith(".xml")) {
-            throw new EnigmaLoadingException("File must have a .ex1-xml extension (case-insensitive)");
+            throw new EnigmaLoadingException("File must have a .xml extension (case-insensitive)");
         }
 
         try {
             JAXBContext context = JAXBContext.newInstance(BTEEnigma.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
+
+            // Configure schema validation
+            Schema schema = loadSchema();
+            if (schema != null) {
+                unmarshaller.setSchema(schema);
+            }
+
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
             throw new EnigmaLoadingException("Unable to parse file '" + filePath + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Load XSD schema from classpath resources for validation.
+     *
+     * <p>The schema file is located at: {@code /schema/Enigma-Ex2.xsd} in the classpath
+     * (typically {@code src/main/resources/schema/Enigma-Ex2.xsd}).</p>
+     *
+     * @return Schema instance for validation, or null if schema cannot be loaded
+     */
+    private Schema loadSchema() {
+        try {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+            // Load schema from classpath
+            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+            if (schemaStream == null) {
+                // Fallback: try loading from URL if available
+                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                if (schemaUrl != null) {
+                    return schemaFactory.newSchema(schemaUrl);
+                }
+                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex2.xsd in classpath. Validation skipped.");
+                return null;
+            }
+
+            return schemaFactory.newSchema(new javax.xml.transform.stream.StreamSource(schemaStream));
+        } catch (SAXException e) {
+            System.err.println("Warning: Unable to load XSD schema: " + e.getMessage() + ". Validation skipped.");
+            return null;
         }
     }
 
