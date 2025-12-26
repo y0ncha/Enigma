@@ -346,9 +346,40 @@ public class ConsoleImpl implements Console {
                     }
                 }
             }
-
 // ---------------------------------------------------------
-// 4) Build CodeConfig and delegate to engine
+// 4) Plugboard choice (loop until valid or user exits)
+// ---------------------------------------------------------
+            while (true) {
+                System.out.println(
+                        """
+                                Enter plug pairs as a continuous string (even length).
+                                Each two characters define one plug pair.
+                                Press ENTER for no plugs:"""
+                );
+                String plugsInput = scanner.nextLine();
+                String cleanedPlugsInput = plugsInput.trim().toUpperCase();
+                try {
+                    EngineValidator.validatePlugs(cleanedPlugsInput, enigma.getMachineSpec().getAlphabet());
+                    //enigma.setPlugboards(cleanedPlugsInput)
+                    break;
+                }
+                catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                    if (!Utilities.askUserToRetry(scanner, "Do you want to try again with a different Plugboard? (Y/N) : ")) {
+                        return;
+                    }
+                }
+                catch (Exception e) {
+                    // Unknown / unexpected error
+                    System.out.println("Unexpected error : " + e.getMessage());
+                    if (!Utilities.askUserToRetry(scanner,
+                            "An unexpected error occurred. Try again? (Y/N) : ")) {
+                        return; // back to main menu
+                    }
+                }
+            }
+// ---------------------------------------------------------
+// 5) Build CodeConfig and delegate to engine
 // ---------------------------------------------------------
             try {
                 CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId); // todo refactor code config to receive plugboard string

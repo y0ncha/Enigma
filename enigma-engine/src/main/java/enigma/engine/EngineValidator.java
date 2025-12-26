@@ -392,4 +392,67 @@ public final class EngineValidator {
         validatePositionsInAlphabet(spec, positions);
     }
 
+
+    /**
+     * Validates the plugboard configuration string.
+     * <p>
+     * The plug string represents a sequence of plug pairs, where every two
+     * consecutive characters define a single plug mapping.
+     * </p>
+     * <ul>
+     *   <li>The string length must be even.</li>
+     *   <li>All characters must belong to the machine alphabet.</li>
+     *   <li>No character may be mapped to itself.</li>
+     *   <li>No character may appear in more than one plug pair.</li>
+     *   <li>An empty string is considered valid and represents no plugs.</li>
+     * </ul>
+     *
+     * @param plugs    the continuous string representing plug pairs
+     * @param alphabet the machine alphabet string
+     * @throws IllegalArgumentException if the plug configuration is invalid
+     * @since 2.0
+     */
+    public static void validatePlugs(String plugs, String alphabet) {
+        if (plugs == null || plugs.isEmpty()) {
+            return;
+        }
+
+        if (alphabet == null || alphabet.isEmpty()) {
+            throw new IllegalArgumentException("Machine alphabet is not defined.");
+        }
+
+        if (plugs.length() % 2 != 0) {
+            throw new IllegalArgumentException(
+                    "Plug string length must be even."
+            );
+        }
+
+        Set<Character> usedChars = new HashSet<>();
+
+        for (int i = 0; i < plugs.length(); i += 2) {
+            char a = plugs.charAt(i);
+            char b = plugs.charAt(i + 1);
+
+            if (alphabet.indexOf(a) == -1 || alphabet.indexOf(b) == -1) {
+                throw new IllegalArgumentException(
+                        "Plug characters must be part of the machine alphabet: " + alphabet
+                );
+            }
+
+            if (a == b) {
+                throw new IllegalArgumentException(
+                        "A character cannot be plugged to itself: " + a
+                );
+            }
+
+            if (usedChars.contains(a) || usedChars.contains(b)) {
+                throw new IllegalArgumentException(
+                        "A character appears in more than one plug: " + a + " or " + b
+                );
+            }
+
+            usedChars.add(a);
+            usedChars.add(b);
+        }
+    }
 }
