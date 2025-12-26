@@ -71,18 +71,7 @@ public class EngineImpl implements Engine {
     // ---------------------------------------------------------
 
     /**
-     * Load and validate a machine specification from an XML file and store it in the engine.
-     *
-     * <p>Example:
-     * <pre>engine.loadMachine("enigma-loader/src/test/resources/xml/ex1-sanity-paper-enigma.xml");</pre>
-     *
-     * Important (concise):
-     * - Does NOT configure the runtime {@link Machine}; call {@link #configManual(CodeConfig)} or {@link #configRandom()} to apply a {@link Code}.
-     * - The {@link Loader} performs schema and structural validation (alphabet, rotors, reflector pairs).
-     * - Caller must handle concurrency; the last successful load overwrites the engine spec.
-     *
-     * @param path absolute or relative path to the Enigma XML file
-     * @throws EngineException if parsing or validation fails (wraps EnigmaLoadingException with context)
+     * {@inheritDoc}
      */
     @Override
     public void loadMachine(String path) throws Exception {
@@ -93,18 +82,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Return a snapshot of machine metadata and current code states.
-     *
-     * <p>The returned {@link MachineState} contains:
-     * <ul>
-     *   <li>Number of rotors available in the spec</li>
-     *   <li>Number of reflectors available in the spec</li>
-     *   <li>Number of strings processed so far</li>
-     *   <li>The original configured code state (if configured)</li>
-     *   <li>The current runtime code state (may change as the machine processes input)</li>
-     * </ul>
-     *
-     * @return a {@link MachineState} snapshot; fields may be null if not applicable (e.g. no spec loaded)
+     * {@inheritDoc}
      */
     @Override
     public MachineState machineData() {
@@ -115,16 +93,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Configure machine with a manual {@link CodeConfig}.
-     *
-     * <p>Validates the config against the loaded spec, then delegates to
-     * {@link CodeFactory#create(MachineSpec, CodeConfig)} to build the runtime
-     * {@link Code}. The code is assigned to the internal machine via
-     * {@link Machine#setCode(Code)}.</p>
-     *
-     * @param config configuration with rotor IDs, positions (chars), reflector ID
-     * @throws InvalidConfigurationException if validation fails
-     * @throws MachineNotLoadedException if spec is not loaded
+     * {@inheritDoc}
      */
     @Override
     public void configManual(CodeConfig config) {
@@ -146,17 +115,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Generate a random, valid {@link CodeConfig} and configure the machine.
-     *
-     * <p>Sampling strategy:</p>
-     * <ul>
-     *   <li>Pick the number of rotors indicated by the loaded {@link enigma.shared.spec.MachineSpec#getRotorsInUse()} (left→right)</li>
-     *   <li>Generate random char positions (left→right) from alphabet</li>
-     *   <li>Pick one random reflector ID</li>
-     * </ul>
-     * <p>Delegates to {@link #configManual(CodeConfig)} for validation and construction.</p>
-     *
-     * @throws MachineNotLoadedException when spec is not loaded
+     * {@inheritDoc}
      */
     @Override
     public void configRandom() {
@@ -168,22 +127,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Process the provided input string through the currently configured
-     * machine/code with detailed debugging information.
-     *
-     * <p>Processing notes:
-     * <ul>
-     *   <li>Input is validated via {@link EngineValidator#validateInputInAlphabet(MachineSpec, String)}</li>
-     *   <li>Each character is processed through the {@link Machine#process(char)} method and a per-character
-     *       {@link SignalTrace} is recorded.</li>
-     *   <li>The method updates the engine's processed counter and records the message in {@link MachineHistory}.</li>
-     * </ul>
-     *
-     * @param input the input text to process
-     * @return detailed debug trace of the processing steps
-     * @throws MachineNotLoadedException if machine specification is not loaded
-     * @throws MachineNotConfiguredException if machine is not configured
-     * @throws InvalidMessageException if input is null or contains invalid characters
+     * {@inheritDoc}
      */
     @Override
     public ProcessTrace process(String input) {
@@ -218,7 +162,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Reset the currently-configured machine to its initial state for the current code.
+     * {@inheritDoc}
      */
     @Override
     public void reset() {
@@ -232,8 +176,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Terminate the engine and release any resources. This implementation currently
-     * has no resources to release; method exists for interface completeness.
+     * {@inheritDoc}
      */
     @Override
     public void terminate() {
@@ -242,9 +185,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Return a human-readable representation of engine history.
-     *
-     * @return textual history of recorded configurations and processed messages
+     * {@inheritDoc}
      */
     @Override
     public String history() {
@@ -255,10 +196,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Deprecated accessor for the loaded MachineSpec. Prefer using EngineState APIs.
-     *
-     * @return the currently loaded {@link MachineSpec}, or null if none loaded
-     * @deprecated kept for backward compatibility with older tests/console
+     * {@inheritDoc}
      */
     @Override
     public MachineSpec getMachineSpec() {
@@ -269,10 +207,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Deprecated convenience to expose the current {@link CodeConfig} from the machine.
-     *
-     * @return the currently-configured {@link CodeConfig} or null if the machine is not configured
-     * @deprecated use history or machine state inspection APIs instead
+     * {@inheritDoc}
      */
     @Override
     public CodeConfig getCurrentCodeConfig() {
@@ -349,11 +284,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Bonus: Save the current machine state (spec + code + history + statistics)
-     * into a JSON snapshot file.
-     *
-     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
-     * @throws EngineException if no spec is loaded or snapshot saving fails
+     * {@inheritDoc}
      */
     @Override
     public void saveSnapshot(String basePath) {
@@ -371,13 +302,7 @@ public class EngineImpl implements Engine {
     }
 
     /**
-     * Bonus: Load a machine state from a previously saved JSON snapshot file.
-     *
-     * <p>This method REPLACES the current machine specification, history and
-     * counters with the loaded data.</p>
-     *
-     * @param basePath full path without extension (e.g. "C:\\tmp\\my-machine")
-     * @throws EngineException if loading fails or snapshot is invalid
+     * {@inheritDoc}
      */
     @Override
     public void loadSnapshot(String basePath) {
@@ -419,9 +344,6 @@ public class EngineImpl implements Engine {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Returns the machine's textual representation if configured.
-     * This method intentionally does not modify any engine or machine state.</p>
      */
     @Override
     public String getMachineDetails() {

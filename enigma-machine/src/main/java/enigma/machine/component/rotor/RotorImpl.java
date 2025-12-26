@@ -52,10 +52,6 @@ public class RotorImpl implements Rotor {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Rotates rotor and returns true if notch is now engaged.</p>
-     *
-     * @return true if next rotor should advance, false otherwise
      */
     @Override
     public boolean advance() {

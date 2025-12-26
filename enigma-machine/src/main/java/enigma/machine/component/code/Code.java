@@ -47,6 +47,13 @@ public interface Code {
     Plugboard getPlugboard();
 
     /**
+     * Active plugboard for character substitution.
+     *
+     * @return plugboard instance
+     */
+    Plugboard getPlugboard();
+
+    /**
      * Rotor IDs corresponding to the rotors list (left→right, index 0 = leftmost).
      *
      * @return immutable list of rotor IDs
@@ -75,9 +82,16 @@ public interface Code {
      */
     CodeConfig getConfig();
 
-    // TODO document
+    /**
+     * Get distance to notch for each rotor in left→right order.
+     *
+     * @return list of step counts until each rotor triggers next rotor
+     */
     List<Integer> getNotchDist();
 
-    // TODO document
+    /**
+     * Reset all rotor positions to their original configured values.
+     * Rotor selection and reflector remain unchanged.
+     */
     void reset();
 }
