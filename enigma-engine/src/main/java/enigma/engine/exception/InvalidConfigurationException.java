@@ -11,7 +11,7 @@ package enigma.engine.exception;
  *   <li>Invalid rotor count (not matching machine specification)</li>
  *   <li>Invalid reflector ID (non-existent)</li>
  *   <li>Invalid initial positions (not in alphabet)</li>
- *   <li>Invalid plugboard configuration</li>
+ *   <li>Invalid plugStr configuration</li>
  * </ul>
  *
  * <p>Exception messages include the specific parameter that failed validation

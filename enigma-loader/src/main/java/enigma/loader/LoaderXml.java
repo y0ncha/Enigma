@@ -2,8 +2,7 @@ package enigma.loader;
 
 import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.xml.generated.*;
-import enigma.machine.component.alphabet.Alphabet;
-import enigma.loader.xml.generated.*;
+import enigma.shared.alphabet.Alphabet;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -141,7 +140,7 @@ public class LoaderXml implements Loader {
             validateRotorIdUnique(id, result);
 
             int notch = rotorXml.getNotch();
-            validateNotch(id, notch, alphabetSize);
+            validateNotch(notch, alphabetSize);
             int notchIndex = notch - 1; // XML notch is 1-based; internal spec uses 0-based
 
             // Build row-ordered right/left char arrays according to XML ordering
@@ -384,12 +383,11 @@ public class LoaderXml implements Loader {
     /**
      * Validate the notch position of a rotor.
      *
-     * @param rotorId id of the rotor
      * @param notch notch position to validate
      * @param alphabetSize size of the alphabet (number of letters)
      * @throws EnigmaLoadingException if the notch position is out of bounds
      */
-    private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
+    private void validateNotch(int notch, int alphabetSize) throws EnigmaLoadingException {
         if (notch < 1 || notch > alphabetSize) {
             throw new EnigmaLoadingException("Notch position is out of bounds");
         }

@@ -169,15 +169,6 @@ public class MachineImpl implements Machine {
      * {@inheritDoc}
      */
     @Override
-    public void plug(char a, char b) {
-        Plugboard plugboard = code.getPlugboard();
-        plugboard.plug(keyboard.toIdx(a),keyboard.toIdx(b));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public CodeState getCodeState() {
         // If code is not configured, return a default 'not configured' state
         if (!isConfigured()) return CodeState.notConfigured();
@@ -185,7 +176,7 @@ public class MachineImpl implements Machine {
         String positions = buildWindowString();
         List<Integer> notchDist = code.getNotchDist();
         String reflectorId = code.getReflector().getId();
-        return new CodeState(code.getRotorIds(), positions, notchDist, reflectorId, "");
+        return new CodeState(code.getRotorIds(), positions, notchDist, reflectorId, code.getPlugboard().toString());
     }
 
     /**

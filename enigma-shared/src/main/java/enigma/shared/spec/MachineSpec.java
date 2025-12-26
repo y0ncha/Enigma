@@ -2,7 +2,7 @@ package enigma.shared.spec;
 
 import java.util.Map;
 import java.util.Comparator;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 
 /**
  * Represents the specification of an Enigma machine, including its alphabet,
@@ -76,7 +76,7 @@ public record MachineSpec(
      */
     @Override
     public String toString() {
-        String letters = (alphabet == null) ? null : alphabet.getLetters();
+        String letters = (alphabet == null) ? null : alphabet.letters();
         int alphaSize = (alphabet == null) ? 0 : alphabet.size();
 
         StringBuilder sb = new StringBuilder();
@@ -143,7 +143,7 @@ public record MachineSpec(
      * @return the alphabet string (sequence of valid characters)
      */
     public String getAlphabet() {
-        return alphabet.getLetters();
+        return alphabet.letters();
     }
 
 }

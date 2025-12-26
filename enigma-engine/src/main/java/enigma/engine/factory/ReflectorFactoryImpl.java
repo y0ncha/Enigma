@@ -2,7 +2,7 @@ package enigma.engine.factory;
 
 import enigma.engine.exception.InvalidConfigurationException;
 import enigma.shared.spec.ReflectorSpec;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.reflector.ReflectorImpl;
 

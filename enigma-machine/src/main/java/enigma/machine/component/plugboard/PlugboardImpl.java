@@ -1,7 +1,7 @@
 package enigma.machine.component.plugboard;
 
 /**
- * Array-based implementation of symmetric plugboard mapping.
+ * Array-based implementation of symmetric plugStr mapping.
  * <p>
  * Initially maps each index to itself (identity). Plugs create bidirectional swaps.
  * <p>
@@ -17,7 +17,7 @@ public class PlugboardImpl implements Plugboard {
     private final int[] mapping;
 
     /**
-     * Creates a plugboard initialized to identity mapping.
+     * Creates a plugStr initialized to identity mapping.
      *
      * @param alphabetSize size of the alphabet (number of characters)
      */
@@ -59,7 +59,7 @@ public class PlugboardImpl implements Plugboard {
     }
 
     /**
-     * Format plugboard mapping as string of pairs.
+     * Format plugStr mapping as string of pairs.
      * Example: "ABCDEF" for plugs A↔B, C↔D, E↔F
      */
     @Override

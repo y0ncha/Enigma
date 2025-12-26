@@ -204,38 +204,6 @@ public class EngineImpl implements Engine {
         return spec;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CodeConfig getCurrentCodeConfig() {
-        if (!machine.isConfigured()) {
-            return null;
-        }
-        return machine.getConfig();
-    }
-
-    /**
-     * Set up the plugboard connections from a string of character pairs.
-     *
-     * <p>Example: "ABCD" connects A↔B and C↔D.</p>
-     *
-     * @param connections string of character pairs for plugboard connections
-     * @throws MachineNotLoadedException if no machine is loaded
-     */
-    @Override
-    public void setPlugboard(String connections) {
-        if (spec == null) {
-            throw new MachineNotLoadedException("No machine loaded");
-        }
-        for(int i = 0; i < connections.length(); i += 2) {
-            char a = connections.charAt(i);
-            char b = connections.charAt(i + 1);
-            machine.plug(a, b);
-        }
-    }
-
-
     // ---------------------------------------------------------
     // Flow helpers: machine creation and random code generation
     // ---------------------------------------------------------

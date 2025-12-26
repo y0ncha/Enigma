@@ -3,7 +3,7 @@ package enigma.engine.factory;
 import enigma.engine.exception.InvalidConfigurationException;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.rotor.Rotor;
 
 /**

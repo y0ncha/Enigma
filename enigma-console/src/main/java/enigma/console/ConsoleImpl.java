@@ -388,7 +388,7 @@ public class ConsoleImpl implements Console {
 // 4) Build CodeConfig and delegate to engine
 // ---------------------------------------------------------
             try {
-                CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId, ""); // TODO get plugboard from user ! chnage from enmpty string
+                CodeConfig config = new CodeConfig(rotorIds, positionsLst, reflectorId, "TH"); // TODO get plugStr from user !
                 enigma.configManual(config);
                 codeConfigured = true;
                 System.out.println("Manual code configuration was set successfully");

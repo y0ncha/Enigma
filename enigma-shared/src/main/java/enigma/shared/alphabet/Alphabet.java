@@ -1,4 +1,7 @@
-package enigma.machine.component.alphabet;
+package enigma.shared.alphabet;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Immutable alphabet mapping characters to indices.
@@ -8,9 +11,7 @@ package enigma.machine.component.alphabet;
  *
  * @since 1.0
  */
-public class Alphabet {
-    private final String letters;
-
+public record Alphabet(String letters) {
     /**
      * Create alphabet from character sequence.
      *
@@ -18,20 +19,19 @@ public class Alphabet {
      * @throws IllegalArgumentException if letters is null, empty, or contains duplicates
      * @since 1.0
      */
-    public Alphabet(String letters) {
+    public Alphabet {
         if (letters == null) {
             throw new IllegalArgumentException("Alphabet letters cannot be null");
         }
         if (letters.isEmpty()) {
             throw new IllegalArgumentException("Alphabet letters cannot be empty");
         }
-        java.util.Set<Character> seen = new java.util.HashSet<>();
+        Set<Character> seen = new HashSet<>();
         for (char c : letters.toCharArray()) {
             if (!seen.add(c)) {
                 throw new IllegalArgumentException("Alphabet contains duplicate character: " + c);
             }
         }
-        this.letters = letters;
     }
 
     /**
@@ -40,7 +40,8 @@ public class Alphabet {
      * @return alphabet letters
      * @since 1.0
      */
-    public String getLetters() {
+    @Override
+    public String letters() {
         return letters;
     }
 
