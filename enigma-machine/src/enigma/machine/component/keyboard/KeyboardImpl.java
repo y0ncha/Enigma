@@ -69,17 +69,26 @@ public class KeyboardImpl implements Keyboard {
         return alphabet.indexOf(ch);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean charInbound(char ch) {
         return alphabet.contains(ch);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean idxInbound(int idx) {
         return 0 <= idx && idx < alphabet.size();
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int size() {return alphabet.size(); }
 }

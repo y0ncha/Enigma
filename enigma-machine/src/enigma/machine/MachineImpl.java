@@ -118,6 +118,11 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     // State Checkers
     // ---------------------------------------------------------
+    /**
+     * Ensure machine is configured with a code.
+     *
+     * @throws IllegalStateException if machine is not configured
+     */
     private void ensureConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured");
@@ -127,6 +132,9 @@ public class MachineImpl implements Machine {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConfigured() {
         return code != null && keyboard != null;
@@ -140,6 +148,9 @@ public class MachineImpl implements Machine {
         return code.getConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         ensureConfigured();
@@ -151,6 +162,9 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CodeState getCodeState() {
         // If code is not configured, return a default 'not configured' state

@@ -71,7 +71,21 @@ public interface Code {
      */
     CodeConfig getConfig();
 
+    /**
+     * Get distance to notch for all rotors.
+     *
+     * <p>Returns a list of integers representing the number of steps
+     * until each rotor's notch position is reached, in left→right order.</p>
+     *
+     * @return list of notch distances (index 0 = leftmost rotor)
+     */
     List<Integer> getNotchDist();
 
+    /**
+     * Reset all rotor positions to their original values.
+     *
+     * <p>Restores positions to their state at configuration time.
+     * Does not change rotor selection, reflector, or plugboard.</p>
+     */
     void reset();
 }

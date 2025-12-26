@@ -86,6 +86,9 @@ public class CodeImpl implements Code {
         return new CodeConfig(rotorIds, positions, reflectorId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Integer> getNotchDist() {
         List<Integer> notchDist = new ArrayList<>();
@@ -95,6 +98,9 @@ public class CodeImpl implements Code {
         return notchDist;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         for (int i = 0; i < rotors.size(); i++) {
