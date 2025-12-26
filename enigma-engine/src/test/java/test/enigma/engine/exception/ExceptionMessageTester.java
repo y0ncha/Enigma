@@ -263,7 +263,7 @@ public class ExceptionMessageTester {
             CodeConfig config = new CodeConfig(
                 List.of(1, 2, 3),
                 List.of('A', 'A', 'A'),
-                "X",  // Reflector X doesn't exist,
+                "X",  // Reflector X doesn't exist
                     ""
             );
             engine.configManual(config);
