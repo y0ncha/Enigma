@@ -430,7 +430,7 @@ This spec is then used by:
 Loader loader = new LoaderXml(3); // 3 rotors in use
 
 try {
-    MachineSpec spec = loader.loadSpecs("enigma.xml");
+    MachineSpec spec = loader.loadSpecs("enigma.ex1-xml");
     
     // Spec is valid and ready to use
     System.out.println("Alphabet: " + spec.alphabet());

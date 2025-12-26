@@ -80,7 +80,7 @@ public class LoaderXml implements Loader {
         }
 
         if (!filePath.toLowerCase().endsWith(".xml")) {
-            throw new EnigmaLoadingException("File must have a .xml extension (case-insensitive)");
+            throw new EnigmaLoadingException("File must have a .ex1-xml extension (case-insensitive)");
         }
 
         try {

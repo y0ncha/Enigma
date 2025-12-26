@@ -59,6 +59,40 @@ public class ConsoleImpl implements Console {
             dispatchCommand(command);
             System.out.println();
         }
+
+        System.out.println("===============================================================\n");
+        System.out.print(enigma.getMachineDetails());
+        System.out.println();
+        System.out.println("Goodbye!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void runTest(String xmlPath) {
+        System.out.println();
+        System.out.println("Welcome to the Enigma machine console (Exercise 1) - Test Mode");
+        System.out.println("===============================================================");
+
+        try {
+            enigma.loadMachine(xmlPath);
+            machineLoaded = true;
+            codeConfigured = false; // previous code no longer relevant
+            System.out.println("Machine specification loaded successfully from : " + xmlPath);
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println("File Loading failed : " + e.getMessage());
+            return;
+        }
+
+        while (!exitRequested) {
+            printMenu();
+            ConsoleCommand command = readCommandFromUser();
+            dispatchCommand(command);
+            System.out.println();
+        }
+
         System.out.println("===============================================================\n");
         System.out.print(enigma.getMachineDetails());
         System.out.println();
@@ -192,7 +226,7 @@ public class ConsoleImpl implements Console {
      * <p>
      * Flow (logic to be implemented later):
      * - ask user for full XML path (may contain spaces)
-     * - validate file extension (.xml)
+     * - validate file extension (.ex1-xml)
      * - call engine to load & validate machine
      * - if invalid: print clear error (do NOT crash)
      * - if valid: inform user + override previous machine
@@ -207,7 +241,7 @@ public class ConsoleImpl implements Console {
                 // If we got here – loading succeeded
                 machineLoaded = true;
                 codeConfigured = false; // previous code no longer relevant
-                System.out.println("Machine configuration loaded successfully from : " + path);
+                System.out.println("Machine specification loaded successfully from : " + path);
                 return;
             }
             catch (Exception e) {
