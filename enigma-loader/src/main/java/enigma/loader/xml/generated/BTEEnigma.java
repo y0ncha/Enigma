@@ -7,8 +7,10 @@
 
 package enigma.loader.xml.generated;
 
+import java.math.BigInteger;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
@@ -28,6 +30,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element ref="{}BTE-Rotors"/>
  *         <element ref="{}BTE-Reflectors"/>
  *       </all>
+ *       <attribute name="rotors-count" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *     </restriction>
  *   </complexContent>
  * </complexType>
@@ -48,6 +51,8 @@ public class BTEEnigma {
     protected BTERotors bteRotors;
     @XmlElement(name = "BTE-Reflectors", required = true)
     protected BTEReflectors bteReflectors;
+    @XmlAttribute(name = "rotors-count", required = true)
+    protected BigInteger rotorsCount;
 
     /**
      * Gets the value of the abc property.
@@ -119,6 +124,30 @@ public class BTEEnigma {
      */
     public void setBTEReflectors(BTEReflectors value) {
         this.bteReflectors = value;
+    }
+
+    /**
+     * Gets the value of the rotorsCount property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *     
+     */
+    public BigInteger getRotorsCount() {
+        return rotorsCount;
+    }
+
+    /**
+     * Sets the value of the rotorsCount property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setRotorsCount(BigInteger value) {
+        this.rotorsCount = value;
     }
 
 }

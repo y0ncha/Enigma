@@ -11,6 +11,7 @@ import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,23 +28,12 @@ import java.util.*;
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
-    private final int rotorsInUse;
+    private int rotorsInUse;
 
     /**
      * Create loader expecting specified rotor count.
-     *
-     * @param rotorsInUse expected number of rotors
      */
-    public LoaderXml(int rotorsInUse) {
-        this.rotorsInUse = rotorsInUse; // todo remove ctors, only default empty needed
-    }
-
-    /**
-     * Create loader with default 3 rotors.
-     */
-    public LoaderXml() {
-        this(3);
-    }
+    public LoaderXml() { }
 
     /**
      * {@inheritDoc}
@@ -52,7 +42,7 @@ public class LoaderXml implements Loader {
     public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
 
-        // todo extract rotorsInUse
+        rotorsInUse = extractRotorsInUse(root);
 
         Alphabet alphabet = extractAlphabet(root);
 
@@ -460,4 +450,53 @@ public class LoaderXml implements Loader {
             }
         }
     }
+    /**
+     * Extract the rotors-in-use value from the JAXB root and validate it.
+     *
+     * <p>Validation rules:
+     * <ul>
+     *   <li>The {@code rotors-count} attribute must exist</li>
+     *   <li>Value must be a positive integer (>= 1)</li>
+     *   <li>If rotors are defined, {@code rotors-count} cannot be greater
+     *       than the number of available rotors in {@code <BTE-Rotors>}</li>
+     * </ul>
+     *
+     * @param root JAXB root object
+     * @return validated rotors-in-use value
+     * @throws EnigmaLoadingException if validation fails
+     */
+    private int extractRotorsInUse(BTEEnigma root) throws EnigmaLoadingException {
+        BigInteger raw = root.getRotorsCount();
+        if (raw == null) {
+            throw new EnigmaLoadingException(
+                    "Missing required 'rotors-count' attribute on <BTE-Enigma> element");
+        }
+
+        int value;
+        try {
+            value = raw.intValueExact();
+        } catch (ArithmeticException ex) {
+            throw new EnigmaLoadingException(
+                    "'rotors-count' value " + raw + " is out of valid int range", ex);
+        }
+
+        if (value <= 0) {
+            throw new EnigmaLoadingException(
+                    "'rotors-count' must be a positive integer, got " + value);
+        }
+
+        // Optional consistency check against defined rotors
+        BTERotors bteRotors = root.getBTERotors();
+        if (bteRotors != null && !bteRotors.getBTERotor().isEmpty()) {
+            int definedRotors = bteRotors.getBTERotor().size();
+            if (value > definedRotors) {
+                throw new EnigmaLoadingException(
+                        "'rotors-count' (" + value + ") cannot be greater than the number of " +
+                                "defined rotors (" + definedRotors + ")");
+            }
+        }
+
+        return value;
+    }
+
 }
