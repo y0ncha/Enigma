@@ -10,6 +10,10 @@ import enigma.machine.component.plugboard.Plugboard;
  * @since 1.0
  */
 public interface PlugboardFactory {
-    // TODO document
+    /**
+     * Create identity plugboard (no character swaps).
+     *
+     * @return new plugboard instance
+     */
     Plugboard create();
 }

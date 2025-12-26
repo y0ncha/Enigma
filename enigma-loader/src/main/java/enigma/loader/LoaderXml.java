@@ -47,19 +47,7 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Load and validate machine specification from XML file.
-     *
-     * <p>High-level flow:</p>
-     * <ol>
-     *   <li>Unmarshal XML → JAXB objects</li>
-     *   <li>Validate and extract alphabet</li>
-     *   <li>Validate and extract rotors</li>
-     *   <li>Validate and extract reflectors</li>
-     *   <li>Build {@link MachineSpec}</li>
-     * </ol>
-     *
-     * @param filePath path to XML file
-     * @return validated MachineSpec
+     * {@inheritDoc}
      */
     @Override
     public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {

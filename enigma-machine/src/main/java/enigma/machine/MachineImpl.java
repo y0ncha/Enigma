@@ -51,10 +51,6 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     /**
      * {@inheritDoc}
-     *
-     * <p>Attaches code and creates keyboard from code alphabet.</p>
-     *
-     * @param code runtime code with rotors, reflector, and alphabet
      */
     @Override
     public void setCode(Code code) {
@@ -64,14 +60,6 @@ public class MachineImpl implements Machine {
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Steps rotors, processes signal through forward pass, reflector,
-     * and backward pass, returning detailed trace.</p>
-     *
-     * @param input input character from machine alphabet
-     * @return signal trace containing output and step-by-step details
-     * @throws IllegalStateException if machine is not configured
-     * @throws IllegalArgumentException if input character is not in alphabet
      */
     @Override
     public SignalTrace process(char input) {
@@ -139,6 +127,9 @@ public class MachineImpl implements Machine {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConfigured() {
         return code != null && keyboard != null;
@@ -152,7 +143,9 @@ public class MachineImpl implements Machine {
         return code.getConfig();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
         assertConfigured();
@@ -181,6 +174,9 @@ public class MachineImpl implements Machine {
         plugboard.plug(keyboard.toIdx(a),keyboard.toIdx(b));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CodeState getCodeState() {
         // If code is not configured, return a default 'not configured' state
