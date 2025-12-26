@@ -13,14 +13,14 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the enigma.engine.xml.generated package. 
+ * generated in the enigma.engine.ex1-xml.generated package.
  * <p>An ObjectFactory allows you to programmatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
  * content can consist of schema derived interfaces 
  * and classes representing the binding of schema 
  * type definitions, element declarations and model 
- * groups.  CodeFactory methods for each of these are
+ * groups.  Factory methods for each of these are 
  * provided in this class.
  * 
  */
@@ -29,7 +29,7 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: enigma.engine.xml.generated
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.example.enigma
      * 
      */
     public ObjectFactory() {

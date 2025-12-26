@@ -1,5 +1,6 @@
 package enigma.engine.factory;
 
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.plugboard.Plugboard;
 
 /**
@@ -11,9 +12,9 @@ import enigma.machine.component.plugboard.Plugboard;
  */
 public interface PlugboardFactory {
     /**
-     * Create identity plugboard (no character swaps).
+     * Create identity plugStr (no character swaps).
      *
-     * @return new plugboard instance
+     * @return new plugStr instance
      */
-    Plugboard create();
+    Plugboard create(Alphabet alphabet, String plugStr);
 }

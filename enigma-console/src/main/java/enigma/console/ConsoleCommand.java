@@ -25,8 +25,8 @@ package enigma.console;
  */
 public enum ConsoleCommand {
 
-    LOAD_MACHINE_FROM_XML(1, "Load machine configuration from XML"),
-    SHOW_MACHINE_SPEC(2, "Show machine specification"),
+    LOAD_MACHINE_FROM_XML(1, "Load machine specification from XML"),
+    SHOW_MACHINE_SPEC(2, "Show machine configuration"),
     SET_MANUAL_CODE(3, "Set manual code configuration"),
     SET_AUTOMATIC_CODE(4, "Set automatic code configuration"),
     PROCESS_INPUT(5, "Process input"),

@@ -204,38 +204,6 @@ public class EngineImpl implements Engine {
         return spec;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public CodeConfig getCurrentCodeConfig() {
-        if (!machine.isConfigured()) {
-            return null;
-        }
-        return machine.getConfig();
-    }
-
-    /**
-     * Set up the plugboard connections from a string of character pairs.
-     *
-     * <p>Example: "ABCD" connects A↔B and C↔D.</p>
-     *
-     * @param connections string of character pairs for plugboard connections
-     * @throws MachineNotLoadedException if no machine is loaded
-     */
-    @Override
-    public void setPlugboard(String connections) {
-        if (spec == null) {
-            throw new MachineNotLoadedException("No machine loaded");
-        }
-        for(int i = 0; i < connections.length(); i += 2) {
-            char a = connections.charAt(i);
-            char b = connections.charAt(i + 1);
-            machine.plug(a, b);
-        }
-    }
-
-
     // ---------------------------------------------------------
     // Flow helpers: machine creation and random code generation
     // ---------------------------------------------------------
@@ -277,10 +245,64 @@ public class EngineImpl implements Engine {
         List<String> reflectorIds = new ArrayList<>(spec.reflectorsById().keySet());
         String reflectorId = reflectorIds.get(random.nextInt(reflectorIds.size()));
 
-        // TODO add random plugs
+        // Generate random plugboard (0-5 pairs)
+        String plugStr = generateRandomPlugboard(spec.alphabet(), random);
 
-        // rotorIds (left→right), positions as chars (left→right), reflectorId
-        return new CodeConfig(chosenRotors, positions, reflectorId, "");
+        // rotorIds (left→right), positions as chars (left→right), reflectorId, plugStr
+        return new CodeConfig(chosenRotors, positions, reflectorId, plugStr);
+    }
+
+    /**
+     * Generate a random valid plugboard string with 0-5 random plug pairs.
+     *
+     * <p>Plugboard rules:</p>
+     * <ul>
+     *   <li>Each pair is represented as two consecutive characters (e.g., "ABCD" = A↔B, C↔D)</li>
+     *   <li>No character can appear more than once (no duplicates)</li>
+     *   <li>No character can map to itself (no self-mapping)</li>
+     *   <li>Maximum of 5 pairs (10 characters in the string)</li>
+     *   <li>If not enough unique characters, fewer pairs are created</li>
+     * </ul>
+     *
+     * @param alphabet the machine alphabet
+     * @param random SecureRandom instance for randomization
+     * @return a valid plugboard string (possibly empty if no pairs could be created)
+     */
+    private String generateRandomPlugboard(enigma.shared.alphabet.Alphabet alphabet, SecureRandom random) {
+        // Maximum 5 plugs (pairs)
+        int maxPlugs = 5;
+
+        // Each plug uses 2 characters, so we need at least 2 characters per plug
+        // We can have at most min(alphabet.size() / 2, 5) plugs
+        int maxPossiblePlugs = Math.min(alphabet.size() / 2, maxPlugs);
+
+        if (maxPossiblePlugs == 0) {
+            return ""; // Alphabet too small for plugboard
+        }
+
+        // Randomly decide how many plugs to create (0 to maxPossiblePlugs inclusive)
+        int numPlugs = random.nextInt(maxPossiblePlugs + 1);
+
+        if (numPlugs == 0) {
+            return ""; // No plugs
+        }
+
+        // Convert alphabet to a list we can shuffle
+        List<Character> chars = new ArrayList<>();
+        for (int i = 0; i < alphabet.size(); i++) {
+            chars.add(alphabet.charAt(i));
+        }
+
+        // Shuffle characters
+        Collections.shuffle(chars, random);
+
+        // Take the first 2*numPlugs characters and pair them
+        StringBuilder plugStr = new StringBuilder();
+        for (int i = 0; i < numPlugs * 2; i++) {
+            plugStr.append(chars.get(i));
+        }
+
+        return plugStr.toString();
     }
 
     /**

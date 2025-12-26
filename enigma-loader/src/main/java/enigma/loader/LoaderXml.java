@@ -2,16 +2,22 @@ package enigma.loader;
 
 import enigma.loader.exception.EnigmaLoadingException;
 import enigma.loader.xml.generated.*;
-import enigma.machine.component.alphabet.Alphabet;
-import enigma.loader.xml.generated.*;
+import enigma.shared.alphabet.Alphabet;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.File;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,23 +34,12 @@ import java.util.*;
 public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
-    private final int rotorsInUse;
+    private int rotorsInUse;
 
     /**
      * Create loader expecting specified rotor count.
-     *
-     * @param rotorsInUse expected number of rotors
      */
-    public LoaderXml(int rotorsInUse) {
-        this.rotorsInUse = rotorsInUse; // todo remove ctors, only default empty needed
-    }
-
-    /**
-     * Create loader with default 3 rotors.
-     */
-    public LoaderXml() {
-        this(3);
-    }
+    public LoaderXml() { }
 
     /**
      * {@inheritDoc}
@@ -53,7 +48,7 @@ public class LoaderXml implements Loader {
     public MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException {
         BTEEnigma root = loadRoot(filePath);
 
-        // todo extract rotorsInUse
+        rotorsInUse = extractRotorsInUse(root);
 
         Alphabet alphabet = extractAlphabet(root);
 
@@ -66,7 +61,7 @@ public class LoaderXml implements Loader {
     }
 
     /**
-     * Unmarshal XML file to JAXB root object.
+     * Unmarshal XML file to JAXB root object with schema validation.
      *
      * @param filePath path to XML file
      * @return JAXB root object
@@ -86,10 +81,48 @@ public class LoaderXml implements Loader {
         try {
             JAXBContext context = JAXBContext.newInstance(BTEEnigma.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
+
+            // Configure schema validation
+            Schema schema = loadSchema();
+            if (schema != null) {
+                unmarshaller.setSchema(schema);
+            }
+
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
             throw new EnigmaLoadingException("Unable to parse file '" + filePath + "': " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Load XSD schema from classpath resources for validation.
+     *
+     * <p>The schema file is located at: {@code /schema/Enigma-Ex2.xsd} in the classpath
+     * (typically {@code src/main/resources/schema/Enigma-Ex2.xsd}).</p>
+     *
+     * @return Schema instance for validation, or null if schema cannot be loaded
+     */
+    private Schema loadSchema() {
+        try {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+            // Load schema from classpath
+            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+            if (schemaStream == null) {
+                // Fallback: try loading from URL if available
+                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                if (schemaUrl != null) {
+                    return schemaFactory.newSchema(schemaUrl);
+                }
+                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex2.xsd in classpath. Validation skipped.");
+                return null;
+            }
+
+            return schemaFactory.newSchema(new javax.xml.transform.stream.StreamSource(schemaStream));
+        } catch (SAXException e) {
+            System.err.println("Warning: Unable to load XSD schema: " + e.getMessage() + ". Validation skipped.");
+            return null;
         }
     }
 
@@ -141,7 +174,7 @@ public class LoaderXml implements Loader {
             validateRotorIdUnique(id, result);
 
             int notch = rotorXml.getNotch();
-            validateNotch(id, notch, alphabetSize);
+            validateNotch(notch, alphabetSize);
             int notchIndex = notch - 1; // XML notch is 1-based; internal spec uses 0-based
 
             // Build row-ordered right/left char arrays according to XML ordering
@@ -384,12 +417,11 @@ public class LoaderXml implements Loader {
     /**
      * Validate the notch position of a rotor.
      *
-     * @param rotorId id of the rotor
      * @param notch notch position to validate
      * @param alphabetSize size of the alphabet (number of letters)
      * @throws EnigmaLoadingException if the notch position is out of bounds
      */
-    private void validateNotch(int rotorId, int notch, int alphabetSize) throws EnigmaLoadingException {
+    private void validateNotch(int notch, int alphabetSize) throws EnigmaLoadingException {
         if (notch < 1 || notch > alphabetSize) {
             throw new EnigmaLoadingException("Notch position is out of bounds");
         }
@@ -462,4 +494,53 @@ public class LoaderXml implements Loader {
             }
         }
     }
+    /**
+     * Extract the rotors-in-use value from the JAXB root and validate it.
+     *
+     * <p>Validation rules:
+     * <ul>
+     *   <li>The {@code rotors-count} attribute must exist</li>
+     *   <li>Value must be a positive integer (>= 1)</li>
+     *   <li>If rotors are defined, {@code rotors-count} cannot be greater
+     *       than the number of available rotors in {@code <BTE-Rotors>}</li>
+     * </ul>
+     *
+     * @param root JAXB root object
+     * @return validated rotors-in-use value
+     * @throws EnigmaLoadingException if validation fails
+     */
+    private int extractRotorsInUse(BTEEnigma root) throws EnigmaLoadingException {
+        BigInteger raw = root.getRotorsCount();
+        if (raw == null) {
+            throw new EnigmaLoadingException(
+                    "Missing required 'rotors-count' attribute on <BTE-Enigma> element");
+        }
+
+        int value;
+        try {
+            value = raw.intValueExact();
+        } catch (ArithmeticException ex) {
+            throw new EnigmaLoadingException(
+                    "'rotors-count' value " + raw + " is out of valid int range", ex);
+        }
+
+        if (value <= 0) {
+            throw new EnigmaLoadingException(
+                    "'rotors-count' must be a positive integer, got " + value);
+        }
+
+        // Optional consistency check against defined rotors
+        BTERotors bteRotors = root.getBTERotors();
+        if (bteRotors != null && !bteRotors.getBTERotor().isEmpty()) {
+            int definedRotors = bteRotors.getBTERotor().size();
+            if (value > definedRotors) {
+                throw new EnigmaLoadingException(
+                        "'rotors-count' (" + value + ") cannot be greater than the number of " +
+                                "defined rotors (" + definedRotors + ")");
+            }
+        }
+
+        return value;
+    }
+
 }

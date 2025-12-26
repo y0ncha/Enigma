@@ -1,6 +1,6 @@
 package enigma.machine.component.code;
 
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;

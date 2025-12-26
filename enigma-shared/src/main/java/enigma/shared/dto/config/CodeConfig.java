@@ -3,6 +3,8 @@ package enigma.shared.dto.config;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static enigma.shared.utils.Utils.formatPlugboard;
+
 /**
  * User-provided code configuration for setting up the Enigma machine.
  *
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
  * <h2>Purpose</h2>
  * <p>This record contains all information needed to configure the machine's code:
  * which rotors to use, their starting positions, which reflector to use, and
- * optionally plugboard pairs. It represents the user's configuration choice
+ * optionally plugStr pairs. It represents the user's configuration choice
  * before validation and machine setup.</p>
  *
  * <h2>Ordering Convention</h2>
@@ -28,10 +30,10 @@ import java.util.stream.Collectors;
  * letters visible on a physical Enigma machine and the characters users see.</p>
  *
  * <h2>Plugboard (Exercise 2)</h2>
- * <p>The plugboard field contains character pairs for plugboard wiring:</p>
+ * <p>The plugStr field contains character pairs for plugStr wiring:</p>
  * <ul>
  *   <li>Even-length string: "ABCD" means A↔B, C↔D</li>
- *   <li>Empty string "" means no plugboard connections</li>
+ *   <li>Empty string "" means no plugStr connections</li>
  *   <li>Each character appears at most once</li>
  *   <li>No self-mappings (e.g., "AA" is invalid)</li>
  * </ul>
@@ -63,7 +65,7 @@ import java.util.stream.Collectors;
  *     List.of(1, 2, 3),           // rotors: 1=left, 3=right
  *     List.of('O', 'D', 'X'),     // positions: O=left, X=right
  *     "I",                        // reflector
- *     ""                          // no plugboard
+ *     ""                          // no plugStr
  * );
  *
  * // Pass to engine for validation and application
@@ -79,7 +81,7 @@ public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
         List<Character> positions,    // starting positions as characters (left→right), e.g. ['O','D','X']
         String reflectorId,           // e.g. "I"
-        String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
+        String plugStr              // plugStr pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
 ) {
     /**
      * Returns a compact string representation of the configuration.
@@ -113,28 +115,10 @@ public record CodeConfig(
                 .append("<").append(positionStr).append(">")
                 .append("<").append(reflectorStr).append(">");
 
-        // Optionally include plugboard if configured
-        if (plugboard != null && !plugboard.isEmpty()) {
-            result.append("<").append(formatPlugboard()).append(">");
+        // Optionally include plugStr if configured
+        if (plugStr != null && !plugStr.isEmpty()) {
+            result.append("<").append(formatPlugboard(plugStr)).append(">");
         }
-
         return result.toString();
-    }
-
-    /** Formats the plugboard string into pairs separated by commas.
-     * Example: "ABCD" -> "A|B,C|D"
-     * @return formatted plugboard string
-     */
-    private String formatPlugboard() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < plugboard.length(); i += 2) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(plugboard.charAt(i))
-                    .append("|")
-                    .append(plugboard.charAt(i + 1));
-        }
-        return sb.toString();
     }
 }

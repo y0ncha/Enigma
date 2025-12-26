@@ -32,7 +32,7 @@ State snapshot records capturing machine/code state at a point in time.
 ### MachineSpec
 **Purpose**: Complete machine specification loaded from XML.
 
-```java
+```text
 public record MachineSpec(
     String alphabet,                  // e.g., "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     int rotorsInUse,                  // number of rotors in configuration (e.g., 3)
@@ -46,10 +46,13 @@ public record MachineSpec(
 - Used by: Engine (validation), Console (display options)
 - Immutable: Thread-safe, can be shared
 
+**XML Source**: Machine specifications are loaded from XML files that conform to the schema at:
+`enigma-loader/src/main/resources/schema/Enigma-Ex2.xsd`
+
 ### RotorSpec
 **Purpose**: Specification for a single rotor.
 
-```java
+```text
 public record RotorSpec(
     int id,                           // rotor identifier (1, 2, 3, ...)
     char[] rightColumn,               // right-side wiring (top→bottom)
@@ -71,7 +74,7 @@ public record RotorSpec(
 ### ReflectorSpec
 **Purpose**: Specification for a reflector.
 
-```java
+```text
 public record ReflectorSpec(
     String id,                        // reflector identifier ("I", "II", "III", ...)
     int[] mapping                     // symmetric mapping array
@@ -89,12 +92,12 @@ public record ReflectorSpec(
 ### CodeConfig
 **Purpose**: User-provided code configuration.
 
-```java
+```text
 public record CodeConfig(
     List<Integer> rotorIds,           // selected rotor IDs (left→right)
     List<Character> positions,        // initial positions (left→right)
     String reflectorId,               // selected reflector ID
-    String plugboard                  // plugboard pairs (optional, e.g., "ABCD" = A↔B, C↔D)
+    String plugboard                  // plugStr pairs (optional, e.g., "ABCD" = A↔B, C↔D)
 )
 ```
 
@@ -125,13 +128,13 @@ public record CodeConfig(
 ### CodeState
 **Purpose**: Snapshot of code configuration and current positions.
 
-```java
+```text
 public record CodeState(
     List<Integer> rotorIds,           // rotor IDs (left→right)
     List<Character> positions,        // current positions (left→right)
     List<Integer> notchDistances,     // distance to next notch for each rotor
     String reflectorId,               // reflector ID
-    String plugboard                  // plugboard pairs
+    String plugboard                  // plugStr pairs
 )
 ```
 
@@ -157,7 +160,7 @@ public record CodeState(
 ### MachineState
 **Purpose**: Comprehensive machine state snapshot.
 
-```java
+```text
 public record MachineState(
     String alphabet,                  // machine alphabet
     int rotorsInUse,                  // rotors in configuration
@@ -179,7 +182,7 @@ public record MachineState(
 ### SignalTrace
 **Purpose**: Complete trace of one character's encryption path.
 
-```java
+```text
 public record SignalTrace(
     char inputChar,                   // original input character
     char outputChar,                  // final output character
@@ -209,7 +212,7 @@ public record SignalTrace(
 ### ProcessTrace
 **Purpose**: Bundle of output string and per-character traces.
 
-```java
+```text
 public record ProcessTrace(
     String output,                    // final encrypted/decrypted string
     List<SignalTrace> signalTraces    // one trace per input character
@@ -223,7 +226,7 @@ public record ProcessTrace(
 ### RotorTrace
 **Purpose**: Single rotor's transformation during signal processing.
 
-```java
+```text
 public record RotorTrace(
     int rotorIndex,                   // rotor position (0=leftmost)
     int id,                           // rotor ID from spec
@@ -239,7 +242,7 @@ public record RotorTrace(
 ### ReflectorTrace
 **Purpose**: Reflector's transformation during signal processing.
 
-```java
+```text
 public record ReflectorTrace(
     String id,                        // reflector ID (e.g., "I")
     int entryIndex,                   // input index
@@ -256,7 +259,7 @@ public record ReflectorTrace(
 ### MessageRecord
 **Purpose**: Record of a processed message in history.
 
-```java
+```text
 public record MessageRecord(
     String input,                     // input message
     String output,                    // output message

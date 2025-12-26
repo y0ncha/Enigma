@@ -1,6 +1,6 @@
 package enigma.machine.component.keyboard;
 
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 
 /**
  * Default {@link Keyboard} implementation backed by an {@link Alphabet}.

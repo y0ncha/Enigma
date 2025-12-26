@@ -119,11 +119,11 @@ public final class ConsoleValidator {
     }
 
     /**
-     * Validate plugboard format (even length).
+     * Validate plugStr format (even length).
      *
      * <p><b>Validation:</b></p>
      * <ul>
-     *   <li>Null or empty is valid (no plugboard connections)</li>
+     *   <li>Null or empty is valid (no plugStr connections)</li>
      *   <li>If provided, must have even length (pairs of characters)</li>
      * </ul>
      *
@@ -134,11 +134,11 @@ public final class ConsoleValidator {
      *   <li>Alphabet membership (engine validates)</li>
      * </ul>
      *
-     * @param plugboard plugboard string (e.g., "ABCD" for A ↔ B, C ↔ D)
+     * @param plugboard plugStr string (e.g., "ABCD" for A ↔ B, C ↔ D)
      * @throws IllegalArgumentException if a format is invalid with a user-friendly message
      */
-    public static void validatePlugboardFormat(String plugboard) {
-        // null or empty is valid (no plugboard)
+    public static void validatePlugboardFormat(String plugboard) { // TODO use in console
+        // null or empty is valid (no plugStr)
         if (plugboard == null || plugboard.isEmpty()) {
             return;
         }

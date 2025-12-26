@@ -20,9 +20,6 @@ import java.util.Set;
  */
 public final class EngineValidator {
 
-    private static final char ESC_CHAR = '\u001B'; // ESC character (ASCII 27)
-    private EngineValidator() { /* utility */ }
-
     private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
@@ -49,7 +46,7 @@ public final class EngineValidator {
         validateReflectorExists(spec, reflectorId);
         validatePositionsInAlphabet(spec, positions);
         // Plugboard validation is available for future use (exercise 2). Call with empty string (no-op)
-        validatePlugboard(spec, "");
+        validatePlugboard(spec, config.plugStr());
     }
 
     public static void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
@@ -168,7 +165,6 @@ public final class EngineValidator {
      * @since 1.0
      */
     public static void validatePositionsInAlphabet(MachineSpec spec, List<Character> positions) {
-        String alphabet = spec.alphabet().getLetters();
 
         for (char c : positions) {
             if (!spec.alphabet().contains(c)) {
@@ -200,7 +196,7 @@ public final class EngineValidator {
                 "Input message is missing");
         }
 
-        String alphabet = spec.alphabet().getLetters();
+        String alphabet = spec.alphabet().letters();
 
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
@@ -209,18 +205,15 @@ public final class EngineValidator {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
                     String.format(
-                        "Control character %s detected at position %d. " +
-                        "Input: \"%s\"",
-                        controlName, i, truncateForDisplay(input, 50)));
+                        "Control character %s detected at position %d",
+                        controlName, i));
             }
 
             if (!spec.alphabet().contains(c)) {
                 throw new InvalidMessageException(
                     String.format(
-                        "Character '%c' at position %d is not in the machine alphabet. " +
-                        "Machine alphabet: %s. " +
-                        "Input: \"%s\"",
-                        c, i, alphabet, truncateForDisplay(input, 50)));
+                        "Character '%c' at position %d is not in the machine alphabet : %s",
+                        c, i, alphabet));
             }
         }
     }
@@ -240,27 +233,6 @@ public final class EngineValidator {
             case 27 -> "ESC";
             default -> "CONTROL";
         };
-    }
-    
-    /**
-     * Truncate string for display, escaping control characters.
-     *
-     * @param str string to prepare for display
-     * @param maxLen maximum length before truncation
-     * @return escaped and possibly truncated string
-     */
-    private static String truncateForDisplay(String str, int maxLen) {
-        if (str == null) {
-            return null;
-        }
-
-        // First, escape control/non-printable characters to visible markers (e.g., \n, \t, ESC)
-        String escaped = escapeControlChars(str);
-
-        if (escaped.length() <= maxLen) {
-            return escaped;
-        }
-        return escaped.substring(0, maxLen) + "...";
     }
 
     /**
@@ -292,19 +264,19 @@ public final class EngineValidator {
     }
 
     /**
-     * Validate plugboard configuration string.
+     * Validate plugStr configuration string.
      *
      * <p>Validates even length, no duplicates, no self-mapping, and
      * all characters in alphabet.</p>
      *
      * @param spec machine specification containing the alphabet
-     * @param plugboard plugboard configuration string, may be null or empty
+     * @param plugboard plugStr configuration string, may be null or empty
      */
     private static void validatePlugboard(MachineSpec spec, String plugboard) {
         // Validate spec
         specIsNull(spec);
         
-        // null or empty plugboard is valid (no plugboard configured)
+        // null or empty plugStr is valid (no plugStr configured)
         if (plugboard == null || plugboard.isEmpty()) {
             return;
         }
@@ -318,7 +290,7 @@ public final class EngineValidator {
         }
 
         Set<Character> seenChars = new HashSet<>();
-        String alphabet = spec.alphabet().getLetters();
+        String alphabet = spec.alphabet().letters();
 
         for (int i = 0; i < plugboard.length(); i += 2) {
             char first = plugboard.charAt(i);
@@ -392,4 +364,67 @@ public final class EngineValidator {
         validatePositionsInAlphabet(spec, positions);
     }
 
+
+    /**
+     * Validates the plugboard configuration string.
+     * <p>
+     * The plug string represents a sequence of plug pairs, where every two
+     * consecutive characters define a single plug mapping.
+     * </p>
+     * <ul>
+     *   <li>The string length must be even.</li>
+     *   <li>All characters must belong to the machine alphabet.</li>
+     *   <li>No character may be mapped to itself.</li>
+     *   <li>No character may appear in more than one plug pair.</li>
+     *   <li>An empty string is considered valid and represents no plugs.</li>
+     * </ul>
+     *
+     * @param plugs    the continuous string representing plug pairs
+     * @param alphabet the machine alphabet string
+     * @throws IllegalArgumentException if the plug configuration is invalid
+     * @since 2.0
+     */
+    public static void validatePlugs(String plugs, String alphabet) {
+        if (plugs == null || plugs.isEmpty()) {
+            return;
+        }
+
+        if (alphabet == null || alphabet.isEmpty()) {
+            throw new IllegalArgumentException("Machine alphabet is not defined.");
+        }
+
+        if (plugs.length() % 2 != 0) {
+            throw new IllegalArgumentException(
+                    "Plug string length must be even."
+            );
+        }
+
+        Set<Character> usedChars = new HashSet<>();
+
+        for (int i = 0; i < plugs.length(); i += 2) {
+            char a = plugs.charAt(i);
+            char b = plugs.charAt(i + 1);
+
+            if (alphabet.indexOf(a) == -1 || alphabet.indexOf(b) == -1) {
+                throw new IllegalArgumentException(
+                        "Plug characters must be part of the machine alphabet [" + alphabet + "]"
+                );
+            }
+
+            if (a == b) {
+                throw new IllegalArgumentException(
+                        "A character cannot be plugged to itself: " + a
+                );
+            }
+
+            if (usedChars.contains(a) || usedChars.contains(b)) {
+                throw new IllegalArgumentException(
+                        "A character appears in more than one plug: " + a + " or " + b
+                );
+            }
+
+            usedChars.add(a);
+            usedChars.add(b);
+        }
+    }
 }

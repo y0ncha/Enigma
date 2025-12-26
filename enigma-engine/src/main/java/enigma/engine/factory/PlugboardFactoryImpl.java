@@ -1,6 +1,6 @@
 package enigma.engine.factory;
 
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.plugboard.PlugboardImpl;
 
@@ -13,12 +13,12 @@ import enigma.machine.component.plugboard.PlugboardImpl;
  */
 public class PlugboardFactoryImpl implements PlugboardFactory {
 
-    private int size;
+    private final int size;
 
     /**
-     * Create plugboard factory bound to alphabet.
+     * Create plugStr factory bound to alphabet.
      *
-     * @param alphabet alphabet for sizing plugboard
+     * @param alphabet alphabet for sizing plugStr
      */
     public PlugboardFactoryImpl(Alphabet alphabet) {
         this.size = alphabet.size();
@@ -28,7 +28,13 @@ public class PlugboardFactoryImpl implements PlugboardFactory {
      * {@inheritDoc}
      */
     @Override
-    public Plugboard create() {
-        return new PlugboardImpl(size);
+    public Plugboard create(Alphabet alphabet, String plugStr) {
+        Plugboard plugboard = new PlugboardImpl(size);
+        for (int i = 0; i + 1 < plugStr.length(); i += 2) {
+            int a = alphabet.indexOf(plugStr.charAt(i));
+            int b = alphabet.indexOf(plugStr.charAt(i + 1));
+            plugboard.plug(a, b);
+        }
+        return plugboard;
     }
 }

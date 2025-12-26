@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BTE-Enigma xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Enigma-Ex1.xsd">	
+		<ABC>
+			ABCDEF
+		</ABC>
+		<BTE-Rotors>
+			<BTE-Rotor id="1" notch="4">
+				<BTE-Positioning right="A" left="F"/>
+				<BTE-Positioning right="A" left="E"/>
+				<BTE-Positioning right="C" left="D"/>
+				<BTE-Positioning right="D" left="C"/>
+				<BTE-Positioning right="E" left="B"/>				
+				<BTE-Positioning right="F" left="A"/>				
+			</BTE-Rotor>
+			<BTE-Rotor id="3" notch="6">
+				<BTE-Positioning right="A" left="B"/>
+				<BTE-Positioning right="B" left="A"/>
+				<BTE-Positioning right="C" left="D"/>
+				<BTE-Positioning right="D" left="C"/>
+				<BTE-Positioning right="E" left="F"/>				
+				<BTE-Positioning right="F" left="E"/>				
+			</BTE-Rotor>						
+			<BTE-Rotor id="2" notch="1">
+				<BTE-Positioning right="A" left="E"/>
+				<BTE-Positioning right="B" left="B"/>
+				<BTE-Positioning right="C" left="D"/>
+				<BTE-Positioning right="D" left="F"/>
+				<BTE-Positioning right="E" left="C"/>				
+				<BTE-Positioning right="F" left="A"/>				
+			</BTE-Rotor>						
+		</BTE-Rotors>
+		<BTE-Reflectors>
+			<BTE-Reflector id="I">
+				<BTE-Reflect input="1" output="4"/>
+				<BTE-Reflect input="2" output="5"/>
+				<BTE-Reflect input="3" output="6"/>								
+			</BTE-Reflector>
+			<BTE-Reflector id="II">
+				<BTE-Reflect input="1" output="2"/>
+				<BTE-Reflect input="3" output="4"/>
+				<BTE-Reflect input="5" output="6"/>
+			</BTE-Reflector>			
+		</BTE-Reflectors>
+</BTE-Enigma>

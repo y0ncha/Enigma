@@ -120,7 +120,7 @@ Beyond referential integrity, the engine enforces semantic rules:
 **Key Operations**:
 
 #### 1. Loading (`loadMachine`)
-```java
+```text
 engine.loadMachine("path/to/machine.xml");
 ```
 - Delegates to Loader for XML parsing and validation
@@ -129,15 +129,20 @@ engine.loadMachine("path/to/machine.xml");
 - **Does NOT configure machine** (requires separate config call)
 - Transactional: Invalid XML never overwrites existing spec
 
+**XML Schema Location**: Machine XML files should reference the schema located at:
+`enigma-loader/src/main/resources/schema/Enigma-Ex2.xsd`
+
+See the enigma-loader README for details on how XML files should reference the schema.
+
 #### 2. Configuration
 
 **Manual Configuration** (`configManual`):
-```java
+```text
 CodeConfig config = new CodeConfig(
     List.of(1, 2, 3),      // rotor IDs (left→right)
     List.of('A', 'B', 'C'), // positions (left→right)
     "I",                    // reflector ID
-    ""                      // plugboard (empty for now)
+    ""                      // plugStr (empty for now)
 );
 engine.configManual(config);
 ```
@@ -147,7 +152,7 @@ engine.configManual(config);
 - Applies to machine
 
 **Random Configuration** (`configRandom`):
-```java
+```text
 engine.configRandom();
 ```
 - Generates random valid configuration
@@ -155,7 +160,7 @@ engine.configRandom();
 - Delegates to configManual for validation and application
 
 #### 3. Processing (`process`)
-```java
+```text
 ProcessTrace trace = engine.process("HELLO");
 ```
 - Validates: machine loaded, machine configured, input not null
@@ -167,7 +172,7 @@ ProcessTrace trace = engine.process("HELLO");
 - Returns ProcessTrace with output and traces
 
 #### 4. Reset (`reset`)
-```java
+```text
 engine.reset();
 ```
 - Returns machine to **original code state** (positions recorded at config time)
@@ -176,7 +181,7 @@ engine.reset();
 - Does **NOT** change rotor/reflector selection
 
 #### 5. History (`history`)
-```java
+```text
 String historyReport = engine.history();
 ```
 - Returns formatted string of all processed messages
@@ -243,7 +248,7 @@ Validates engine state before operations:
 **Purpose**: Records and organizes processing history by original code configuration.
 
 **Data Structure**:
-```java
+```text
 Map<CodeState, List<MessageRecord>> history
 ```
 
@@ -380,7 +385,7 @@ The difference is the **positions**: original has initial positions, current has
 
 ## Usage Example
 
-```java
+```text
 // Create engine
 Engine engine = new EngineImpl();
 
@@ -432,5 +437,4 @@ All exceptions include descriptive error messages with fix suggestions.
 ## Related Documentation
 
 - [Validation Layer Organization](../docs/VALIDATION_LAYER_ORGANIZATION.md)
-- [Integration Dev UI](../docs/integration-dev-ui.md)
 - Main [README.md](../README.md)
