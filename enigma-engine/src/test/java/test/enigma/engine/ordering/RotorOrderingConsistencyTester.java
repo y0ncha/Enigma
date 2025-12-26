@@ -130,7 +130,8 @@ public class RotorOrderingConsistencyTester {
         CodeConfig config321 = new CodeConfig(
             List.of(3, 2, 1),           // rotors left→right
             List.of('A', 'B', 'C'),     // positions left→right
-            "I"                          // reflector
+            "I",                          // reflector
+                ""
         );
 
         try {
@@ -230,7 +231,8 @@ public class RotorOrderingConsistencyTester {
         CodeConfig config123 = new CodeConfig(
             List.of(1, 2, 3),           // rotors left→right
             List.of('O', 'D', 'X'),     // positions left→right
-            "I"                          // reflector
+            "I",                          // reflector
+                ""
         );
 
         try {

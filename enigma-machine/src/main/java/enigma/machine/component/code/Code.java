@@ -43,9 +43,6 @@ public interface Code {
      */
     Reflector getReflector();
 
-    // TODO document
-    Plugboard getPlugboard();
-
     /**
      * Active plugboard for character substitution.
      *

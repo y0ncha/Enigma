@@ -47,25 +47,11 @@ public record CodeState(
      */
     @Override
     public String toString() {
-
-        String ids = rotorIds.toString().replaceAll("[\\[\\] ]", "");
-
-        StringBuilder posBuilder = new StringBuilder();
-        for (int i = 0; i < positions.length(); i++) {
-            char windowChar = positions.charAt(i);
-            int dist = notchDist.get(i);
-
-            posBuilder.append(windowChar)
-                    .append("(")
-                    .append(dist)
-                    .append(")");
-
-            if (i < positions.length() - 1) {
-                posBuilder.append(",");
-            }
+        if (this == NOT_CONFIGURED) {
+            throw new IllegalStateException(
+                    "Code not configured");
         }
-
-        return "<%s><%s><%s>".formatted(ids, posBuilder, reflectorId);
+        return this.toConfig().toString();
     }
 
     /**
@@ -74,16 +60,16 @@ public record CodeState(
      * @return code configuration from this state
      * @throws IllegalStateException if state is NOT_CONFIGURED
      */
-    public CodeConfig toCodeConfig() {
+    public CodeConfig toConfig() {
         if (this == NOT_CONFIGURED) {
             throw new IllegalStateException(
-                    "Cannot convert NOT_CONFIGURED state to CodeConfig");
+                    "Code not configured");
         }
 
         List<Character> positionChars = new ArrayList<>(positions.length());
         for (int i = 0; i < positions.length(); i++) {
             positionChars.add(positions.charAt(i));
         }
-        return new CodeConfig(rotorIds, positionChars, reflectorId);
+        return new CodeConfig(rotorIds, positionChars, reflectorId, plugboard);
     }
 }

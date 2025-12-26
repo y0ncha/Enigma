@@ -93,7 +93,7 @@ public class CodeImpl implements Code {
     /** {@inheritDoc} */
     @Override
     public CodeConfig getConfig() {
-        return new CodeConfig(rotorIds, positions, reflectorId);
+        return new CodeConfig(rotorIds, positions, reflectorId, plugboard.toString());
     }
 
     /**

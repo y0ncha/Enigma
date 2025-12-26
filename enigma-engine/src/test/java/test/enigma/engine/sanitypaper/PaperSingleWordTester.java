@@ -28,7 +28,8 @@ public class PaperSingleWordTester {
     private static final CodeConfig CODE_CONFIG = new CodeConfig(
             java.util.List.of(1, 2, 3),   // rotors left→right
             java.util.List.of('O', 'D', 'X'), // "ODX" (O=14, D=3, X=23)
-            "I"                           // reflector
+            "I",                           // reflector
+            ""
     );
 
     /**

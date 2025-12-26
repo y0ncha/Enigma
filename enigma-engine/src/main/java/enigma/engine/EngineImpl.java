@@ -7,8 +7,6 @@ import enigma.engine.factory.CodeFactoryImpl;
 import enigma.engine.history.MachineHistory;
 import enigma.engine.snapshot.EngineSnapshot;
 import enigma.engine.snapshot.EngineSnapshotJson;
-import enigma.engine.exception.InvalidConfigurationException;
-import enigma.engine.exception.InvalidMessageException;
 import enigma.loader.Loader;
 import enigma.loader.LoaderXml;
 import enigma.engine.factory.CodeFactory;
@@ -279,8 +277,10 @@ public class EngineImpl implements Engine {
         List<String> reflectorIds = new ArrayList<>(spec.reflectorsById().keySet());
         String reflectorId = reflectorIds.get(random.nextInt(reflectorIds.size()));
 
+        // TODO add random plugs
+
         // rotorIds (left→right), positions as chars (left→right), reflectorId
-        return new CodeConfig(chosenRotors, positions, reflectorId);
+        return new CodeConfig(chosenRotors, positions, reflectorId, "");
     }
 
     /**
@@ -327,7 +327,7 @@ public class EngineImpl implements Engine {
                 if (hasCurrent) {
                     // Machine was configured when snapshot was taken
                     isSnapshot = true;
-                    configManual(theCurCodeState.toCodeConfig());
+                    configManual(theCurCodeState.toConfig());
                     isSnapshot = false;
                 }
             } else {
