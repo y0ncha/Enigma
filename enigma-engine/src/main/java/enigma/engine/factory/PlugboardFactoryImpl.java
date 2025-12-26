@@ -30,9 +30,9 @@ public class PlugboardFactoryImpl implements PlugboardFactory {
     @Override
     public Plugboard create(Alphabet alphabet, String plugStr) {
         Plugboard plugboard = new PlugboardImpl(size);
-        for  (int i = 0; i < plugStr.length(); i++) {
+        for (int i = 0; i + 1 < plugStr.length(); i += 2) {
             int a = alphabet.indexOf(plugStr.charAt(i));
-            int b = alphabet.indexOf(plugStr.charAt(++i));
+            int b = alphabet.indexOf(plugStr.charAt(i + 1));
             plugboard.plug(a, b);
         }
         return plugboard;
