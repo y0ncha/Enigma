@@ -63,14 +63,6 @@ public interface Engine {
     MachineSpec getMachineSpec();
 
     /**
-     * Return current code configuration.
-     *
-     * @return code config, or null if not configured
-     */
-    CodeConfig getCurrentCodeConfig();
-
-
-    /**
      * Reset rotor positions to original configuration values.
      *
      * <p>Returns positions to their initial values at configuration time.

@@ -92,7 +92,18 @@ public interface Rotor {
      */
     int getId();
 
+    /**
+     * Get wire pair at given row for inspection and debugging.
+     *
+     * @param row row index (0..alphabetSize-1)
+     * @return wire containing right and left contact characters
+     */
     Wire getWire(int row);
 
+    /**
+     * Get step count until this rotor reaches its notch position.
+     *
+     * @return distance to notch (0 when at notch)
+     */
     int notchDist();
 }

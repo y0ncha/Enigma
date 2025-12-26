@@ -44,7 +44,7 @@ public interface Machine {
      * Get the current code configuration metadata.
      *
      * <p>Returns a {@link CodeConfig} containing rotor IDs, current positions,
-     * reflector ID, and plugboard configuration. The positions reflect the
+     * reflector ID, and plugStr configuration. The positions reflect the
      * current state (after any processing), not the original positions.</p>
      *
      * @return current code configuration, or null if not configured
@@ -53,10 +53,19 @@ public interface Machine {
     CodeConfig getConfig();
 
     /**
+     * Perform a plugStr transition for the given input character.
+     *
+     * @param input input character as an integer (0-25)
+     * @return output character after plugStr transition as an integer (0-25)
+     * @since 1.0
+     */
+    int plugboardTransition(int input);
+
+    /**
      * Get detailed current code state snapshot.
      *
      * <p>Returns a {@link CodeState} containing rotor IDs, current positions,
-     * notch distances, reflector ID, and plugboard. This provides more detail
+     * notch distances, reflector ID, and plugStr. This provides more detail
      * than {@link #getConfig()}, including distance to each rotor's notch.</p>
      *
      * @return current code state, or null if not configured
@@ -70,7 +79,7 @@ public interface Machine {
      * <p><b>Behavior:</b></p>
      * <ul>
      *   <li>Returns all rotor positions to their <b>original values</b> at configuration time</li>
-     *   <li>Maintains rotor selection, reflector selection, and plugboard</li>
+     *   <li>Maintains rotor selection, reflector selection, and plugStr</li>
      *   <li>Does NOT change the code configuration itself</li>
      * </ul>
      *

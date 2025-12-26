@@ -1,5 +1,6 @@
 package enigma.engine.factory;
 
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.spec.MachineSpec;
@@ -7,7 +8,7 @@ import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
 
 import enigma.engine.EngineImpl;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.code.Code;
 import enigma.machine.component.code.CodeImpl;
 import enigma.machine.component.rotor.Rotor;
@@ -18,7 +19,7 @@ import java.util.*;
 /**
  * Default implementation of {@link CodeFactory}.
  *
- * <p>This factory constructs {@link Code} instances using the mechanical rotor
+ * <p>This factory constructs {@link Code} instances using the rotor
  * model ({@link RotorImpl}). The factory:</p>
  * <ul>
  *   <li>Creates a {@link RotorFactory} for the given alphabet</li>
@@ -59,24 +60,26 @@ public class CodeFactoryImpl implements CodeFactory {
 
     private RotorFactory rotorFactory;
     private ReflectorFactory reflectorFactory;
+    private PlugboardFactory plugboardFactory;
 
     /**
      * {@inheritDoc}
-     *
-     * <p>This is the primary factory method that creates codes using the
-     * mechanical rotor model.</p>
      */
     @Override
     public Code create(MachineSpec spec, CodeConfig config) {
         Alphabet alphabet = spec.alphabet();
         this.rotorFactory = new RotorFactoryImpl(alphabet);
         this.reflectorFactory = new ReflectorFactoryImpl(alphabet);
+        this.plugboardFactory = new PlugboardFactoryImpl(alphabet);
 
         // Build rotors in left→right order
         List<Rotor> rotors = buildRotors(spec, config);
 
         // Build reflector
         Reflector reflector = buildReflector(spec, config);
+
+        // Build plugStr
+        Plugboard plugboard = buildPlugboard(spec, config);
 
         // Assemble code (preserving left→right order)
         return new CodeImpl(
@@ -85,7 +88,8 @@ public class CodeFactoryImpl implements CodeFactory {
                 reflector,
                 new ArrayList<>(config.rotorIds()),
                 new ArrayList<>(config.positions()),
-                config.reflectorId()
+                config.reflectorId(),
+                plugboard
         );
     }
 
@@ -137,5 +141,17 @@ public class CodeFactoryImpl implements CodeFactory {
     private Reflector buildReflector(MachineSpec spec, CodeConfig config) {
         ReflectorSpec reflectorSpec = spec.getReflectorById(config.reflectorId());
         return this.reflectorFactory.create(reflectorSpec);
+    }
+
+    /**
+     * Build the plugStr.
+     *
+     * <p>Currently creates an empty plugStr. Future enhancements
+     * may allow configuration-based connections.</p>
+     *
+     * @return plugStr instance
+     */
+    private Plugboard buildPlugboard(MachineSpec spec, CodeConfig config) {
+        return this.plugboardFactory.create(spec.alphabet(), config.plugStr());
     }
 }

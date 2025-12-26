@@ -2,7 +2,7 @@ package enigma.engine.factory;
 
 import enigma.engine.exception.InvalidConfigurationException;
 import enigma.shared.spec.ReflectorSpec;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.reflector.ReflectorImpl;
 
@@ -38,15 +38,7 @@ public class ReflectorFactoryImpl implements ReflectorFactory {
     }
 
     /**
-     * Create a reflector from the given specification.
-     *
-     * <p>The mapping array is used directly from the spec without modification
-     * or reordering. Symmetry and bijectivity are assumed to be validated by
-     * the loader.</p>
-     *
-     * @param spec reflector specification with ID and symmetric mapping
-     * @return {@link ReflectorImpl} instance
-     * @throws InvalidConfigurationException if spec is null
+     * {@inheritDoc}
      */
     @Override
     public Reflector create(ReflectorSpec spec) {

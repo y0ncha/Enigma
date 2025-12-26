@@ -3,6 +3,8 @@ package enigma.shared.dto.config;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static enigma.shared.utils.Utils.formatPlugboard;
+
 /**
  * User-provided code configuration for setting up the Enigma machine.
  *
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
  * <h2>Purpose</h2>
  * <p>This record contains all information needed to configure the machine's code:
  * which rotors to use, their starting positions, which reflector to use, and
- * optionally plugboard pairs. It represents the user's configuration choice
+ * optionally plugStr pairs. It represents the user's configuration choice
  * before validation and machine setup.</p>
  *
  * <h2>Ordering Convention</h2>
@@ -28,10 +30,10 @@ import java.util.stream.Collectors;
  * letters visible on a physical Enigma machine and the characters users see.</p>
  *
  * <h2>Plugboard (Exercise 2)</h2>
- * <p>The plugboard field contains character pairs for plugboard wiring:</p>
+ * <p>The plugStr field contains character pairs for plugStr wiring:</p>
  * <ul>
  *   <li>Even-length string: "ABCD" means A↔B, C↔D</li>
- *   <li>Empty string "" means no plugboard connections</li>
+ *   <li>Empty string "" means no plugStr connections</li>
  *   <li>Each character appears at most once</li>
  *   <li>No self-mappings (e.g., "AA" is invalid)</li>
  * </ul>
@@ -63,7 +65,7 @@ import java.util.stream.Collectors;
  *     List.of(1, 2, 3),           // rotors: 1=left, 3=right
  *     List.of('O', 'D', 'X'),     // positions: O=left, X=right
  *     "I",                        // reflector
- *     ""                          // no plugboard
+ *     ""                          // no plugStr
  * );
  *
  * // Pass to engine for validation and application
@@ -78,8 +80,8 @@ import java.util.stream.Collectors;
 public record CodeConfig(
         List<Integer> rotorIds,       // rotor IDs in user-selected order (left → right)
         List<Character> positions,    // starting positions as characters (left→right), e.g. ['O','D','X']
-        String reflectorId           // e.g. "I"
-        // String plugboard              // plugboard pairs (e.g., "ABCD" = A↔B, C↔D), "" = none // todo uncomment and implement plugboard string to object
+        String reflectorId,           // e.g. "I"
+        String plugStr              // plugStr pairs (e.g., "ABCD" = A↔B, C↔D), "" = none
 ) {
     /**
      * Returns a compact string representation of the configuration.
@@ -93,13 +95,30 @@ public record CodeConfig(
      */
     @Override
     public String toString() {
-        return "<%s><%s><%s>"
-                .formatted(
-                        rotorIds.toString().replaceAll("[\\[\\] ]", ""),
-                        positions == null ? "" : positions.stream()
-                                .map(String::valueOf)
-                                .collect(Collectors.joining()),
-                        reflectorId
-                );
+
+        // Format rotor IDs as comma-separated string without brackets/spaces
+        String rotorStr = rotorIds().toString().replaceAll("[\\[\\] ]", "");
+
+        // Format positions as concatenated string of characters
+        String positionStr = positions() == null ? "" :
+                positions()
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining());
+
+        // Reflector ID or empty if null
+        String reflectorStr = reflectorId() == null ? "" : reflectorId();
+
+        // Build final string
+        StringBuilder result = new StringBuilder();
+        result.append("<").append(rotorStr).append(">")
+                .append("<").append(positionStr).append(">")
+                .append("<").append(reflectorStr).append(">");
+
+        // Optionally include plugStr if configured
+        if (plugStr != null && !plugStr.isEmpty()) {
+            result.append("<").append(formatPlugboard(plugStr)).append(">");
+        }
+        return result.toString();
     }
 }

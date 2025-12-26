@@ -35,4 +35,10 @@ public interface Console {
      * - repeat until Exit is chosen
      */
     void run();
+
+    /**
+     * Runs an end-to-end test using the specified XML file.
+     * @param xmlPath path to the XML file defining the machine and test parameters
+     */
+    void runTest(String xmlPath);
 }

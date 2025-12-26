@@ -1,6 +1,7 @@
 package enigma.machine.component.code;
 
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
+import enigma.machine.component.plugboard.Plugboard;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
 import enigma.shared.dto.config.CodeConfig;
@@ -43,6 +44,13 @@ public interface Code {
     Reflector getReflector();
 
     /**
+     * Active plugStr for character substitution.
+     *
+     * @return plugStr instance
+     */
+    Plugboard getPlugboard();
+
+    /**
      * Rotor IDs corresponding to the rotors list (left→right, index 0 = leftmost).
      *
      * @return immutable list of rotor IDs
@@ -71,7 +79,16 @@ public interface Code {
      */
     CodeConfig getConfig();
 
+    /**
+     * Get distance to notch for each rotor in left→right order.
+     *
+     * @return list of step counts until each rotor triggers next rotor
+     */
     List<Integer> getNotchDist();
 
+    /**
+     * Reset all rotor positions to their original configured values.
+     * Rotor selection and reflector remain unchanged.
+     */
     void reset();
 }

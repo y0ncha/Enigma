@@ -19,7 +19,7 @@ import java.util.*;
  *
  * <h3>Original Code</h3>
  * <p>The "original code" is the complete code configuration (rotor IDs, initial positions,
- * reflector ID, plugboard) captured at the moment of configuration via
+ * reflector ID, plugStr) captured at the moment of configuration via
  * {@code Engine.configManual()} or {@code Engine.configRandom()}.</p>
  *
  * <p><b>Example</b>: If you configure rotors [1,2,3] at positions ['O','D','X']

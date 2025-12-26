@@ -3,7 +3,7 @@ package enigma.engine.factory;
 import enigma.engine.exception.InvalidConfigurationException;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.shared.spec.RotorSpec;
-import enigma.machine.component.alphabet.Alphabet;
+import enigma.shared.alphabet.Alphabet;
 import enigma.machine.component.rotor.Rotor;
 
 /**
@@ -49,15 +49,7 @@ public class RotorFactoryImpl implements RotorFactory {
     }
 
     /**
-     * Create a rotor from the given specification.
-     *
-     * <p>Extracts right/left character columns from the spec and constructs
-     * a {@link RotorImpl} using the mechanical column-rotation model. Columns
-     * are passed as-is without modification (XML row order).</p>
-     *
-     * @param spec rotor specification with ID, columns, and notch index
-     * @return {@link RotorImpl} instance ready for position setting
-     * @throws InvalidConfigurationException if column lengths don't match alphabet size
+     * {@inheritDoc}
      */
     @Override
     public Rotor create(RotorSpec spec) {

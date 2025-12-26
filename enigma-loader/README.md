@@ -87,16 +87,9 @@ Each rotor has two columns (right and left) that define its wiring:
 ### LoaderXml
 **Purpose**: JAXB-based XML parser and validator.
 
-**Constructor**:
-```java
-public LoaderXml()                 // Default: 3 rotors in use
-public LoaderXml(int rotorsInUse)  // Custom rotor count (Exercise 2)
-```
+**Constructor (signatures shown for documentation)**: `public LoaderXml()` (Default: 3 rotors in use), `public LoaderXml(int rotorsInUse)` (Custom rotor count, Exercise 2)
 
-**Main Method**:
-```java
-MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException
-```
+**Main Method (signature)**: `MachineSpec loadSpecs(String filePath) throws EnigmaLoadingException`
 
 **Loading Process**:
 1. Validate file path and extension (.xml)
@@ -162,73 +155,19 @@ Each rotor has two columns (right and left) that define its wiring:
 
 **Rationale:** Bijective mappings ensure reversibility. The signal can traverse forward and backward through the rotor with deterministic transformations.
 
-**Example** (alphabet "ABCD"):
-```xml
-<BTE-Positioning>
-    <Right>A</Right>
-    <Left>B</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>B</Right>
-    <Left>C</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>C</Right>
-    <Left>D</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>D</Right>
-    <Left>A</Left>
-</BTE-Positioning>
-```
+**Example (alphabet "ABCD")**:
+
+- `<BTE-Positioning><Right>A</Right><Left>B</Left></BTE-Positioning>`
+- `<BTE-Positioning><Right>B</Right><Left>C</Left></BTE-Positioning>`
+- `<BTE-Positioning><Right>C</Right><Left>D</Left></BTE-Positioning>`
+- `<BTE-Positioning><Right>D</Right><Left>A</Left></BTE-Positioning>`
+
 Right column: A, B, C, D (all present ✓)  
 Left column: B, C, D, A (all present ✓)
 
 #### Notch Position
 - **1-based index**: Notch position is in range [1, alphabetSize]
 - **Within alphabet**: Notch references a valid position in the alphabet
-
-**Example**: For alphabet size 26, notch can be 1-26.
-
-**Rationale:** Notch triggers stepping of adjacent rotors. It must reference a valid alphabet position.
-- ✅ No duplicates
-
-**Valid**: 1, 2, 3, 4, 5  
-**Invalid**: 1, 2, 4, 5 (gap at 3)  
-**Invalid**: 1, 2, 2, 3 (duplicate 2)  
-**Invalid**: 0, 1, 2, 3 (must start at 1)
-
-#### Rotor Mappings (Bijectivity)
-Each rotor has two columns (right and left) defined in XML `<BTE-Positioning>` elements. Both columns must be **full permutations** of the alphabet (bijectivity):
-- ✅ Every alphabet character appears exactly once in each column
-- ✅ No missing characters
-- ✅ No duplicate characters
-
-**Example** (alphabet "ABCD"):
-```xml
-<BTE-Positioning>
-    <Right>A</Right>
-    <Left>B</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>B</Right>
-    <Left>C</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>C</Right>
-    <Left>D</Left>
-</BTE-Positioning>
-<BTE-Positioning>
-    <Right>D</Right>
-    <Left>A</Left>
-</BTE-Positioning>
-```
-Right column: A, B, C, D (all present ✓)  
-Left column: B, C, D, A (all present ✓)
-
-#### Notch Position
-- ✅ 1-based index
-- ✅ Must be in range [1, alphabetSize]
 
 **Example**: For alphabet size 26, notch can be 1-26.
 
@@ -256,25 +195,12 @@ Reflectors define symmetric pairwise mappings:
 - **Complete coverage**: All alphabet characters must be paired
 - **Exact pair count**: Must define exactly alphabetSize/2 pairs
 
-**How Symmetry is Enforced:**
-The loader constructs reflector mappings by processing pairs:
-```java
-mapping[inputIndex] = outputIndex;
-mapping[outputIndex] = inputIndex;  // Automatic symmetry
-```
-This construction makes asymmetric mappings impossible.
+**How Symmetry is Enforced:** The loader constructs reflector mappings by processing pairs: `mapping[inputIndex] = outputIndex; mapping[outputIndex] = inputIndex;` (automatic symmetry). This construction makes asymmetric mappings impossible.
 
-**Example** (alphabet "ABCD", size 4 → 2 pairs needed):
-```xml
-<BTE-Reflect>
-    <Input>A</Input>
-    <Output>B</Output>
-</BTE-Reflect>
-<BTE-Reflect>
-    <Input>C</Input>
-    <Output>D</Output>
-</BTE-Reflect>
-```
+**Example (alphabet "ABCD", size 4 → 2 pairs needed):**
+- `<BTE-Reflect><Input>A</Input><Output>B</Output></BTE-Reflect>`
+- `<BTE-Reflect><Input>C</Input><Output>D</Output></BTE-Reflect>`
+
 Result: A↔B, C↔D (symmetric ✓, complete ✓, 2 pairs ✓)
 
 **Rationale for Symmetry:** Historical Enigma reflectors were physically symmetric due to their wiring construction. Symmetry also ensures the machine is self-reciprocal (encrypting twice returns the original message).
@@ -304,25 +230,10 @@ Rotor columns are stored in **XML row order** (top→bottom as parsed):
 - Second `<BTE-Positioning>` → row 1
 - Last `<BTE-Positioning>` → row N-1 (bottom of rotor)
 
-This order is preserved exactly in `RotorSpec`:
-```java
-public record RotorSpec(
-    int id,
-    char[] rightColumn,  // top→bottom order from XML
-    char[] leftColumn,   // top→bottom order from XML
-    int notch
-)
-```
+This order is preserved exactly in `RotorSpec` (record shown for documentation): `public record RotorSpec(int id, char[] rightColumn, char[] leftColumn, int notch)` where columns are in XML top→bottom order.
 
 ### Reflector Wiring Order
-Reflector pairs are processed in **XML order** and stored in a mapping array:
-```java
-int[] mapping = new int[alphabetSize];
-for (each <BTE-Reflect> pair in XML order) {
-    mapping[inputIndex] = outputIndex;
-    mapping[outputIndex] = inputIndex;
-}
-```
+Reflector pairs are processed in **XML order** and stored in a mapping array: `int[] mapping = new int[alphabetSize];` then for each `<BTE-Reflect>` pair in XML order: `mapping[inputIndex] = outputIndex; mapping[outputIndex] = inputIndex;`.
 
 **Why This Matters:**
 - The mechanical model depends on exact wire positioning
@@ -334,17 +245,10 @@ for (each <BTE-Reflect> pair in XML order) {
 
 ## Error Handling
 
-**Example** (alphabet "ABCD", 4 chars → 2 pairs needed):
-```xml
-<BTE-Reflect>
-    <Input>A</Input>
-    <Output>B</Output>
-</BTE-Reflect>
-<BTE-Reflect>
-    <Input>C</Input>
-    <Output>D</Output>
-</BTE-Reflect>
-```
+**Example (alphabet "ABCD", 4 chars → 2 pairs needed):**
+- `<BTE-Reflect><Input>A</Input><Output>B</Output></BTE-Reflect>`
+- `<BTE-Reflect><Input>C</Input><Output>D</Output></BTE-Reflect>`
+
 Result: A↔B, C↔D (symmetric ✓, complete ✓)
 
 ### Rotors-In-Use Count (Exercise 2)
@@ -363,25 +267,10 @@ Rotor columns are stored in **XML row order** (top→bottom as parsed):
 - Second `<BTE-Positioning>` → row 1
 - Last `<BTE-Positioning>` → row N-1 (bottom of rotor)
 
-This order is preserved exactly in `RotorSpec`:
-```java
-public record RotorSpec(
-    int id,
-    char[] rightColumn,  // top→bottom order from XML
-    char[] leftColumn,   // top→bottom order from XML
-    int notch
-)
-```
+This order is preserved exactly in `RotorSpec` (record doc): `public record RotorSpec(int id, char[] rightColumn, char[] leftColumn, int notch)`.
 
 ### Reflector Wiring
-Reflector pairs are processed in **XML order** and stored in a mapping array:
-```java
-int[] mapping = new int[alphabetSize];
-for (each <BTE-Reflect> pair in XML order) {
-    mapping[inputIndex] = outputIndex;
-    mapping[outputIndex] = inputIndex;
-}
-```
+Reflector pairs are processed in **XML order** and stored in a mapping array: `int[] mapping = new int[alphabetSize]; for each pair: mapping[inputIndex] = outputIndex; mapping[outputIndex] = inputIndex;`.
 
 **Why This Matters**:
 - The mechanical model depends on exact wire positioning
@@ -396,28 +285,13 @@ All validation errors throw `EnigmaLoadingException` with:
 - **How to fix**: Actionable guidance
 
 **Example Error Messages**:
-```
-"Alphabet validation failed: Alphabet size must be even. Found 7 characters. 
-Fix: Add or remove one character to make the length even."
-
-"Rotor validation failed: Rotor ID 3 has non-bijective right column. 
-Character 'A' appears 2 times. Fix: Ensure each character appears exactly once."
-
-"Reflector validation failed: Reflector 'II' is missing from specification. 
-Reflectors must be contiguous starting from 'I'. Fix: Add reflector 'II' or remove reflectors after 'I'."
-```
+- "Alphabet validation failed: Alphabet size must be even. Found 7 characters. Fix: Add or remove one character to make the length even."
+- "Rotor validation failed: Rotor ID 3 has non-bijective right column. Character 'A' appears 2 times. Fix: Ensure each character appears exactly once."
+- "Reflector validation failed: Reflector 'II' is missing from specification. Reflectors must be contiguous starting from 'I'. Fix: Add reflector 'II' or remove reflectors after 'I'."
 
 ## Output: MachineSpec
 
-After successful validation, the loader produces a `MachineSpec`:
-```java
-public record MachineSpec(
-    String alphabet,                  // validated alphabet string
-    int rotorsInUse,                  // number of rotors in configuration
-    List<RotorSpec> rotors,           // validated rotor specifications
-    List<ReflectorSpec> reflectors    // validated reflector specifications
-)
-```
+After successful validation, the loader produces a `MachineSpec` (record doc): `public record MachineSpec(String alphabet, int rotorsInUse, List<RotorSpec> rotors, List<ReflectorSpec> reflectors)`.
 
 This spec is then used by:
 - Engine: For validation (rotor/reflector existence checks)
@@ -426,21 +300,7 @@ This spec is then used by:
 
 ## Usage Example
 
-```java
-Loader loader = new LoaderXml(3); // 3 rotors in use
-
-try {
-    MachineSpec spec = loader.loadSpecs("enigma.xml");
-    
-    // Spec is valid and ready to use
-    System.out.println("Alphabet: " + spec.alphabet());
-    System.out.println("Rotors: " + spec.rotors().size());
-    System.out.println("Reflectors: " + spec.reflectors().size());
-    
-} catch (EnigmaLoadingException e) {
-    System.err.println("Failed to load: " + e.getMessage());
-}
-```
+Example usage in code (pseudo): `Loader loader = new LoaderXml(3); MachineSpec spec = loader.loadSpecs("enigma.ex1-xml");`
 
 ## Validation vs Runtime Separation
 

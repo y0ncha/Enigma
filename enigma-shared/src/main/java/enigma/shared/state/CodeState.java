@@ -5,17 +5,19 @@ import enigma.shared.dto.config.CodeConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import static enigma.shared.utils.Utils.formatPlugboard;
+
 /**
  * Snapshot of code configuration and current rotor positions.
  *
- * <p>Captures rotor IDs, positions, notch distances, reflector ID, and plugboard.
+ * <p>Captures rotor IDs, positions, notch distances, reflector ID, and plugStr.
  * Used for both original configuration (at setup) and current state (after processing).</p>
  *
  * @param rotorIds rotor IDs in left→right order
  * @param positions current rotor positions as string
  * @param notchDist distance to next notch for each rotor
  * @param reflectorId reflector identifier
- * @param plugboard plugboard pairs
+ * @param plugStr plugStr pairs
  * @since 1.0
  */
 public record CodeState(
@@ -23,7 +25,7 @@ public record CodeState(
         String positions,
         List<Integer> notchDist,
         String reflectorId,
-        String plugboard
+        String plugStr
 ) {
 
     /**
@@ -48,24 +50,34 @@ public record CodeState(
     @Override
     public String toString() {
 
-        String ids = rotorIds.toString().replaceAll("[\\[\\] ]", "");
-
-        StringBuilder posBuilder = new StringBuilder();
+        // Format rotors with positions and notch distances
+        String ids = "<" + rotorIds.toString().replaceAll("[\\[\\] ]", "") + ">";
+        StringBuilder rotorStr = new StringBuilder();
+        rotorStr.append("<");
         for (int i = 0; i < positions.length(); i++) {
             char windowChar = positions.charAt(i);
             int dist = notchDist.get(i);
 
-            posBuilder.append(windowChar)
+            rotorStr.append(windowChar)
                     .append("(")
                     .append(dist)
                     .append(")");
 
             if (i < positions.length() - 1) {
-                posBuilder.append(",");
+                rotorStr.append(",");
             }
         }
+        rotorStr.append(">");
 
-        return "<%s><%s><%s>".formatted(ids, posBuilder, reflectorId);
+        // Format reflector id
+        String reflectorStr = "<" + reflectorId + ">";
+
+        // If plugStr is configured, format it
+        String plugboardStr = "";
+        if (plugStr != null && !plugStr.isEmpty()) {
+            plugboardStr = "<" + formatPlugboard(plugStr) + ">";
+        }
+        return ids + rotorStr + reflectorStr + plugboardStr;
     }
 
     /**
@@ -74,16 +86,17 @@ public record CodeState(
      * @return code configuration from this state
      * @throws IllegalStateException if state is NOT_CONFIGURED
      */
-    public CodeConfig toCodeConfig() {
+    public CodeConfig toConfig() {
         if (this == NOT_CONFIGURED) {
             throw new IllegalStateException(
-                    "Cannot convert NOT_CONFIGURED state to CodeConfig");
+                    "Code not configured");
         }
 
         List<Character> positionChars = new ArrayList<>(positions.length());
         for (int i = 0; i < positions.length(); i++) {
             positionChars.add(positions.charAt(i));
         }
-        return new CodeConfig(rotorIds, positionChars, reflectorId);
+        return new CodeConfig(rotorIds, positionChars, reflectorId, plugStr);
     }
+
 }
