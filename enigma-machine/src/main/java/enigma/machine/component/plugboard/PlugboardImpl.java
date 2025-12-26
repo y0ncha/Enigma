@@ -70,6 +70,6 @@ public class PlugboardImpl implements Plugboard {
                 sb.append((char) ('A' + i)).append((char) ('A' + mapping[i]));
             }
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 }
