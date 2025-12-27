@@ -20,6 +20,17 @@ import java.util.Set;
  */
 public final class EngineValidator {
 
+    /**
+     * Prevent instantiation of utility class.
+     */
+    private EngineValidator() {}
+
+    /**
+     * Check if machine specification is null and throw exception.
+     *
+     * @param spec the machine specification to check
+     * @throws InvalidConfigurationException if spec is null
+     */
     private static void specIsNull(MachineSpec spec) {
         if (spec == null) {
             throw new InvalidConfigurationException(
@@ -27,6 +38,25 @@ public final class EngineValidator {
         }
     }
 
+    /**
+     * Validate complete code configuration against machine specification.
+     *
+     * <p>Performs comprehensive validation of a code configuration including:</p>
+     * <ul>
+     *   <li>Non-null configuration elements</li>
+     *   <li>Rotor count matches specification requirement</li>
+     *   <li>Position count matches rotor count</li>
+     *   <li>All rotor IDs exist and are unique</li>
+     *   <li>Reflector ID exists</li>
+     *   <li>All position characters are in the alphabet</li>
+     *   <li>Plugboard configuration is valid</li>
+     * </ul>
+     *
+     * @param spec the machine specification to validate against
+     * @param config the code configuration to validate
+     * @throws InvalidConfigurationException if any validation rule is violated
+     * @since 1.0
+     */
     public static void validateCodeConfig(MachineSpec spec, CodeConfig config) {
         // Validate spec
         specIsNull(spec);
@@ -49,6 +79,17 @@ public final class EngineValidator {
         validatePlugboard(spec, config.plugStr());
     }
 
+    /**
+     * Validate that configuration elements are non-null.
+     *
+     * <p>Checks that rotor IDs, positions, and reflector ID are all provided.</p>
+     *
+     * @param rotorIds list of rotor IDs
+     * @param positions list of initial positions
+     * @param reflectorId reflector identifier
+     * @throws InvalidConfigurationException if any element is null
+     * @since 1.0
+     */
     public static void validateNullChecks(List<Integer> rotorIds, List<Character> positions, String reflectorId) {
         if (rotorIds == null) {
             throw new InvalidConfigurationException(
@@ -64,6 +105,18 @@ public final class EngineValidator {
         }
     }
 
+    /**
+     * Validate rotor and position counts match specification requirement.
+     *
+     * <p>Ensures that the number of rotors and positions both equal the
+     * required rotor count specified in the machine specification.</p>
+     *
+     * @param spec the machine specification
+     * @param rotorIds list of rotor IDs
+     * @param positions list of initial positions
+     * @throws InvalidConfigurationException if counts do not match requirement
+     * @since 1.0
+     */
     public static void validateRotorAndPositionCounts(MachineSpec spec, List<Integer> rotorIds, List<Character> positions) {
         // Validate spec
         specIsNull(spec);
@@ -123,6 +176,20 @@ public final class EngineValidator {
 
 
 
+    /**
+     * Validate rotor IDs exist in specification and are unique.
+     *
+     * <p>Ensures that:</p>
+     * <ul>
+     *   <li>All rotor IDs exist in the machine specification</li>
+     *   <li>No rotor ID appears more than once in the configuration</li>
+     * </ul>
+     *
+     * @param spec the machine specification
+     * @param rotorIds list of rotor IDs to validate
+     * @throws InvalidConfigurationException if validation fails
+     * @since 1.0
+     */
     public static void validateRotorIdsExistenceAndUniqueness(MachineSpec spec, List<Integer> rotorIds) {
         Set<Integer> seen = new HashSet<>();
         Set<Integer> availableRotorIds = new HashSet<>(spec.rotorsById().keySet());
@@ -140,6 +207,17 @@ public final class EngineValidator {
         }
     }
 
+    /**
+     * Validate reflector ID exists in the machine specification.
+     *
+     * <p>Checks that the reflector ID is non-empty and exists in the
+     * available reflectors defined in the machine specification.</p>
+     *
+     * @param spec the machine specification
+     * @param reflectorId the reflector identifier to validate
+     * @throws InvalidConfigurationException if reflector does not exist or ID is blank
+     * @since 1.0
+     */
     public static void validateReflectorExists(MachineSpec spec, String reflectorId) {
         if (reflectorId.isBlank()) {
             throw new InvalidConfigurationException(

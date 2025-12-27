@@ -32,12 +32,28 @@ public class ConsoleImpl implements Console {
     private boolean codeConfigured = false;
     private boolean exitRequested = false;
 
-
+    /**
+     * Construct console with provided engine and scanner.
+     *
+     * <p>Used for testing or when input source needs to be controlled.</p>
+     *
+     * @param engine the Enigma engine for business logic
+     * @param scanner the scanner for reading user input
+     * @since 1.0
+     */
     public ConsoleImpl(Engine engine, Scanner scanner) {
         this.enigma = engine;
         this.scanner = scanner;
     }
 
+    /**
+     * Construct console with provided engine and System.in scanner.
+     *
+     * <p>Standard constructor for normal console operation with keyboard input.</p>
+     *
+     * @param engine the Enigma engine for business logic
+     * @since 1.0
+     */
     public ConsoleImpl(Engine engine) {
         this.enigma = engine;
         this.scanner = new Scanner(System.in);
@@ -103,6 +119,12 @@ public class ConsoleImpl implements Console {
 // Menu & dispatch
 // ---------------------------------------------------------
 
+    /**
+     * Display the main menu with all available commands.
+     *
+     * <p>Shows enabled commands normally and disabled commands with "(disabled)"
+     * suffix. Commands are numbered 1-N matching their command IDs.</p>
+     */
     private void printMenu() {
         printSectionHeader("Enigma Machine - Main Menu");
         System.out.println("Please choose an option by number : ");
@@ -119,8 +141,10 @@ public class ConsoleImpl implements Console {
     }
 
     /**
-     * Returns a human-readable explanation why a command is disabled.
-     * Returns null if the command IS enabled.
+     * Get explanation for why a command is disabled.
+     *
+     * @param command the command to check
+     * @return user-friendly reason if disabled, null if enabled
      */
     private String getDisabledReason(ConsoleCommand command) {
         switch (command) {
@@ -150,7 +174,10 @@ public class ConsoleImpl implements Console {
     }
 
     /**
-     * Returns true if the given command is currently enabled.
+     * Check if a command is currently enabled.
+     *
+     * @param command the command to check
+     * @return true if enabled, false if disabled
      */
     private boolean isCommandEnabled(ConsoleCommand command) {
         // A command is enabled if and only if there is no disabled reason
@@ -198,6 +225,11 @@ public class ConsoleImpl implements Console {
         }
     }
 
+    /**
+     * Dispatch command to appropriate handler method.
+     *
+     * @param command the command to execute
+     */
     private void dispatchCommand(ConsoleCommand command) {
         if (command == null) {
             System.out.println("Invalid command. Please choose a number between 1 and 8");
@@ -222,15 +254,12 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
 
     /**
-     * Command 1: Load machine configuration from XML file.
-     * <p>
-     * Flow (logic to be implemented later):
-     * - ask user for full XML path (may contain spaces)
-     * - validate file extension (.ex1-xml)
-     * - call engine to load & validate machine
-     * - if invalid: print clear error (do NOT crash)
-     * - if valid: inform user + override previous machine
-     * - note: this command is always enabled
+     * Handle command 1: Load machine configuration from XML file.
+     *
+     * <p>Prompts user for file path, validates extension, and loads
+     * machine specification through the engine.</p>
+     */
+    private void handleLoadMachineFromXml() {
      */
     private void handleLoadMachineFromXml() {
 
@@ -260,6 +289,12 @@ public class ConsoleImpl implements Console {
 // Command 2: Show machine specification
 // ---------------------------------------------------------
 
+    /**
+     * Handle command 2: Display machine specification and current state.
+     *
+     * <p>Shows rotor count, reflector count, processed message count,
+     * and current configuration details.</p>
+     */
     private void handleShowMachineSpecification() {
 
         try {
@@ -275,6 +310,13 @@ public class ConsoleImpl implements Console {
 // Command 3: Manual code selection
 // ---------------------------------------------------------
 
+    /**
+     * Handle command 3: Manual code configuration.
+     *
+     * <p>Prompts user for rotor IDs, positions, reflector selection,
+     * and plugboard configuration. Validates input and applies
+     * configuration through the engine.</p>
+     */
     private void handleSetManualCode() {
 
         boolean keepTrying = true;
@@ -451,11 +493,10 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
 
     /**
-     * Command 4: Automatically generate random valid code configuration.
-     * - call engine to generate random rotors, positions, reflector
-     * - print the chosen configuration in compact format
-     * - configuration becomes active in the machine
-     * Enabled only after valid XML is loaded.
+     * Handle command 4: Generate random code configuration.
+     *
+     * <p>Delegates to engine to generate random valid configuration
+     * including rotor selection, positions, and reflector choice.</p>
      */
     private void handleSetAutomaticCode() {
         try {
@@ -479,13 +520,13 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
 
     /**
-     * Command 5: Process user input string through the machine.
-     * Flow:
-     * - ensure machine is loaded and a code (manual/automatic) was already set
-     * - ask user for input string
-     * - validate all characters are from machine alphabet (case-insensitive)
-     * - call engine to process and measure duration (nano-seconds)
-     * - print: original input, processed output and duration
+     * Handle command 5: Process input message through the machine.
+     *
+     * <p>Prompts user for input string, validates characters against
+     * alphabet, and processes through configured machine. Displays
+     * original input, processed output, and character-by-character trace.</p>
+     */
+    private void handleProcessInput() {
      * - note: rotors remain in their new positions (no auto reset)
      */
     private void handleProcessInput() {
@@ -525,11 +566,10 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
 
     /**
-     * Command 6: Reset current rotors to original code configuration.
-     * - enabled only after XML is loaded AND a code was set (3 or 4)
-     * - use engine.getOriginalCodeConfig() to retrieve the saved initial config
-     * - call engine.codeManual(...) to re-apply it
-     * - print resulting configuration in compact format
+     * Handle command 6: Reset rotor positions to original configuration.
+     *
+     * <p>Returns rotor positions to their values at configuration time.
+     * Does not change rotor selection, reflector, or plugboard.</p>
      */
     private void handleResetCode() {
         // Get the current configuration from the engine
@@ -546,13 +586,10 @@ public class ConsoleImpl implements Console {
 // ---------------------------------------------------------
 
     /**
-     * Command 7: Show machine history & statistics.
-     * <p>
-     * For each original code configuration (set by 3 or 4):
-     * - print the code in compact format
-     * - under it, print all processed messages:
-     *   #. &lt;input&gt; --> &lt;output&gt; (n nano-seconds)
-     * where # is running index starting from 1.
+     * Handle command 7: Display processing history and statistics.
+     *
+     * <p>Shows all processed messages grouped by original code configuration,
+     * including input, output, and processing duration for each message.</p>
      */
     private void handleShowHistoryAndStatistics() {
         try {
@@ -581,8 +618,9 @@ public class ConsoleImpl implements Console {
     // ----------[ Command 8: Exit ]----------
 
     /**
-     * Command 8: Exit application.
-     * Sets a flag so that the main loop in run() stops.
+     * Handle command 8: Exit application.
+     *
+     * <p>Terminates the engine and sets exit flag to stop the main loop.</p>
      */
     private void handleExit() {
         enigma.terminate();
@@ -590,12 +628,10 @@ public class ConsoleImpl implements Console {
     }
     // ----------[ Command 9: Save current machine state to a JSON file ]----------
     /**
-     * Bonus command: Save current machine state to a JSON file.
-     * Flow:
-     *  - ensure a machine is loaded (from XML or previous snapshot)
-     *  - ask user for full path (without extension)
-     *  - delegate to EngineImpl.saveSnapshot(basePath)
-     *  - on error: print message and let user retry or go back to main menu
+     * Handle command 9: Save machine state to JSON file.
+     *
+     * <p>Prompts user for file path and delegates to engine to save
+     * complete machine state including specification and configuration.</p>
      */
     private void handleSaveSnapshot() {
         while (true) {
@@ -625,11 +661,10 @@ public class ConsoleImpl implements Console {
 
     // [ Command 10: Load machine state from a previously saved JSON snapshot file ]
     /**
-     * Bonus command: Load machine state from a previously saved JSON snapshot file.
-     * Flow:
-     *  - ask user for full path (without extension)
-     *  - delegate to EngineImpl.loadSnapshot(basePath)
-     *  - on success: mark machineLoaded=true, codeConfigured according to loaded state
+     * Handle command 10: Load machine state from JSON snapshot file.
+     *
+     * <p>Prompts user for file path and delegates to engine to restore
+     * complete machine state from previously saved snapshot.</p>
      */
     private void handleLoadSnapshot() {
         while (true) {
