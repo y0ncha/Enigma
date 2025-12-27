@@ -260,8 +260,6 @@ public class ConsoleImpl implements Console {
      * machine specification through the engine.</p>
      */
     private void handleLoadMachineFromXml() {
-     */
-    private void handleLoadMachineFromXml() {
 
         while (true) {
             String path = Utilities.readNonEmptyLine(scanner, "Please enter the full path to the XML file :");
@@ -525,8 +523,7 @@ public class ConsoleImpl implements Console {
      * <p>Prompts user for input string, validates characters against
      * alphabet, and processes through configured machine. Displays
      * original input, processed output, and character-by-character trace.</p>
-     */
-    private void handleProcessInput() {
+     *
      * - note: rotors remain in their new positions (no auto reset)
      */
     private void handleProcessInput() {
