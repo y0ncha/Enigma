@@ -42,6 +42,9 @@ package enigma.console.helper;
  * @since 1.0
  */
 public final class Utilities {
+    /**
+     * Prevent instantiation of utility class.
+     */
     private Utilities() {
         // Prevent instantiation
     }

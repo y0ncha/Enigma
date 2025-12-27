@@ -118,6 +118,11 @@ public class MachineImpl implements Machine {
     // ---------------------------------------------------------
     // State Checkers
     // ---------------------------------------------------------
+    /**
+     * Assert that machine is configured and ready for processing.
+     *
+     * @throws IllegalStateException if code or keyboard is not initialized
+     */
     private void assertConfigured() {
         if (code == null) {
             throw new IllegalStateException("Machine is not configured");

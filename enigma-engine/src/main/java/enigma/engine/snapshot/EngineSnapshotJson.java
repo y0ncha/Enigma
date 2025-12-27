@@ -24,6 +24,9 @@ public final class EngineSnapshotJson {
             .setPrettyPrinting()
             .create();
 
+    /**
+     * Prevent instantiation of utility class.
+     */
     private EngineSnapshotJson() {
         // utility class
     }
