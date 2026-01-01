@@ -374,4 +374,12 @@ public class EngineImpl implements Engine {
         }
         return machine.toString();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isMachineConfigured() {
+        return machine.isConfigured();
+    }
 }
