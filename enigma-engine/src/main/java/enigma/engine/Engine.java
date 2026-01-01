@@ -118,4 +118,16 @@ public interface Engine {
      * @return machine details string
      */
     String getMachineDetails();
+
+    /**
+     * Check if the machine is fully configured and ready for processing.
+     *
+     * <p>A machine is considered configured when it has been loaded and
+     * a valid rotor and reflector configuration has been applied.
+     * This method allows clients to verify the machine state before
+     * attempting to process input.</p>
+     *
+     * @return true if machine is loaded and configured; false otherwise
+     */
+    boolean isMachineConfigured();
 }

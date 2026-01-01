@@ -77,7 +77,7 @@ public class ConsoleImpl implements Console {
         }
 
         System.out.println("===============================================================\n");
-        System.out.print(enigma.getMachineDetails());
+        if (enigma.isMachineConfigured()) System.out.print(enigma.getMachineDetails());
         System.out.println();
         System.out.println("Goodbye!");
     }
