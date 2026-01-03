@@ -429,7 +429,7 @@ public class ConsoleImpl implements Console {
 // 4) Plugboard choice (loop until valid or user exits)
 // ---------------------------------------------------------
             while (true) {
-                System.out.println("Enter plug pairs as a continuous string (even length), e.g. ABKC (A ↔ B, K ↔ C)");
+                System.out.println("Enter plug pairs as a continuous string (even length), e.g. ABKC (A|B, K|C)");
                 System.out.println("Each letter may appear at most once, and a letter cannot be paired with itself (press Enter for no plugs) : ");
                 System.out.print("> ");
 
