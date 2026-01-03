@@ -4,6 +4,6 @@ cd enigma
 
 call mvn clean install
 
-cd target
+cd enigma-console/target
 
 java -jar enigma-machine-ex2.jar
