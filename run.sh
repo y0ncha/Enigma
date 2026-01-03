@@ -8,4 +8,4 @@ mvn clean install
 
 cd target
 
-java -jar enigma-machine-ex2.jar
+java -jar enigma-machine-ex2.jarrun.sh
