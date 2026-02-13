@@ -72,6 +72,7 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
                     definition.machineName(),
                     machineSpec.getTotalRotors(),
                     machineSpec.getTotalReflectors(),
+                    machineSpec.getAlphabet(),
                     definition.xmlPath(),
                     definition.loadedAt()
             ));

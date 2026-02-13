@@ -25,6 +25,9 @@ public class MachineEntity {
     @Column(name = "reflectors_count", nullable = false)
     private Integer reflectorsCount;
 
+    @Column(name = "abc", nullable = false)
+    private String abc;
+
     @Column(name = "xml_path", nullable = false)
     private String xmlPath;
 
@@ -35,14 +38,21 @@ public class MachineEntity {
     }
 
     public MachineEntity(UUID id, String name, String xmlPath, Instant loadedAt) {
-        this(id, name, 0, 0, xmlPath, loadedAt);
+        this(id, name, 0, 0, "", xmlPath, loadedAt);
     }
 
-    public MachineEntity(UUID id, String name, Integer rotorsCount, Integer reflectorsCount, String xmlPath, Instant loadedAt) {
+    public MachineEntity(UUID id,
+                         String name,
+                         Integer rotorsCount,
+                         Integer reflectorsCount,
+                         String abc,
+                         String xmlPath,
+                         Instant loadedAt) {
         this.id = id;
         this.name = name;
         this.rotorsCount = rotorsCount;
         this.reflectorsCount = reflectorsCount;
+        this.abc = abc;
         this.xmlPath = xmlPath;
         this.loadedAt = loadedAt;
     }
@@ -77,6 +87,14 @@ public class MachineEntity {
 
     public void setReflectorsCount(Integer reflectorsCount) {
         this.reflectorsCount = reflectorsCount;
+    }
+
+    public String getAbc() {
+        return abc;
+    }
+
+    public void setAbc(String abc) {
+        this.abc = abc;
     }
 
     public String getXmlPath() {
