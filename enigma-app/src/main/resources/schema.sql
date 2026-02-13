@@ -1,10 +1,4 @@
-DO $$
-BEGIN
-    CREATE TYPE reflector_id_enum AS ENUM ('I', 'II', 'III', 'IV', 'V');
-EXCEPTION
-    WHEN duplicate_object THEN NULL;
-END
-$$;
+CREATE TYPE reflector_id_enum AS ENUM ('I', 'II', 'III', 'IV', 'V');
 
 CREATE TABLE IF NOT EXISTS machines (
     id UUID PRIMARY KEY,
