@@ -1,6 +1,11 @@
 package enigma.sessions.service.impl;
 
 import enigma.dal.entity.MachineEntity;
+import enigma.dal.entity.MachineReflectorEntity;
+import enigma.dal.entity.MachineRotorEntity;
+import enigma.dal.entity.ReflectorId;
+import enigma.dal.repository.MachineReflectorRepository;
+import enigma.dal.repository.MachineRotorRepository;
 import enigma.dal.repository.MachineRepository;
 import enigma.loader.Loader;
 import enigma.loader.LoaderXml;
@@ -10,38 +15,39 @@ import enigma.sessions.exception.ConflictException;
 import enigma.sessions.exception.ResourceNotFoundException;
 import enigma.sessions.model.MachineDefinition;
 import enigma.sessions.service.MachineCatalogService;
+import enigma.shared.alphabet.Alphabet;
 import enigma.shared.spec.MachineSpec;
+import enigma.shared.spec.ReflectorSpec;
+import enigma.shared.spec.RotorSpec;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class MachineCatalogServiceImpl implements MachineCatalogService {
 
     private final MachineRepository machineRepository;
+    private final MachineRotorRepository machineRotorRepository;
+    private final MachineReflectorRepository machineReflectorRepository;
     private final Loader loader;
-    private final Map<String, MachineDefinition> machinesByName;
+    private final Map<String, MachineRuntimeMetadata> runtimeMetadataByMachineName;
 
-    public MachineCatalogServiceImpl(MachineRepository machineRepository) {
+    public MachineCatalogServiceImpl(MachineRepository machineRepository,
+                                     MachineRotorRepository machineRotorRepository,
+                                     MachineReflectorRepository machineReflectorRepository) {
         this.machineRepository = machineRepository;
+        this.machineRotorRepository = machineRotorRepository;
+        this.machineReflectorRepository = machineReflectorRepository;
         this.loader = new LoaderXml();
-        this.machinesByName = new ConcurrentHashMap<>();
-    }
-
-    @PostConstruct
-    void loadFromDb() {
-        for (MachineEntity entity : machineRepository.findAll()) {
-            machinesByName.putIfAbsent(
-                    entity.getName(),
-                    new MachineDefinition(entity.getName(), entity.getXmlPath(), entity.getLoadedAt()));
-        }
+        this.runtimeMetadataByMachineName = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -64,24 +70,26 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
             throw new ConflictException("Machine name already exists: " + machineName);
         }
 
-        MachineDefinition definition = new MachineDefinition(machineName, xmlPath.trim(), Instant.now());
+        UUID machineId = UUID.randomUUID();
+        Instant loadedAt = Instant.now();
+        MachineDefinition definition = new MachineDefinition(machineId, machineName, xmlPath.trim(), loadedAt);
 
         try {
-            machineRepository.save(new MachineEntity(
-                    java.util.UUID.randomUUID(),
-                    definition.machineName(),
+            MachineEntity machine = machineRepository.save(new MachineEntity(
+                    machineId,
+                    machineName,
                     machineSpec.getTotalRotors(),
-                    machineSpec.getTotalReflectors(),
-                    machineSpec.getAlphabet(),
-                    definition.xmlPath(),
-                    definition.loadedAt()
+                    machineSpec.getAlphabet()
             ));
+
+            saveRotors(machine, machineSpec);
+            saveReflectors(machine, machineSpec);
         }
         catch (DataIntegrityViolationException e) {
             throw new ConflictException("Machine name already exists: " + machineName);
         }
 
-        machinesByName.put(machineName, definition);
+        runtimeMetadataByMachineName.put(machineName, new MachineRuntimeMetadata(definition.xmlPath(), definition.loadedAt()));
         return definition;
     }
 
@@ -89,12 +97,8 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
     @Transactional(readOnly = true)
     public List<MachineDefinition> listMachines() {
         List<MachineDefinition> items = machineRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
-                .map(entity -> new MachineDefinition(entity.getName(), entity.getXmlPath(), entity.getLoadedAt()))
+                .map(this::toDefinition)
                 .toList();
-
-        for (MachineDefinition item : items) {
-            machinesByName.putIfAbsent(item.machineName(), item);
-        }
         return List.copyOf(items);
     }
 
@@ -109,8 +113,64 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
         MachineEntity entity = machineRepository.findByName(key)
                 .orElseThrow(() -> new ResourceNotFoundException("Machine not found: " + key));
 
-        MachineDefinition resolved = new MachineDefinition(entity.getName(), entity.getXmlPath(), entity.getLoadedAt());
-        machinesByName.putIfAbsent(entity.getName(), resolved);
-        return resolved;
+        return toDefinition(entity);
+    }
+
+    private void saveRotors(MachineEntity machine, MachineSpec machineSpec) {
+        List<MachineRotorEntity> rotors = new ArrayList<>();
+        for (RotorSpec rotorSpec : machineSpec.rotorsById().values()) {
+            rotors.add(new MachineRotorEntity(
+                    UUID.randomUUID(),
+                    machine,
+                    rotorSpec.id(),
+                    rotorSpec.notchIndex() + 1,
+                    new String(rotorSpec.getRightColumn()),
+                    new String(rotorSpec.getLeftColumn())
+            ));
+        }
+        machineRotorRepository.saveAll(rotors);
+    }
+
+    private void saveReflectors(MachineEntity machine, MachineSpec machineSpec) {
+        List<MachineReflectorEntity> reflectors = new ArrayList<>();
+        Alphabet alphabet = machineSpec.alphabet();
+
+        for (ReflectorSpec reflectorSpec : machineSpec.reflectorsById().values()) {
+            String input = alphabet.letters();
+            String output = toOutputWiring(alphabet, reflectorSpec.mapping());
+
+            reflectors.add(new MachineReflectorEntity(
+                    UUID.randomUUID(),
+                    machine,
+                    ReflectorId.fromDbValue(reflectorSpec.id()),
+                    input,
+                    output
+            ));
+        }
+        machineReflectorRepository.saveAll(reflectors);
+    }
+
+    private String toOutputWiring(Alphabet alphabet, int[] mapping) {
+        StringBuilder output = new StringBuilder(mapping.length);
+        for (int mappedIndex : mapping) {
+            output.append(alphabet.charAt(mappedIndex));
+        }
+        return output.toString();
+    }
+
+    private MachineDefinition toDefinition(MachineEntity entity) {
+        MachineRuntimeMetadata metadata = runtimeMetadataByMachineName.get(entity.getName());
+        String xmlPath = metadata == null ? null : metadata.xmlPath();
+        Instant loadedAt = metadata == null ? null : metadata.loadedAt();
+
+        return new MachineDefinition(
+                entity.getId(),
+                entity.getName(),
+                xmlPath,
+                loadedAt
+        );
+    }
+
+    private record MachineRuntimeMetadata(String xmlPath, Instant loadedAt) {
     }
 }

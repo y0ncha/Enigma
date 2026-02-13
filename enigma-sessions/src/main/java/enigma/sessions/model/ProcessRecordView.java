@@ -4,9 +4,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ProcessRecordView(
-        Long id,
+        UUID id,
         UUID sessionId,
         String machineName,
+        String code,
         String inputText,
         String outputText,
         long durationNanos,

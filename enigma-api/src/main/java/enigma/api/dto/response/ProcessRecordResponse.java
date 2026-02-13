@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ProcessRecordResponse(
-        Long id,
+        UUID id,
         UUID sessionId,
         String machineName,
         String inputText,

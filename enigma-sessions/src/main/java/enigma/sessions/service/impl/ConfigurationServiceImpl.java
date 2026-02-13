@@ -1,7 +1,5 @@
 package enigma.sessions.service.impl;
 
-import enigma.dal.entity.ConfigurationEventEntity;
-import enigma.dal.repository.ConfigurationEventRepository;
 import enigma.engine.exception.InvalidConfigurationException;
 import enigma.sessions.exception.ApiValidationException;
 import enigma.sessions.model.SessionRuntime;
@@ -24,12 +22,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private static final String ACTION_RESET = "RESET";
 
     private final SessionService sessionService;
-    private final ConfigurationEventRepository configurationEventRepository;
+    private final ConfigurationEventStore configurationEventStore;
 
     public ConfigurationServiceImpl(SessionService sessionService,
-                                    ConfigurationEventRepository configurationEventRepository) {
+                                    ConfigurationEventStore configurationEventStore) {
         this.sessionService = sessionService;
-        this.configurationEventRepository = configurationEventRepository;
+        this.configurationEventStore = configurationEventStore;
     }
 
     @Override
@@ -57,12 +55,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             throw new ApiValidationException("Invalid configuration: " + e.getMessage(), e);
         }
 
-        configurationEventRepository.save(new ConfigurationEventEntity(
+        configurationEventStore.add(
                 runtime.sessionId(),
                 runtime.machineName(),
                 ACTION_MANUAL,
                 CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
-                Instant.now()));
+                Instant.now());
 
         return state;
     }
@@ -79,12 +77,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
 
         String payload = CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState());
-        configurationEventRepository.save(new ConfigurationEventEntity(
+        configurationEventStore.add(
                 runtime.sessionId(),
                 runtime.machineName(),
                 ACTION_RANDOM,
                 payload,
-                Instant.now()));
+                Instant.now());
 
         return state;
     }
@@ -100,12 +98,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             state = runtime.engine().machineData();
         }
 
-        configurationEventRepository.save(new ConfigurationEventEntity(
+        configurationEventStore.add(
                 runtime.sessionId(),
                 runtime.machineName(),
                 ACTION_RESET,
                 CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
-                Instant.now()));
+                Instant.now());
 
         return state;
     }

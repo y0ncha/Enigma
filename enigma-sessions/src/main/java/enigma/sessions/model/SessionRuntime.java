@@ -8,6 +8,7 @@ import java.util.UUID;
 public class SessionRuntime {
 
     private final UUID sessionId;
+    private final UUID machineId;
     private final String machineName;
     private final String xmlPath;
     private final Engine engine;
@@ -17,11 +18,13 @@ public class SessionRuntime {
     private final Object lock = new Object();
 
     public SessionRuntime(UUID sessionId,
+                          UUID machineId,
                           String machineName,
                           String xmlPath,
                           Engine engine,
                           Instant openedAt) {
         this.sessionId = sessionId;
+        this.machineId = machineId;
         this.machineName = machineName;
         this.xmlPath = xmlPath;
         this.engine = engine;
@@ -31,6 +34,10 @@ public class SessionRuntime {
 
     public UUID sessionId() {
         return sessionId;
+    }
+
+    public UUID machineId() {
+        return machineId;
     }
 
     public String machineName() {

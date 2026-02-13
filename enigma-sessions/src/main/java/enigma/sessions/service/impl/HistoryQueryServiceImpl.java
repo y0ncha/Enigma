@@ -1,17 +1,15 @@
 package enigma.sessions.service.impl;
 
-import enigma.dal.entity.ConfigurationEventEntity;
 import enigma.dal.entity.ProcessRecordEntity;
-import enigma.dal.entity.SessionEntity;
-import enigma.dal.repository.ConfigurationEventRepository;
 import enigma.dal.repository.ProcessRecordRepository;
-import enigma.dal.repository.SessionRepository;
-import enigma.sessions.exception.ResourceNotFoundException;
 import enigma.sessions.model.ConfigEventView;
 import enigma.sessions.model.HistoryView;
+import enigma.sessions.model.MachineDefinition;
 import enigma.sessions.model.ProcessRecordView;
+import enigma.sessions.model.SessionView;
 import enigma.sessions.service.HistoryQueryService;
 import enigma.sessions.service.MachineCatalogService;
+import enigma.sessions.service.SessionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,42 +20,37 @@ import java.util.UUID;
 public class HistoryQueryServiceImpl implements HistoryQueryService {
 
     private final MachineCatalogService machineCatalogService;
-    private final SessionRepository sessionRepository;
-    private final ConfigurationEventRepository configurationEventRepository;
+    private final SessionService sessionService;
+    private final ConfigurationEventStore configurationEventStore;
     private final ProcessRecordRepository processRecordRepository;
 
     public HistoryQueryServiceImpl(MachineCatalogService machineCatalogService,
-                                   SessionRepository sessionRepository,
-                                   ConfigurationEventRepository configurationEventRepository,
+                                   SessionService sessionService,
+                                   ConfigurationEventStore configurationEventStore,
                                    ProcessRecordRepository processRecordRepository) {
         this.machineCatalogService = machineCatalogService;
-        this.sessionRepository = sessionRepository;
-        this.configurationEventRepository = configurationEventRepository;
+        this.sessionService = sessionService;
+        this.configurationEventStore = configurationEventStore;
         this.processRecordRepository = processRecordRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
     public HistoryView bySession(UUID sessionId) {
-        SessionEntity session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
+        SessionView session = sessionService.getSession(sessionId);
 
-        List<ConfigEventView> configEvents = configurationEventRepository
-                .findBySessionIdOrderByCreatedAtAsc(sessionId)
-                .stream()
-                .map(this::toConfigView)
-                .toList();
+        List<ConfigEventView> configEvents = configurationEventStore.bySession(sessionId);
 
         List<ProcessRecordView> processEvents = processRecordRepository
-                .findBySessionIdOrderByProcessedAtAsc(sessionId)
+                .findBySessionIdOrderByIdAsc(sessionId.toString())
                 .stream()
-                .map(this::toProcessView)
+                .map(entity -> toProcessView(entity, session.machineName()))
                 .toList();
 
         return new HistoryView(
                 "SESSION",
                 sessionId,
-                session.getMachineName(),
+                session.machineName(),
                 configEvents,
                 processEvents
         );
@@ -66,49 +59,47 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
     @Override
     @Transactional(readOnly = true)
     public HistoryView byMachineName(String machineName) {
-        machineCatalogService.resolveMachine(machineName);
+        MachineDefinition machineDefinition = machineCatalogService.resolveMachine(machineName);
 
-        List<ConfigEventView> configEvents = configurationEventRepository
-                .findByMachineNameOrderByCreatedAtAsc(machineName)
-                .stream()
-                .map(this::toConfigView)
-                .toList();
+        List<ConfigEventView> configEvents = configurationEventStore.byMachineName(machineDefinition.machineName());
 
         List<ProcessRecordView> processEvents = processRecordRepository
-                .findByMachineNameOrderByProcessedAtAsc(machineName)
+                .findByMachine_IdOrderByIdAsc(machineDefinition.machineId())
                 .stream()
-                .map(this::toProcessView)
+                .map(entity -> toProcessView(entity, machineDefinition.machineName()))
                 .toList();
 
         return new HistoryView(
                 "MACHINE",
                 null,
-                machineName,
+                machineDefinition.machineName(),
                 configEvents,
                 processEvents
         );
     }
 
-    private ConfigEventView toConfigView(ConfigurationEventEntity entity) {
-        return new ConfigEventView(
-                entity.getId(),
-                entity.getSessionId(),
-                entity.getMachineName(),
-                entity.getAction(),
-                entity.getPayload(),
-                entity.getCreatedAt()
-        );
-    }
-
-    private ProcessRecordView toProcessView(ProcessRecordEntity entity) {
+    private ProcessRecordView toProcessView(ProcessRecordEntity entity, String machineName) {
         return new ProcessRecordView(
                 entity.getId(),
-                entity.getSessionId(),
-                entity.getMachineName(),
+                parseUuidOrNull(entity.getSessionId()),
+                machineName,
+                entity.getCode(),
                 entity.getInputText(),
                 entity.getOutputText(),
                 entity.getDurationNanos(),
-                entity.getProcessedAt()
+                null
         );
+    }
+
+    private UUID parseUuidOrNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return UUID.fromString(value.trim());
+        }
+        catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 }

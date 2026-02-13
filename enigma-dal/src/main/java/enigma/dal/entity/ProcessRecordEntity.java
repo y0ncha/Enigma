@@ -2,76 +2,106 @@ package enigma.dal.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "process_records")
+@Table(
+        name = "processing",
+        indexes = {
+                @Index(name = "idx_processing_machine_id", columnList = "machine_id"),
+                @Index(name = "idx_processing_session_id", columnList = "session_id")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_processing_id", columnNames = "id")
+        }
+)
 public class ProcessRecordEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    private Long id;
+    private UUID id;
 
-    @Column(name = "session_id", nullable = false)
-    private UUID sessionId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "machine_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_processing_machine_id")
+    )
+    private MachineEntity machine;
 
-    @Column(name = "machine_name", nullable = false)
-    private String machineName;
+    @Column(name = "session_id", nullable = false, columnDefinition = "TEXT")
+    private String sessionId;
 
-    @Column(name = "input_text", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "code", columnDefinition = "TEXT")
+    private String code;
+
+    @Column(name = "input", nullable = false, columnDefinition = "TEXT")
     private String inputText;
 
-    @Column(name = "output_text", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "output", nullable = false, columnDefinition = "TEXT")
     private String outputText;
 
-    @Column(name = "duration_nanos", nullable = false)
+    @Column(name = "time", nullable = false)
     private long durationNanos;
-
-    @Column(name = "processed_at", nullable = false)
-    private Instant processedAt;
 
     public ProcessRecordEntity() {
     }
 
-    public ProcessRecordEntity(UUID sessionId,
-                               String machineName,
+    public ProcessRecordEntity(UUID id,
+                               MachineEntity machine,
+                               String sessionId,
+                               String code,
                                String inputText,
                                String outputText,
-                               long durationNanos,
-                               Instant processedAt) {
+                               long durationNanos) {
+        this.id = id;
+        this.machine = machine;
         this.sessionId = sessionId;
-        this.machineName = machineName;
+        this.code = code;
         this.inputText = inputText;
         this.outputText = outputText;
         this.durationNanos = durationNanos;
-        this.processedAt = processedAt;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public UUID getSessionId() {
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public MachineEntity getMachine() {
+        return machine;
+    }
+
+    public void setMachine(MachineEntity machine) {
+        this.machine = machine;
+    }
+
+    public String getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(UUID sessionId) {
+    public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public String getMachineName() {
-        return machineName;
+    public String getCode() {
+        return code;
     }
 
-    public void setMachineName(String machineName) {
-        this.machineName = machineName;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getInputText() {
@@ -96,13 +126,5 @@ public class ProcessRecordEntity {
 
     public void setDurationNanos(long durationNanos) {
         this.durationNanos = durationNanos;
-    }
-
-    public Instant getProcessedAt() {
-        return processedAt;
-    }
-
-    public void setProcessedAt(Instant processedAt) {
-        this.processedAt = processedAt;
     }
 }

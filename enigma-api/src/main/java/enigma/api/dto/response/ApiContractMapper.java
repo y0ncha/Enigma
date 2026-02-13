@@ -52,13 +52,16 @@ public final class ApiContractMapper {
         ConfigEventView activeConfig = null;
 
         for (ProcessRecordView record : records) {
-            while (configIndex < configurations.size()
-                    && !configurations.get(configIndex).createdAt().isAfter(record.processedAt())) {
-                activeConfig = configurations.get(configIndex);
-                configIndex++;
+            String key = recordCode(record);
+            if (key == null) {
+                while (record.processedAt() != null
+                        && configIndex < configurations.size()
+                        && !configurations.get(configIndex).createdAt().isAfter(record.processedAt())) {
+                    activeConfig = configurations.get(configIndex);
+                    configIndex++;
+                }
+                key = activeConfig == null ? NOT_CONFIGURED : configDescription(activeConfig);
             }
-
-            String key = activeConfig == null ? NOT_CONFIGURED : configDescription(activeConfig);
             grouped.computeIfAbsent(key, ignored -> new ArrayList<>())
                     .add(new HistoryEntryResponse(
                             record.inputText(),
@@ -105,5 +108,13 @@ public final class ApiContractMapper {
             return configEvent.action();
         }
         return payload;
+    }
+
+    private static String recordCode(ProcessRecordView record) {
+        String code = record.code();
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return code;
     }
 }

@@ -1,7 +1,5 @@
 package enigma.sessions.service.impl;
 
-import enigma.dal.entity.SessionEntity;
-import enigma.dal.repository.SessionRepository;
 import enigma.engine.EngineImpl;
 import enigma.sessions.exception.ApiValidationException;
 import enigma.sessions.exception.ConflictException;
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,35 +29,13 @@ public class SessionServiceImpl implements SessionService {
     private static final Logger log = LoggerFactory.getLogger(SessionServiceImpl.class);
 
     private final MachineCatalogService machineCatalogService;
-    private final SessionRepository sessionRepository;
     private final Map<UUID, SessionRuntime> runtimeBySessionId;
+    private final Map<UUID, SessionView> sessionById;
 
-    public SessionServiceImpl(MachineCatalogService machineCatalogService, SessionRepository sessionRepository) {
+    public SessionServiceImpl(MachineCatalogService machineCatalogService) {
         this.machineCatalogService = machineCatalogService;
-        this.sessionRepository = sessionRepository;
         this.runtimeBySessionId = new ConcurrentHashMap<>();
-    }
-
-    @PostConstruct
-    @Transactional
-    void closeDanglingSessions() {
-        log.info("Scanning for dangling open sessions at startup");
-        List<SessionEntity> allSessions = sessionRepository.findAll();
-        Instant now = Instant.now();
-        boolean changed = false;
-
-        for (SessionEntity session : allSessions) {
-            if (SessionStatus.OPEN.name().equals(session.getStatus())) {
-                session.setStatus(SessionStatus.CLOSED.name());
-                session.setClosedAt(now);
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            sessionRepository.saveAll(allSessions);
-            log.info("Closed dangling sessions at startup");
-        }
+        this.sessionById = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -68,6 +43,11 @@ public class SessionServiceImpl implements SessionService {
     public SessionView openSession(String machineName) {
         log.info("Opening session for machine={}", machineName);
         MachineDefinition machineDefinition = machineCatalogService.resolveMachine(machineName);
+
+        if (machineDefinition.xmlPath() == null || machineDefinition.xmlPath().isBlank()) {
+            throw new ConflictException("Machine source XML is unavailable for '" + machineDefinition.machineName()
+                    + "'. Reload it before opening a session.");
+        }
 
         EngineImpl engine = new EngineImpl();
         try {
@@ -81,25 +61,27 @@ public class SessionServiceImpl implements SessionService {
 
         UUID sessionId = UUID.randomUUID();
         Instant openedAt = Instant.now();
-
-        SessionEntity persisted = sessionRepository.save(new SessionEntity(
+        SessionView opened = new SessionView(
                 sessionId,
                 machineDefinition.machineName(),
-                SessionStatus.OPEN.name(),
+                SessionStatus.OPEN,
                 openedAt,
                 null
-        ));
+        );
 
         SessionRuntime runtime = new SessionRuntime(
-                persisted.getId(),
-                persisted.getMachineName(),
+                sessionId,
+                machineDefinition.machineId(),
+                machineDefinition.machineName(),
                 machineDefinition.xmlPath(),
                 engine,
-                persisted.getOpenedAt());
+                openedAt
+        );
 
-        runtimeBySessionId.put(persisted.getId(), runtime);
-        log.info("Session opened successfully sessionId={} machine={}", persisted.getId(), persisted.getMachineName());
-        return toView(runtime);
+        runtimeBySessionId.put(sessionId, runtime);
+        sessionById.put(sessionId, opened);
+        log.info("Session opened successfully sessionId={} machine={}", sessionId, machineDefinition.machineName());
+        return opened;
     }
 
     @Override
@@ -110,17 +92,24 @@ public class SessionServiceImpl implements SessionService {
         }
         log.info("Closing session sessionId={}", sessionId);
 
-        SessionEntity entity = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
+        SessionView existing = sessionById.get(sessionId);
+        if (existing == null) {
+            throw new ResourceNotFoundException("Session not found: " + sessionId);
+        }
 
-        if (SessionStatus.CLOSED.name().equals(entity.getStatus())) {
+        if (existing.status() == SessionStatus.CLOSED) {
             throw new ConflictException("Session is already closed: " + sessionId);
         }
 
         Instant closedAt = Instant.now();
-        entity.setStatus(SessionStatus.CLOSED.name());
-        entity.setClosedAt(closedAt);
-        SessionEntity updated = sessionRepository.save(entity);
+        SessionView closed = new SessionView(
+                existing.sessionId(),
+                existing.machineName(),
+                SessionStatus.CLOSED,
+                existing.openedAt(),
+                closedAt
+        );
+        sessionById.put(sessionId, closed);
 
         SessionRuntime runtime = runtimeBySessionId.remove(sessionId);
         if (runtime != null) {
@@ -128,7 +117,7 @@ public class SessionServiceImpl implements SessionService {
         }
 
         log.info("Session closed sessionId={}", sessionId);
-        return toView(updated);
+        return closed;
     }
 
     @Override
@@ -138,18 +127,17 @@ public class SessionServiceImpl implements SessionService {
             throw new ApiValidationException("sessionId must be provided");
         }
 
-        return sessionRepository.findById(sessionId)
-                .map(this::toView)
-                .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
+        SessionView session = sessionById.get(sessionId);
+        if (session == null) {
+            throw new ResourceNotFoundException("Session not found: " + sessionId);
+        }
+        return session;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SessionView> listSessions() {
-        List<SessionView> result = new ArrayList<>();
-        for (SessionEntity sessionEntity : sessionRepository.findAll()) {
-            result.add(toView(sessionEntity));
-        }
+        List<SessionView> result = new ArrayList<>(sessionById.values());
         result.sort(Comparator.comparing(SessionView::openedAt));
         return List.copyOf(result);
     }
@@ -163,14 +151,13 @@ public class SessionServiceImpl implements SessionService {
 
         SessionRuntime runtime = runtimeBySessionId.get(sessionId);
         if (runtime == null) {
-            SessionEntity persisted = sessionRepository
-                    .findById(sessionId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
-
-            if (SessionStatus.CLOSED.name().equals(persisted.getStatus())) {
+            SessionView persisted = sessionById.get(sessionId);
+            if (persisted == null) {
+                throw new ResourceNotFoundException("Session not found: " + sessionId);
+            }
+            if (persisted.status() == SessionStatus.CLOSED) {
                 throw new ConflictException("Session is closed: " + sessionId);
             }
-
             throw new ConflictException("Session runtime is unavailable. Please open a new session.");
         }
 
@@ -179,23 +166,5 @@ public class SessionServiceImpl implements SessionService {
         }
 
         return runtime;
-    }
-
-    private SessionView toView(SessionRuntime runtime) {
-        return new SessionView(
-                runtime.sessionId(),
-                runtime.machineName(),
-                runtime.status(),
-                runtime.openedAt(),
-                runtime.closedAt());
-    }
-
-    private SessionView toView(SessionEntity entity) {
-        return new SessionView(
-                entity.getId(),
-                entity.getMachineName(),
-                SessionStatus.valueOf(entity.getStatus()),
-                entity.getOpenedAt(),
-                entity.getClosedAt());
     }
 }

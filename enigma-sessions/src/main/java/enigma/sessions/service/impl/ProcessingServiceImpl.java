@@ -1,18 +1,20 @@
 package enigma.sessions.service.impl;
 
 import enigma.dal.entity.ProcessRecordEntity;
+import enigma.dal.repository.MachineRepository;
 import enigma.dal.repository.ProcessRecordRepository;
 import enigma.sessions.exception.ApiValidationException;
+import enigma.sessions.exception.ResourceNotFoundException;
 import enigma.sessions.model.ProcessOutcome;
 import enigma.sessions.model.SessionRuntime;
 import enigma.sessions.service.ProcessingService;
 import enigma.sessions.service.SessionService;
 import enigma.shared.dto.tracer.ProcessTrace;
 import enigma.shared.state.MachineState;
+import enigma.shared.utils.CodeStateCompactFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -21,11 +23,14 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     private final SessionService sessionService;
     private final ProcessRecordRepository processRecordRepository;
+    private final MachineRepository machineRepository;
 
     public ProcessingServiceImpl(SessionService sessionService,
-                                 ProcessRecordRepository processRecordRepository) {
+                                 ProcessRecordRepository processRecordRepository,
+                                 MachineRepository machineRepository) {
         this.sessionService = sessionService;
         this.processRecordRepository = processRecordRepository;
+        this.machineRepository = machineRepository;
     }
 
     @Override
@@ -50,12 +55,15 @@ public class ProcessingServiceImpl implements ProcessingService {
         }
 
         processRecordRepository.save(new ProcessRecordEntity(
-                runtime.sessionId(),
-                runtime.machineName(),
+                UUID.randomUUID(),
+                machineRepository.findById(runtime.machineId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Machine not found for processing runtime: " + runtime.machineId())),
+                runtime.sessionId().toString(),
+                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
                 normalizedInput,
                 processTrace.output(),
-                durationNanos,
-                Instant.now()
+                durationNanos
         ));
 
         return new ProcessOutcome(
