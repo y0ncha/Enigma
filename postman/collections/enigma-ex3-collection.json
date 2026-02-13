@@ -266,8 +266,8 @@
                   "script": {
                     "id": "8e1b7e5c-bbf0-4d9a-ab57-e73470110375",
                     "exec": [
-                      "pm.test(\"Status code is 409 for unknown machine\", function () {",
-                      "    pm.response.to.have.status(409);",
+                      "pm.test(\"Status code is 404 for unknown machine\", function () {",
+                      "    pm.response.to.have.status(404);",
                       "});",
                       "const jsonData = pm.response.json();",
                       "pm.test(\"Error message mentions unknown machine name\", function () {",
@@ -1387,52 +1387,52 @@
   ],
   "variable": [
     {
-      "id": "59b51b22-1ec0-4f81-9c37-81829ed5ad54",
+      "id": "b993bff8-69d7-4cfa-8419-a69cf424ecfa",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "0d9105ac-6df8-4f6a-b1b7-d78db9a27142",
+      "id": "42e0677f-5ed4-43ba-a5b5-34ce020a724c",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "f1587359-58b8-460b-b29b-b0b476733795",
+      "id": "27a97ac0-8452-4c42-9687-16623e6afea6",
       "key": "machineNameSanity",
       "value": "sanity"
     },
     {
-      "id": "073c75d2-501f-48e8-be79-42130514a1ee",
+      "id": "7fbc3885-9fe7-4e0c-9121-a2a90ac95da6",
       "key": "activeMachineName",
       "value": "sanity"
     },
     {
-      "id": "9a1446a8-36ca-4130-9774-540edc08c78b",
+      "id": "3caf864a-4b29-4147-a8bb-fce38819f1da",
       "key": "machineNamePaper",
       "value": ""
     },
     {
-      "id": "ecc013a3-0f2f-4b6b-a991-029afbaa3930",
+      "id": "9e7f3039-87ee-4d5d-a7a5-9068ba8e758c",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "3abd4bb2-0c9a-47b3-8a91-4bd2f84342ba",
+      "id": "1ea0deed-9d58-42e4-9353-ddd7a896352a",
       "key": "createdSessionIdPaper",
       "value": ""
     },
     {
-      "id": "7881c748-395d-4932-8fcf-d6e1f4666c2b",
+      "id": "bba2afc5-53b9-4296-ba4e-7fdb38fd02ce",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "a26734e3-0cf5-4e56-adb1-7a099764dff3",
+      "id": "92614042-695c-40d8-9168-6b438b9dd00a",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "f0afb641-aac9-4a05-abac-294f9fc9b042",
+      "id": "0d274236-c6b5-4f4a-a221-603309743786",
       "key": "deletedSessionId",
       "value": ""
     }
