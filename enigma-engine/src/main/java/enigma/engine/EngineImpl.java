@@ -137,14 +137,14 @@ public class EngineImpl implements Engine {
             throw new MachineNotConfiguredException("Machine is not configured");
         }
         
-        // Validate input is not null and contains only valid characters
-        EngineValidator.validateInputInAlphabet(spec, input);
+        // Validate and normalize input to the machine alphabet (case-insensitive)
+        String normalizedInput = EngineValidator.normalizeInputToAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();
         StringBuilder output = new StringBuilder();
 
         long start = System.nanoTime();
-        for (char c : input.toCharArray()) {
+        for (char c : normalizedInput.toCharArray()) {
             SignalTrace trace = machine.process(c);
             traces.add(trace);
             output.append(trace.outputChar());

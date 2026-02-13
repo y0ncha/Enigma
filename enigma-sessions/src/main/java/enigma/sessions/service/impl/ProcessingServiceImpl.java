@@ -33,6 +33,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         if (input == null) {
             throw new ApiValidationException("input must be provided");
         }
+        String normalizedInput = input.trim();
 
         SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
 
@@ -42,7 +43,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
         synchronized (runtime.lock()) {
             long startedAt = System.nanoTime();
-            processTrace = runtime.engine().process(input);
+            processTrace = runtime.engine().process(normalizedInput);
             durationNanos = System.nanoTime() - startedAt;
             state = runtime.engine().machineData();
         }
@@ -50,7 +51,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         processRecordRepository.save(new ProcessRecordEntity(
                 runtime.sessionId(),
                 runtime.machineName(),
-                input,
+                normalizedInput,
                 processTrace.output(),
                 durationNanos,
                 Instant.now()
@@ -59,7 +60,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         return new ProcessOutcome(
                 runtime.sessionId(),
                 runtime.machineName(),
-                input,
+                normalizedInput,
                 processTrace.output(),
                 durationNanos,
                 state

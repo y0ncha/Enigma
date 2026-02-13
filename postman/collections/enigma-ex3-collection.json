@@ -630,40 +630,82 @@
           "name": "config",
           "item": [
             {
-              "name": "manual",
-              "item": [
+              "name": "Manual code selection",
+              "event": [
                 {
-                  "name": "Manual code selection",
-                  "event": [
-                    {
-                      "listen": "prerequest",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
-                          "if (!activeSessionId) {",
-                          "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
-                          "}"
-                        ]
-                      }
-                    },
-                    {
-                      "listen": "test",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "pm.test(\"Status code is 200\", function () {",
-                          "    pm.response.to.have.status(200);",
-                          "});",
-                          "pm.test(\"Manual config returns plain text\", function () {",
-                          "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
-                          "});"
-                        ]
-                      }
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "ce919be7-34b1-49b0-99b3-294b1b31c4a5",
+                    "exec": [
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
+                      "if (!activeSessionId) {",
+                      "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "4c387446-378f-43df-a9f8-c996295b18db",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test(\"Manual config returns plain text\", function () {",
+                      "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "id": "cac5d1fd-c4b7-40b1-9a87-78d3136b9da7",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"sessionID\": \"{{activeSessionId}}\",\n    \"rotors\": [\n        {\n            \"rotorNumber\": 1,\n            \"rotorPosition\": \"A\"\n        },\n        {\n            \"rotorNumber\": 2,\n            \"rotorPosition\": \"A\"\n        }\n    ],\n    \"reflector\": \"I\",\n    \"plugs\": []\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
                     }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/enigma/config/manual",
+                  "host": [
+                    "{{baseUrl}}"
                   ],
-                  "id": "cac5d1fd-c4b7-40b1-9a87-78d3136b9da7",
-                  "request": {
+                  "path": [
+                    "enigma",
+                    "config",
+                    "manual"
+                  ]
+                },
+                "description": "Manually set the machine's secret code rotor selection and positions, reflector, and optional plugboard connections."
+              },
+              "response": [
+                {
+                  "id": "d8113668-3cbc-4039-878f-fd562610bc8b",
+                  "name": "Operation result as a plain string",
+                  "originalRequest": {
                     "method": "PUT",
                     "header": [
                       {
@@ -677,7 +719,7 @@
                     ],
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"sessionID\": \"{{activeSessionId}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"A\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"A\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+                      "raw": "{\n  \"sessionID\": \"sess_3f2a9c1d\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"A\"\n    }\n  ],\n  \"reflector\": \"B\",\n  \"plugs\": [\n    {\n      \"plug1\": \"A\",\n      \"plug2\": \"Z\"\n    },\n    {\n      \"plug1\": \"A\",\n      \"plug2\": \"Z\"\n    }\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -695,99 +737,201 @@
                         "config",
                         "manual"
                       ]
-                    },
-                    "description": "Manually set the machine's secret code rotor selection and positions, reflector, and optional plugboard connections."
-                  },
-                  "response": [
-                    {
-                      "id": "d8113668-3cbc-4039-878f-fd562610bc8b",
-                      "name": "Operation result as a plain string",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Content-Type",
-                            "value": "application/json"
-                          },
-                          {
-                            "key": "Accept",
-                            "value": "text/plain"
-                          }
-                        ],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"sessionID\": \"sess_3f2a9c1d\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"A\"\n    }\n  ],\n  \"reflector\": \"B\",\n  \"plugs\": [\n    {\n      \"plug1\": \"A\",\n      \"plug2\": \"Z\"\n    },\n    {\n      \"plug1\": \"A\",\n      \"plug2\": \"Z\"\n    }\n  ]\n}",
-                          "options": {
-                            "raw": {
-                              "headerFamily": "json",
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{baseUrl}}/enigma/config/manual",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "enigma",
-                            "config",
-                            "manual"
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "text/plain"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "Manual code set successfully"
                     }
-                  ]
-                }
-              ],
-              "id": "314e9a91-41a7-40c5-bc12-f105f47b323c"
-            },
-            {
-              "name": "automatic",
-              "item": [
-                {
-                  "name": "Automatic code setup",
-                  "event": [
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [
                     {
-                      "listen": "prerequest",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
-                          "if (!activeSessionId) {",
-                          "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
-                          "}"
-                        ]
-                      }
-                    },
-                    {
-                      "listen": "test",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "pm.test(\"Status code is 200\", function () {",
-                          "    pm.response.to.have.status(200);",
-                          "});",
-                          "pm.test(\"Automatic config returns plain text\", function () {",
-                          "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
-                          "});"
-                        ]
-                      }
+                      "key": "Content-Type",
+                      "value": "text/plain"
                     }
                   ],
-                  "id": "24064ab8-632d-4aa1-8192-0873511bb91f",
-                  "request": {
+                  "cookie": [],
+                  "body": "Manual code set successfully"
+                }
+              ]
+            },
+            {
+              "name": "Get current machine status",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
+                      "if (!activeSessionId) {",
+                      "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "const jsonData = pm.response.json();",
+                      "pm.test(\"Status response has counters\", function () {",
+                      "    pm.expect(jsonData.totalRotors).to.be.a(\"number\");",
+                      "    pm.expect(jsonData.totalReflectors).to.be.a(\"number\");",
+                      "    pm.expect(jsonData.totalProcessedMessages).to.be.a(\"number\");",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "id": "0e2c1c91-b8d2-4ee0-ac98-957e93e5d0a5",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/enigma/config?sessionID={{activeSessionId}}&verbose=false",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enigma",
+                    "config"
+                  ],
+                  "query": [
+                    {
+                      "key": "sessionID",
+                      "value": "{{activeSessionId}}",
+                      "description": "The active session identifier."
+                    },
+                    {
+                      "key": "verbose",
+                      "value": "false",
+                      "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n"
+                    }
+                  ]
+                },
+                "description": "Returns the current status and configuration details of the loaded Enigma machine.\n\nThe optional `verbose` query parameter controls how much detail is returned:\n- When `verbose=true`, the response includes `originalCode` and `currentRotorsPosition`.\n- When `verbose=false` or not provided (default), these attributes are omitted.\n"
+              },
+              "response": [
+                {
+                  "id": "3b72e310-c3a2-4b80-a024-435b11829d8c",
+                  "name": "Current configuration",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/enigma/config?sessionID=string&verbose=false",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "enigma",
+                        "config"
+                      ],
+                      "query": [
+                        {
+                          "description": "The active session identifier.",
+                          "key": "sessionID",
+                          "value": "string"
+                        },
+                        {
+                          "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n",
+                          "key": "verbose",
+                          "value": "false"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"totalRotors\": 5,\n  \"totalReflectors\": 3,\n  \"totalProcessedMessages\": 12,\n  \"originalCode\": {\n    \"rotors\": [\n      {\n        \"notchDistance\": 5,\n        \"rotorNumber\": 2,\n        \"rotorPosition\": \"A\"\n      }\n    ],\n    \"reflector\": \"B\",\n    \"plugs\": [\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      },\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      }\n    ]\n  },\n  \"currentRotorsPosition\": {\n    \"rotors\": [\n      {\n        \"notchDistance\": 5,\n        \"rotorNumber\": 2,\n        \"rotorPosition\": \"A\"\n      }\n    ],\n    \"reflector\": \"B\",\n    \"plugs\": [\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      },\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      }\n    ]\n  },\n  \"originalCodeCompact\": \"1-A | 2-B | 3-C | R:B | P:A-Z,B-Y\",\n  \"currentRotorsPositionCompact\": \"1-B | 2-C | 3-D\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Automatic code setup",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
+                      "if (!activeSessionId) {",
+                      "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test(\"Automatic config returns plain text\", function () {",
+                      "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "id": "24064ab8-632d-4aa1-8192-0873511bb91f",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{activeSessionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enigma",
+                    "config",
+                    "automatic"
+                  ],
+                  "query": [
+                    {
+                      "key": "sessionID",
+                      "value": "{{activeSessionId}}",
+                      "description": "The active session identifier."
+                    }
+                  ]
+                },
+                "description": "Automatically generates and applies a random valid Enigma code setup."
+              },
+              "response": [
+                {
+                  "id": "f47e165a-0ec9-4207-86f8-3cffe935d6d2",
+                  "name": "Operation result as a plain string",
+                  "originalRequest": {
                     "method": "PUT",
                     "header": [
                       {
@@ -796,7 +940,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{activeSessionId}}",
+                      "raw": "{{baseUrl}}/enigma/config/automatic?sessionID=string",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -807,97 +951,206 @@
                       ],
                       "query": [
                         {
+                          "description": "The active session identifier.",
                           "key": "sessionID",
-                          "value": "{{activeSessionId}}",
-                          "description": "The active session identifier."
+                          "value": "string"
                         }
                       ]
-                    },
-                    "description": "Automatically generates and applies a random valid Enigma code setup."
-                  },
-                  "response": [
-                    {
-                      "id": "f47e165a-0ec9-4207-86f8-3cffe935d6d2",
-                      "name": "Operation result as a plain string",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "text/plain"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/enigma/config/automatic?sessionID=string",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "enigma",
-                            "config",
-                            "automatic"
-                          ],
-                          "query": [
-                            {
-                              "description": "The active session identifier.",
-                              "key": "sessionID",
-                              "value": "string"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "text/plain"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "Automatic code setup completed successfully"
                     }
-                  ]
-                }
-              ],
-              "id": "1c54a71f-3815-460d-a4fa-8ebf7fafd3aa"
-            },
-            {
-              "name": "reset",
-              "item": [
-                {
-                  "name": "Reset to original code",
-                  "event": [
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [
                     {
-                      "listen": "prerequest",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
-                          "if (!activeSessionId) {",
-                          "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
-                          "}"
-                        ]
-                      }
-                    },
-                    {
-                      "listen": "test",
-                      "script": {
-                        "type": "text/javascript",
-                        "exec": [
-                          "pm.test(\"Status code is 200\", function () {",
-                          "    pm.response.to.have.status(200);",
-                          "});",
-                          "pm.test(\"Reset returns plain text\", function () {",
-                          "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
-                          "});"
-                        ]
-                      }
+                      "key": "Content-Type",
+                      "value": "text/plain"
                     }
                   ],
-                  "id": "36eea0ca-761a-48b8-9f9c-3c881da82ccd",
-                  "request": {
+                  "cookie": [],
+                  "body": "Automatic code setup completed successfully"
+                }
+              ]
+            },
+            {
+              "name": "Get current machine status",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
+                      "if (!activeSessionId) {",
+                      "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "const jsonData = pm.response.json();",
+                      "pm.test(\"Status response has counters\", function () {",
+                      "    pm.expect(jsonData.totalRotors).to.be.a(\"number\");",
+                      "    pm.expect(jsonData.totalReflectors).to.be.a(\"number\");",
+                      "    pm.expect(jsonData.totalProcessedMessages).to.be.a(\"number\");",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "id": "32221234-16c9-41a1-a545-6d2693c53e13",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/enigma/config?sessionID={{activeSessionId}}&verbose=false",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enigma",
+                    "config"
+                  ],
+                  "query": [
+                    {
+                      "key": "sessionID",
+                      "value": "{{activeSessionId}}",
+                      "description": "The active session identifier."
+                    },
+                    {
+                      "key": "verbose",
+                      "value": "false",
+                      "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n"
+                    }
+                  ]
+                },
+                "description": "Returns the current status and configuration details of the loaded Enigma machine.\n\nThe optional `verbose` query parameter controls how much detail is returned:\n- When `verbose=true`, the response includes `originalCode` and `currentRotorsPosition`.\n- When `verbose=false` or not provided (default), these attributes are omitted.\n"
+              },
+              "response": [
+                {
+                  "id": "b2480e38-c89e-48dd-9dda-3d34993e85f6",
+                  "name": "Current configuration",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/enigma/config?sessionID=string&verbose=false",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "enigma",
+                        "config"
+                      ],
+                      "query": [
+                        {
+                          "description": "The active session identifier.",
+                          "key": "sessionID",
+                          "value": "string"
+                        },
+                        {
+                          "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n",
+                          "key": "verbose",
+                          "value": "false"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"totalRotors\": 5,\n  \"totalReflectors\": 3,\n  \"totalProcessedMessages\": 12,\n  \"originalCode\": {\n    \"rotors\": [\n      {\n        \"notchDistance\": 5,\n        \"rotorNumber\": 2,\n        \"rotorPosition\": \"A\"\n      }\n    ],\n    \"reflector\": \"B\",\n    \"plugs\": [\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      },\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      }\n    ]\n  },\n  \"currentRotorsPosition\": {\n    \"rotors\": [\n      {\n        \"notchDistance\": 5,\n        \"rotorNumber\": 2,\n        \"rotorPosition\": \"A\"\n      }\n    ],\n    \"reflector\": \"B\",\n    \"plugs\": [\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      },\n      {\n        \"plug1\": \"A\",\n        \"plug2\": \"Z\"\n      }\n    ]\n  },\n  \"originalCodeCompact\": \"1-A | 2-B | 3-C | R:B | P:A-Z,B-Y\",\n  \"currentRotorsPositionCompact\": \"1-B | 2-C | 3-D\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Reset to original code",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
+                      "if (!activeSessionId) {",
+                      "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test(\"Reset returns plain text\", function () {",
+                      "    pm.expect(pm.response.text()).to.be.a(\"string\").and.not.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "id": "36eea0ca-761a-48b8-9f9c-3c881da82ccd",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{activeSessionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enigma",
+                    "config",
+                    "reset"
+                  ],
+                  "query": [
+                    {
+                      "key": "sessionID",
+                      "value": "{{activeSessionId}}",
+                      "description": "The active session identifier."
+                    }
+                  ]
+                },
+                "description": "Resets the current machine configuration back to the original loaded code and returns it."
+              },
+              "response": [
+                {
+                  "id": "ea881b3e-5c62-428f-b6b0-7c6090058247",
+                  "name": "Original code after reset",
+                  "originalRequest": {
                     "method": "PUT",
                     "header": [
                       {
@@ -906,7 +1159,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{activeSessionId}}",
+                      "raw": "{{baseUrl}}/enigma/config/reset?sessionID=string",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -917,61 +1170,26 @@
                       ],
                       "query": [
                         {
+                          "description": "The active session identifier.",
                           "key": "sessionID",
-                          "value": "{{activeSessionId}}",
-                          "description": "The active session identifier."
+                          "value": "string"
                         }
                       ]
-                    },
-                    "description": "Resets the current machine configuration back to the original loaded code and returns it."
-                  },
-                  "response": [
-                    {
-                      "id": "ea881b3e-5c62-428f-b6b0-7c6090058247",
-                      "name": "Original code after reset",
-                      "originalRequest": {
-                        "method": "PUT",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "text/plain"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/enigma/config/reset?sessionID=string",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "enigma",
-                            "config",
-                            "reset"
-                          ],
-                          "query": [
-                            {
-                              "description": "The active session identifier.",
-                              "key": "sessionID",
-                              "value": "string"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [
-                        {
-                          "key": "Content-Type",
-                          "value": "text/plain"
-                        }
-                      ],
-                      "cookie": [],
-                      "body": "Automatic code setup completed successfully"
                     }
-                  ]
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "Automatic code setup completed successfully"
                 }
-              ],
-              "id": "24a7ffc8-0fc4-403c-908b-90875946ff79"
+              ]
             },
             {
               "name": "Get current machine status",
@@ -1100,19 +1318,22 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "71811940-cb47-4c12-9490-511b09f075f3",
                     "exec": [
                       "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
                       "if (!activeSessionId) {",
                       "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
                       "}"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 },
                 {
                   "listen": "test",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "aa913a46-49c4-445b-8846-f0ba25e5c54c",
                     "exec": [
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
@@ -1122,7 +1343,10 @@
                       "    pm.expect(jsonData.output).to.be.a(\"string\").and.not.empty;",
                       "});",
                       "pm.collectionVariables.set(\"lastProcessOutput\", jsonData.output);"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -1148,7 +1372,8 @@
                     {
                       "key": "input",
                       "value": "{{processInput}}",
-                      "description": "The text to process."
+                      "description": "The text to process.",
+                      "uuid": "18e20288-1def-4a80-90d9-a25a4cc45e7b"
                     }
                   ]
                 },
@@ -1387,54 +1612,70 @@
   ],
   "variable": [
     {
-      "id": "3f56bb32-7188-4db3-b876-1297f7e80666",
+      "id": "75ffbfdb-708a-427d-bebf-811458f28395",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "5e7a8dac-5139-4155-aa11-6de576766446",
+      "id": "6e78080d-b909-406c-b7b9-2f8767d2d5cf",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "3f07ea44-3fb6-47a7-aeac-55b78ef0e8ca",
+      "id": "653d532f-c6e8-4909-bf20-57dabd8fc1e8",
       "key": "machineNameSanity",
       "value": "sanity"
     },
     {
-      "id": "70358f59-cd25-4e21-a437-e00500f576dd",
+      "id": "5ff42fd2-969c-431f-9a56-9f942c1b6b84",
       "key": "activeMachineName",
       "value": "sanity"
     },
     {
-      "id": "4fbe41f7-8395-4aad-8027-2d359efe21f7",
+      "id": "fe2e0bcf-3c36-48ea-ae02-fffc69c0088c",
       "key": "machineNamePaper",
       "value": ""
     },
     {
-      "id": "97e279d6-66ca-45dc-b22a-e5f8e11e8ef1",
+      "id": "6ca26508-82a8-4afd-b5d3-190e531f9400",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "e1876143-7bba-422b-a155-8b05b2339c6e",
+      "id": "38ad1866-1454-42be-aaf0-546b31b11baa",
       "key": "createdSessionIdPaper",
       "value": ""
     },
     {
-      "id": "72ccdf3d-b377-4cd4-870d-a20b60f1bb48",
+      "id": "2ef7166d-da93-424e-a4cb-9ae4c2515707",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "ebe676f7-3489-49fa-abef-760afae3a0c7",
+      "id": "84867dc7-655d-45ae-abd6-a83fa74a300d",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "34075e27-6cfc-46b1-949b-6bc3ff5e1836",
+      "id": "e14fdb7b-4c22-4e9b-90de-8b7ca56e81be",
       "key": "deletedSessionId",
       "value": ""
+    },
+    {
+      "id": "11e7c8e8-6a24-46f9-896b-df313ba79ea5",
+      "key": "historySessionId",
+      "value": ""
+    },
+    {
+      "id": "d0e32e10-5926-4130-a19a-2cc91e2aacd8",
+      "key": "historyMachineName",
+      "value": ""
+    },
+    {
+      "id": "a3745272-b88c-42a9-8f9f-c46333427343",
+      "key": "processInput",
+      "value": "",
+      "type": "default"
     }
   ]
 }

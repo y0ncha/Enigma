@@ -355,19 +355,15 @@ public class LoaderXml implements Loader {
     /**
      * Validate and clean the raw alphabet string from the XML {@code <ABC>} element.
      *
-     * <p>This method expects the raw alphabet value as read from the XML {@code <ABC>} element.
-     * It removes all whitespace using {@code rawAbc.replaceAll("\\s+", "")} and then
-     * enforces the following constraints on the cleaned alphabet:</p>
+     * <p>This method trims only leading/trailing whitespace from the raw value and
+     * preserves inner spaces as real alphabet characters.</p>
      *
      * <ul>
      *   <li>the raw value must not be {@code null} (the XML must contain an {@code <ABC>} element)</li>
-     *   <li>the cleaned value must not be empty after whitespace removal</li>
+     *   <li>the cleaned value must not be empty after edge trimming</li>
      *   <li>the cleaned value must have an even length</li>
      *   <li>the cleaned value must not contain duplicate characters</li>
      * </ul>
-     *
-     * <p>On success the cleaned alphabet string (all whitespace removed) is returned.
-     * On failure an {@link EnigmaLoadingException} is thrown describing the problem.</p>
      *
      * @param rawAbc raw ABC value from XML
      * @return cleaned alphabet string
@@ -378,9 +374,9 @@ public class LoaderXml implements Loader {
             throw new EnigmaLoadingException("<ABC> section is missing");
         }
 
-        String cleanAbc = rawAbc.replaceAll("\\s+", "");
+        String cleanAbc = rawAbc.trim();
         if (cleanAbc.isEmpty()) {
-            throw new EnigmaLoadingException("<ABC> section is empty after removing whitespace");
+            throw new EnigmaLoadingException("<ABC> section is empty after trimming");
         }
 
         if (cleanAbc.length() % 2 != 0) {

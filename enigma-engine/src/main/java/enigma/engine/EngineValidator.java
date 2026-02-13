@@ -266,34 +266,74 @@ public final class EngineValidator {
      * @since 1.0
      */
     public static void validateInputInAlphabet(MachineSpec spec, String input) {
+        normalizeInputToAlphabet(spec, input);
+    }
+
+    /**
+     * Validate and normalize input message against the machine alphabet.
+     *
+     * <p>Matching is case-insensitive for alphabetic characters. Characters that
+     * are not present in the alphabet (even after case normalization) are rejected.</p>
+     *
+     * @param spec machine specification containing the alphabet
+     * @param input input message to normalize
+     * @return normalized input using characters that exist in the machine alphabet
+     * @throws InvalidMessageException if input is null, contains control characters,
+     *                                 or contains characters outside the alphabet
+     */
+    public static String normalizeInputToAlphabet(MachineSpec spec, String input) {
         // Validate spec
         specIsNull(spec);
 
         if (input == null) {
-            throw new InvalidMessageException(
-                "Input message is missing");
+            throw new InvalidMessageException("Input message is missing");
         }
 
-        String alphabet = spec.alphabet().letters();
+        // Trim only at boundaries; keep inner spaces as valid symbols when present in alphabet.
+        String trimmedInput = input.trim();
 
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
+        String alphabet = spec.alphabet().letters();
+        StringBuilder normalized = new StringBuilder(trimmedInput.length());
+
+        for (int i = 0; i < trimmedInput.length(); i++) {
+            char c = trimmedInput.charAt(i);
 
             if (Character.isISOControl(c)) {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
-                    String.format(
-                        "Control character %s detected at position %d",
-                        controlName, i));
+                    String.format("Control character %s detected at position %d", controlName, i));
             }
 
-            if (!spec.alphabet().contains(c)) {
-                throw new InvalidMessageException(
-                    String.format(
-                        "Character '%c' at position %d is not in the machine alphabet : %s",
-                        c, i, alphabet));
+            if (spec.alphabet().contains(c)) {
+                normalized.append(c);
+                continue;
             }
+
+            Character mapped = mapCaseInsensitiveToAlphabet(c, alphabet);
+            if (mapped != null) {
+                normalized.append(mapped);
+                continue;
+            }
+
+            throw new InvalidMessageException(
+                String.format(
+                    "Character '%c' at position %d is not in the machine alphabet : %s",
+                    c, i, alphabet));
         }
+        return normalized.toString();
+    }
+
+    private static Character mapCaseInsensitiveToAlphabet(char c, String alphabet) {
+        char upper = Character.toUpperCase(c);
+        if (alphabet.indexOf(upper) >= 0) {
+            return upper;
+        }
+
+        char lower = Character.toLowerCase(c);
+        if (alphabet.indexOf(lower) >= 0) {
+            return lower;
+        }
+        return null;
     }
     
     /**
