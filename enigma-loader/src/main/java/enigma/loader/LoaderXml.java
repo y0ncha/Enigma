@@ -35,7 +35,6 @@ public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
     private int rotorsInUse;
-    private String machineName;
 
     /**
      * Create loader expecting specified rotor count.
@@ -50,7 +49,7 @@ public class LoaderXml implements Loader {
         BTEEnigma root = loadRoot(filePath);
 
         rotorsInUse = extractRotorsInUse(root);
-        machineName = validateMachineName(root.getName());
+        String machineName = validateMachineName(root.getName());
 
         Alphabet alphabet = extractAlphabet(root);
 
@@ -100,8 +99,8 @@ public class LoaderXml implements Loader {
     /**
      * Load XSD schema from classpath resources for validation.
      *
-     * <p>The schema file is located at: {@code /schema/Enigma-Ex2.xsd} in the classpath
-     * (typically {@code src/main/resources/schema/Enigma-Ex2.xsd}).</p>
+     * <p>The schema file is located at: {@code /schema/Enigma-Ex3.xsd} in the classpath
+     * (typically {@code src/main/resources/schema/Enigma-Ex3.xsd}).</p>
      *
      * @return Schema instance for validation, or null if schema cannot be loaded
      */
@@ -113,7 +112,7 @@ public class LoaderXml implements Loader {
             InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex3.xsd");
             if (schemaStream == null) {
                 // Fallback: try loading from URL if available
-                schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+                // schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
                 URL schemaUrl = getClass().getResource("/schema/Enigma-Ex3.xsd");
                 if (schemaUrl == null) {
                     schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
