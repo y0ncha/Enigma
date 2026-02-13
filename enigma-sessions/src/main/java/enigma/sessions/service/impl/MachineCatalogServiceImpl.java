@@ -70,6 +70,8 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
             machineRepository.save(new MachineEntity(
                     java.util.UUID.randomUUID(),
                     definition.machineName(),
+                    machineSpec.getTotalRotors(),
+                    machineSpec.getTotalReflectors(),
                     definition.xmlPath(),
                     definition.loadedAt()
             ));
