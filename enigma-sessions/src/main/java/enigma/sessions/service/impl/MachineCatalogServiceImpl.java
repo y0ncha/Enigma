@@ -12,13 +12,12 @@ import enigma.sessions.model.MachineDefinition;
 import enigma.sessions.service.MachineCatalogService;
 import enigma.shared.spec.MachineSpec;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.PostConstruct;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,12 +60,11 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
         }
 
         String machineName = machineSpec.getMachineName();
-        if (machinesByName.containsKey(machineName) || machineRepository.existsByName(machineName)) {
+        if (machineRepository.existsByName(machineName)) {
             throw new ConflictException("Machine name already exists: " + machineName);
         }
 
         MachineDefinition definition = new MachineDefinition(machineName, xmlPath.trim(), Instant.now());
-        machinesByName.put(machineName, definition);
 
         try {
             machineRepository.save(new MachineEntity(
@@ -77,18 +75,23 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
             ));
         }
         catch (DataIntegrityViolationException e) {
-            machinesByName.remove(machineName);
             throw new ConflictException("Machine name already exists: " + machineName);
         }
 
+        machinesByName.put(machineName, definition);
         return definition;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<MachineDefinition> listMachines() {
-        List<MachineDefinition> items = new ArrayList<>(machinesByName.values());
-        items.sort(Comparator.comparing(MachineDefinition::machineName));
+        List<MachineDefinition> items = machineRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
+                .map(entity -> new MachineDefinition(entity.getName(), entity.getXmlPath(), entity.getLoadedAt()))
+                .toList();
+
+        for (MachineDefinition item : items) {
+            machinesByName.putIfAbsent(item.machineName(), item);
+        }
         return List.copyOf(items);
     }
 
@@ -100,11 +103,6 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
         }
 
         String key = machineName.trim();
-        MachineDefinition inMemory = machinesByName.get(key);
-        if (inMemory != null) {
-            return inMemory;
-        }
-
         MachineEntity entity = machineRepository.findByName(key)
                 .orElseThrow(() -> new ResourceNotFoundException("Machine not found: " + key));
 
