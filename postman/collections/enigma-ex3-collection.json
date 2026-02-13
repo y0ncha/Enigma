@@ -67,9 +67,9 @@
                       "description": "The XML file to upload",
                       "key": "file",
                       "type": "file",
-                      "contentType": "text/xml",
+                      "contentType": "",
                       "src": [
-                        "{{xmlPathError}}"
+                        "postman-cloud:///1f108e8f-2f7f-4f90-9485-85f1f4599c16"
                       ]
                     }
                   ]
@@ -150,9 +150,9 @@
                       "description": "The XML file to upload",
                       "key": "file",
                       "type": "file",
-                      "contentType": "text/xml",
+                      "contentType": "",
                       "src": [
-                        "{{xmlPathSanitySmall}}"
+                        "postman-cloud:///1f108e8f-a7e9-42b0-9b83-235b0d554d85"
                       ]
                     }
                   ],
@@ -181,7 +181,7 @@
                 {
                   "listen": "test",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "dbc64e8d-fe0c-47b0-a420-88e605fbd572",
                     "exec": [
                       "const expectedName = \"paper-enigma\";",
                       "let jsonData;",
@@ -199,7 +199,22 @@
                       "        && jsonData.error.includes(\"Machine name already exists: \" + expectedName);",
                       "    pm.expect(loadedNow || alreadyLoaded).to.eql(true);",
                       "});"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "1dade89c-4a83-4ba8-a8a8-bcd913b3d75c",
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -220,7 +235,7 @@
                       "key": "file",
                       "type": "file",
                       "src": [
-                        "{{xmlPathSanityPaperEnigma}}"
+                        "postman-cloud:///1f108e90-3730-4db0-8a8b-77ab43cdd83c"
                       ]
                     }
                   ]
@@ -1119,9 +1134,9 @@
               "description": "The XML file to upload",
               "key": "file",
               "type": "file",
-              "contentType": "text/xml",
+              "contentType": "",
               "src": [
-                "{{xmlPathSanitySmall}}"
+                "postman-cloud:///1f108e8f-a7e9-42b0-9b83-235b0d554d85"
               ]
             }
           ],
