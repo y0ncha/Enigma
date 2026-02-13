@@ -1387,52 +1387,52 @@
   ],
   "variable": [
     {
-      "id": "b993bff8-69d7-4cfa-8419-a69cf424ecfa",
+      "id": "3f56bb32-7188-4db3-b876-1297f7e80666",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "42e0677f-5ed4-43ba-a5b5-34ce020a724c",
+      "id": "5e7a8dac-5139-4155-aa11-6de576766446",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "27a97ac0-8452-4c42-9687-16623e6afea6",
+      "id": "3f07ea44-3fb6-47a7-aeac-55b78ef0e8ca",
       "key": "machineNameSanity",
       "value": "sanity"
     },
     {
-      "id": "7fbc3885-9fe7-4e0c-9121-a2a90ac95da6",
+      "id": "70358f59-cd25-4e21-a437-e00500f576dd",
       "key": "activeMachineName",
       "value": "sanity"
     },
     {
-      "id": "3caf864a-4b29-4147-a8bb-fce38819f1da",
+      "id": "4fbe41f7-8395-4aad-8027-2d359efe21f7",
       "key": "machineNamePaper",
       "value": ""
     },
     {
-      "id": "9e7f3039-87ee-4d5d-a7a5-9068ba8e758c",
+      "id": "97e279d6-66ca-45dc-b22a-e5f8e11e8ef1",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "1ea0deed-9d58-42e4-9353-ddd7a896352a",
+      "id": "e1876143-7bba-422b-a155-8b05b2339c6e",
       "key": "createdSessionIdPaper",
       "value": ""
     },
     {
-      "id": "bba2afc5-53b9-4296-ba4e-7fdb38fd02ce",
+      "id": "72ccdf3d-b377-4cd4-870d-a20b60f1bb48",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "92614042-695c-40d8-9168-6b438b9dd00a",
+      "id": "ebe676f7-3489-49fa-abef-760afae3a0c7",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "0d274236-c6b5-4f4a-a221-603309743786",
+      "id": "34075e27-6cfc-46b1-949b-6bc3ff5e1836",
       "key": "deletedSessionId",
       "value": ""
     }

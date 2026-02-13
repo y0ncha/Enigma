@@ -163,7 +163,8 @@ public class SessionServiceImpl implements SessionService {
 
         SessionRuntime runtime = runtimeBySessionId.get(sessionId);
         if (runtime == null) {
-            SessionEntity persisted = sessionRepository.findById(sessionId)
+            SessionEntity persisted = sessionRepository
+                    .findById(sessionId)
                     .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
 
             if (SessionStatus.CLOSED.name().equals(persisted.getStatus())) {

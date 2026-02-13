@@ -38,19 +38,19 @@ public class ConfigurationController {
         return ApiContractMapper.configStatus(configurationService.currentState(parseSessionId(sessionID)), verbose);
     }
 
-    @PutMapping(value = "/manual", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(value = "/manual", consumes = MediaType.APPLICATION_JSON_VALUE)
     public String manual(@Valid @RequestBody ManualConfigApiRequest request) {
         configurationService.configureManual(parseSessionId(request.sessionID()), toCodeConfig(request));
         return "Manual code set successfully";
     }
 
-    @PutMapping(value = "/automatic", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping("/automatic")
     public String automatic(@RequestParam("sessionID") String sessionID) {
         configurationService.configureRandom(parseSessionId(sessionID));
         return "Automatic code setup completed successfully";
     }
 
-    @PutMapping(value = "/reset", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping("/reset")
     public String reset(@RequestParam("sessionID") String sessionID) {
         configurationService.reset(parseSessionId(sessionID));
         return "Automatic code setup completed successfully";
