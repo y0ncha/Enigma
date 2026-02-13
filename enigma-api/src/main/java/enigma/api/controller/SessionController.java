@@ -5,6 +5,7 @@ import enigma.api.dto.response.CreateSessionApiResponse;
 import enigma.api.dto.response.ResponseMapper;
 import enigma.api.dto.response.SessionResponse;
 import enigma.sessions.exception.ApiValidationException;
+import enigma.sessions.exception.ConflictException;
 import enigma.sessions.exception.ResourceNotFoundException;
 import enigma.sessions.service.SessionService;
 import jakarta.validation.Valid;
@@ -37,7 +38,7 @@ public class SessionController {
             return new CreateSessionApiResponse(sessionService.openSession(request.machine()).sessionId().toString());
         }
         catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException("Unknown machine name: " + request.machine());
+            throw new ConflictException("Unknown machine name: " + request.machine());
         }
     }
 

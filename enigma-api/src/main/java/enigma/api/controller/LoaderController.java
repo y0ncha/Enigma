@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,10 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 @RestController
 @RequestMapping("/load")
@@ -38,21 +32,20 @@ public class LoaderController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LoadMachineApiResponse> loadMachine(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<LoadMachineApiResponse> loadMachine(@RequestParam(value = "file", required = false) MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new LoadMachineApiResponse(false, null, "File not provided"));
         }
 
-        String xmlMachineName = null;
         try {
             Path uploaded = persistUpload(file);
-            xmlMachineName = extractMachineName(uploaded);
             String machineName = machineCatalogService.loadMachine(uploaded.toString()).machineName();
             return ResponseEntity.ok(new LoadMachineApiResponse(true, machineName, null));
         }
         catch (Exception e) {
-            return ResponseEntity.ok(new LoadMachineApiResponse(false, xmlMachineName, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new LoadMachineApiResponse(false, null, e.getMessage()));
         }
     }
 
@@ -73,29 +66,5 @@ public class LoaderController {
 
         Files.copy(file.getInputStream(), uploaded, StandardCopyOption.REPLACE_EXISTING);
         return uploaded;
-    }
-
-    private String extractMachineName(Path xmlPath) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setExpandEntityReferences(false);
-            factory.setXIncludeAware(false);
-            factory.setNamespaceAware(true);
-
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(xmlPath.toFile());
-            String rawName = document.getDocumentElement().getAttribute("name");
-            if (rawName == null) {
-                return null;
-            }
-
-            String normalized = rawName.trim();
-            return normalized.isEmpty() ? null : normalized;
-        }
-        catch (ParserConfigurationException | IOException | SAXException ignored) {
-            return null;
-        }
     }
 }

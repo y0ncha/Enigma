@@ -3,7 +3,6 @@ package enigma.api.dto.response;
 import enigma.sessions.model.ConfigEventView;
 import enigma.sessions.model.HistoryView;
 import enigma.sessions.model.MachineDefinition;
-import enigma.sessions.model.ProcessOutcome;
 import enigma.sessions.model.ProcessRecordView;
 import enigma.sessions.model.SessionView;
 import enigma.shared.state.CodeState;
@@ -37,17 +36,6 @@ public final class ResponseMapper {
                 machineState.stringsProcessed(),
                 stateToText(machineState.ogCodeState()),
                 stateToText(machineState.curCodeState())
-        );
-    }
-
-    public static ProcessResponse process(ProcessOutcome processOutcome) {
-        return new ProcessResponse(
-                processOutcome.sessionId(),
-                processOutcome.machineName(),
-                processOutcome.input(),
-                processOutcome.output(),
-                processOutcome.durationNanos(),
-                machineState(processOutcome.machineState())
         );
     }
 

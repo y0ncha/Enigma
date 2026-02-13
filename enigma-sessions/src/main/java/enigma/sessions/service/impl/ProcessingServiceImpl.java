@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -33,7 +34,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         if (input == null) {
             throw new ApiValidationException("input must be provided");
         }
-        String normalizedInput = input.trim();
+        String normalizedInput = input.trim().toUpperCase(Locale.ROOT);
 
         SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
 

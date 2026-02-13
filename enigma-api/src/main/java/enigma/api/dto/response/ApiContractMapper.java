@@ -6,6 +6,7 @@ import enigma.sessions.model.ProcessOutcome;
 import enigma.sessions.model.ProcessRecordView;
 import enigma.shared.state.CodeState;
 import enigma.shared.state.MachineState;
+import enigma.shared.utils.CodeStateCompactFormatter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,15 +31,15 @@ public final class ApiContractMapper {
                 state.stringsProcessed(),
                 originalCode,
                 currentCode,
-                compact(state.ogCodeState()),
-                compact(state.curCodeState())
+                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
+                CodeStateCompactFormatter.currentRotorsPositionCompact(state.curCodeState())
         );
     }
 
     public static ProcessApiResponse process(ProcessOutcome outcome) {
         return new ProcessApiResponse(
                 outcome.output(),
-                compact(outcome.machineState().curCodeState())
+                CodeStateCompactFormatter.currentRotorsPositionCompact(outcome.machineState().curCodeState())
         );
     }
 
@@ -66,13 +67,6 @@ public final class ApiContractMapper {
         }
 
         return grouped;
-    }
-
-    private static String compact(CodeState codeState) {
-        if (codeState == null || codeState == CodeState.NOT_CONFIGURED) {
-            return NOT_CONFIGURED;
-        }
-        return codeState.toString();
     }
 
     private static EnigmaCodeStructureResponse codeStructure(CodeState codeState) {

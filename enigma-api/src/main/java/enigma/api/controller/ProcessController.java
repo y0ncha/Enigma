@@ -28,13 +28,8 @@ public class ProcessController {
     }
 
     @PostMapping
-    public ProcessApiResponse process(@RequestParam("input") String input,
-                                      @RequestParam(name = "sessionID", required = false) String sessionID) {
-        UUID resolvedSessionId = sessionID == null || sessionID.isBlank()
-                ? latestOpenSessionId()
-                : parseSessionId(sessionID);
-
-        return ApiContractMapper.process(processingService.process(resolvedSessionId, input));
+    public ProcessApiResponse process(@RequestParam("input") String input) {
+        return ApiContractMapper.process(processingService.process(latestOpenSessionId(), input));
     }
 
     private UUID latestOpenSessionId() {
@@ -43,14 +38,5 @@ public class ProcessController {
                 .max(Comparator.comparing(session -> session.openedAt()))
                 .map(session -> session.sessionId())
                 .orElseThrow(() -> new ApiValidationException("No open session available"));
-    }
-
-    private UUID parseSessionId(String sessionID) {
-        try {
-            return UUID.fromString(sessionID.trim());
-        }
-        catch (IllegalArgumentException e) {
-            throw new ApiValidationException("Invalid sessionID: " + sessionID);
-        }
     }
 }

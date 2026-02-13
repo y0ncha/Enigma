@@ -569,11 +569,15 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "const candidate = pm.collectionVariables.get(\"createdSessionIdSmall\")",
-                      "    || pm.collectionVariables.get(\"createdSessionIdPaper\")",
-                      "    || pm.collectionVariables.get(\"createdSessionId\");",
+                      "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\") || \"\";",
+                      "const candidates = [",
+                      "    pm.collectionVariables.get(\"createdSessionIdSmall\"),",
+                      "    pm.collectionVariables.get(\"createdSessionIdPaper\"),",
+                      "    pm.collectionVariables.get(\"createdSessionId\")",
+                      "].filter(Boolean);",
+                      "const candidate = candidates.find(id => id !== activeSessionId);",
                       "if (!candidate) {",
-                      "    throw new Error(\"No session ID found to delete. Run a successful create session first.\");",
+                      "    throw new Error(\"No non-active session ID found to delete. Create an additional session first.\");",
                       "}",
                       "pm.collectionVariables.set(\"sessionIdToDelete\", candidate);"
                     ]
@@ -587,7 +591,11 @@
                       "pm.test(\"Status code is 204 for existing session deletion\", function () {",
                       "    pm.response.to.have.status(204);",
                       "});",
-                      "pm.collectionVariables.set(\"deletedSessionId\", pm.collectionVariables.get(\"sessionIdToDelete\") || \"\");",
+                      "const deleted = pm.collectionVariables.get(\"sessionIdToDelete\") || \"\";",
+                      "pm.collectionVariables.set(\"deletedSessionId\", deleted);",
+                      "if (pm.collectionVariables.get(\"createdSessionIdSmall\") === deleted) { pm.collectionVariables.unset(\"createdSessionIdSmall\"); }",
+                      "if (pm.collectionVariables.get(\"createdSessionIdPaper\") === deleted) { pm.collectionVariables.unset(\"createdSessionIdPaper\"); }",
+                      "if (pm.collectionVariables.get(\"createdSessionId\") === deleted) { pm.collectionVariables.unset(\"createdSessionId\"); }",
                       "pm.collectionVariables.unset(\"sessionIdToDelete\");"
                     ]
                   }
@@ -759,19 +767,22 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "c5546b56-0b0d-40bc-866b-efccd1360957",
                     "exec": [
                       "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\");",
                       "if (!activeSessionId) {",
                       "    throw new Error(\"activeSessionId is missing. Create a session first.\");",
                       "}"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 },
                 {
                   "listen": "test",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "40599603-8bf1-418e-b96e-6c6a221b45ae",
                     "exec": [
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
@@ -782,7 +793,10 @@
                       "    pm.expect(jsonData.totalReflectors).to.be.a(\"number\");",
                       "    pm.expect(jsonData.totalProcessedMessages).to.be.a(\"number\");",
                       "});"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -796,7 +810,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/enigma/config?sessionID={{activeSessionId}}&verbose=false",
+                  "raw": "{{baseUrl}}/enigma/config?sessionID={{activeSessionId}}&verbose=true",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -808,12 +822,14 @@
                     {
                       "key": "sessionID",
                       "value": "{{activeSessionId}}",
-                      "description": "The active session identifier."
+                      "description": "The active session identifier.",
+                      "uuid": "9179e608-be4e-4033-92d5-d0b70a4a8a81"
                     },
                     {
                       "key": "verbose",
-                      "value": "false",
-                      "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n"
+                      "value": "true",
+                      "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n",
+                      "uuid": "338619ea-2671-47f2-8ed3-4742c564a306"
                     }
                   ]
                 },
@@ -832,7 +848,7 @@
                       }
                     ],
                     "url": {
-                      "raw": "{{baseUrl}}/enigma/config?sessionID=string&verbose=false",
+                      "raw": "{{baseUrl}}/enigma/config?sessionID=string&verbose=true",
                       "host": [
                         "{{baseUrl}}"
                       ],
@@ -842,14 +858,16 @@
                       ],
                       "query": [
                         {
-                          "description": "The active session identifier.",
                           "key": "sessionID",
-                          "value": "string"
+                          "value": "string",
+                          "description": "The active session identifier.",
+                          "uuid": "c2001110-69c0-4a46-b85e-24293bcffba0"
                         },
                         {
-                          "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n",
                           "key": "verbose",
-                          "value": "false"
+                          "value": "true",
+                          "description": "If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.\nDefault: false.\n",
+                          "uuid": "60128265-7ac1-42fb-bcf2-170d8d8c4f91"
                         }
                       ]
                     }
@@ -1360,7 +1378,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/enigma/process?input={{processInput}}",
+                  "raw": "{{baseUrl}}/enigma/process?input={{processInput}}&sessionID={{activeSessionId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1374,6 +1392,11 @@
                       "value": "{{processInput}}",
                       "description": "The text to process.",
                       "uuid": "18e20288-1def-4a80-90d9-a25a4cc45e7b"
+                    },
+                    {
+                      "key": "sessionID",
+                      "value": "{{activeSessionId}}",
+                      "description": "The active session identifier."
                     }
                   ]
                 },
@@ -1435,7 +1458,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "2db1cece-6531-451b-a09f-f244715f116e",
                     "exec": [
                       "const mode = (pm.collectionVariables.get(\"historyMode\") || \"machine\").toLowerCase();",
                       "const activeSessionId = pm.collectionVariables.get(\"activeSessionId\") || \"\";",
@@ -1456,13 +1479,16 @@
                       "    pm.collectionVariables.set(\"historySessionId\", \"\");",
                       "    pm.collectionVariables.set(\"historyMachineName\", activeMachineName);",
                       "}"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 },
                 {
                   "listen": "test",
                   "script": {
-                    "type": "text/javascript",
+                    "id": "5665cbf7-83a5-4779-9acf-0fe4f7a7e5b5",
                     "exec": [
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
@@ -1471,7 +1497,10 @@
                       "pm.test(\"History response is JSON object\", function () {",
                       "    pm.expect(jsonData).to.be.an(\"object\");",
                       "});"
-                    ]
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -1485,7 +1514,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/enigma/history?sessionID={{historySessionId}}&machineName={{historyMachineName}}",
+                  "raw": "{{baseUrl}}/enigma/history?machineName={{historyMachineName}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1495,14 +1524,10 @@
                   ],
                   "query": [
                     {
-                      "key": "sessionID",
-                      "value": "{{historySessionId}}",
-                      "description": "Session identifier.\nWhen provided, history is returned only for this session.\n"
-                    },
-                    {
                       "key": "machineName",
                       "value": "{{historyMachineName}}",
-                      "description": "Machine name.\nWhen provided, history is returned across all sessions of this machine.\n"
+                      "description": "Machine name.\nWhen provided, history is returned across all sessions of this machine.\n",
+                      "uuid": "58e8b51f-df2f-4021-8a91-f34a886dd7d9"
                     }
                   ]
                 },
@@ -1612,70 +1637,75 @@
   ],
   "variable": [
     {
-      "id": "75ffbfdb-708a-427d-bebf-811458f28395",
+      "id": "6ab4ba5f-dd14-4ed1-90de-bc9e1d90cd24",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "6e78080d-b909-406c-b7b9-2f8767d2d5cf",
+      "id": "d0b1f76e-2eec-4137-80b5-7aa53a0ec848",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "653d532f-c6e8-4909-bf20-57dabd8fc1e8",
+      "id": "317394db-d71b-41d8-9dbf-1354f89faa45",
       "key": "machineNameSanity",
       "value": "sanity"
     },
     {
-      "id": "5ff42fd2-969c-431f-9a56-9f942c1b6b84",
+      "id": "6b1883eb-740b-41c5-bd92-c0a759fae49c",
       "key": "activeMachineName",
       "value": "sanity"
     },
     {
-      "id": "fe2e0bcf-3c36-48ea-ae02-fffc69c0088c",
+      "id": "efc8d389-0afe-49e1-96ae-5c7c827fed18",
       "key": "machineNamePaper",
       "value": ""
     },
     {
-      "id": "6ca26508-82a8-4afd-b5d3-190e531f9400",
+      "id": "b3627d85-3d68-4cd6-b48e-64a781db640f",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "38ad1866-1454-42be-aaf0-546b31b11baa",
-      "key": "createdSessionIdPaper",
-      "value": ""
-    },
-    {
-      "id": "2ef7166d-da93-424e-a4cb-9ae4c2515707",
+      "id": "4c136974-bbeb-48ca-9a3c-69d69e384968",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "84867dc7-655d-45ae-abd6-a83fa74a300d",
+      "id": "57c13c1f-916f-4ea2-bf0a-646338ee21e6",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "e14fdb7b-4c22-4e9b-90de-8b7ca56e81be",
+      "id": "5ece735f-63c1-4041-af0b-939195f49159",
       "key": "deletedSessionId",
       "value": ""
     },
     {
-      "id": "11e7c8e8-6a24-46f9-896b-df313ba79ea5",
+      "id": "3201117b-215b-4144-9ab1-b71ccb05e385",
       "key": "historySessionId",
       "value": ""
     },
     {
-      "id": "d0e32e10-5926-4130-a19a-2cc91e2aacd8",
+      "id": "8510a885-a604-4d24-8974-81b1246a063f",
       "key": "historyMachineName",
       "value": ""
     },
     {
-      "id": "a3745272-b88c-42a9-8f9f-c46333427343",
+      "id": "655886f2-76f9-4a8f-a7c6-f3aa1f3b868c",
       "key": "processInput",
       "value": "",
       "type": "default"
+    },
+    {
+      "id": "cf9fd077-60d2-43d0-8ea9-b4fc9598d551",
+      "key": "lastProcessOutput",
+      "value": ""
+    },
+    {
+      "id": "b050cfad-4703-404b-850e-5bbb7760afdb",
+      "key": "createdSessionIdPaper",
+      "value": ""
     }
   ]
 }

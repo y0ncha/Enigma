@@ -9,6 +9,7 @@ import enigma.sessions.service.ConfigurationService;
 import enigma.sessions.service.SessionService;
 import enigma.shared.dto.config.CodeConfig;
 import enigma.shared.state.MachineState;
+import enigma.shared.utils.CodeStateCompactFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +61,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 runtime.sessionId(),
                 runtime.machineName(),
                 ACTION_MANUAL,
-                config.toString(),
+                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
                 Instant.now()));
 
         return state;
@@ -77,7 +78,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             state = runtime.engine().machineData();
         }
 
-        String payload = state.ogCodeState() == null ? "<not configured>" : state.ogCodeState().toString();
+        String payload = CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState());
         configurationEventRepository.save(new ConfigurationEventEntity(
                 runtime.sessionId(),
                 runtime.machineName(),
@@ -103,7 +104,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 runtime.sessionId(),
                 runtime.machineName(),
                 ACTION_RESET,
-                "RESET_TO_ORIGINAL",
+                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
                 Instant.now()));
 
         return state;
