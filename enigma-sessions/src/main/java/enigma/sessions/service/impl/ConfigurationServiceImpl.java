@@ -2,6 +2,7 @@ package enigma.sessions.service.impl;
 
 import enigma.dal.entity.ConfigurationEventEntity;
 import enigma.dal.repository.ConfigurationEventRepository;
+import enigma.engine.exception.InvalidConfigurationException;
 import enigma.sessions.model.SessionRuntime;
 import enigma.sessions.service.ConfigurationService;
 import enigma.sessions.service.SessionService;
@@ -41,22 +42,27 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     @Transactional
     public MachineState configureManual(UUID sessionId, CodeConfig config) {
-        SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
+        try {
+            SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
 
-        MachineState state;
-        synchronized (runtime.lock()) {
-            runtime.engine().configManual(config);
-            state = runtime.engine().machineData();
+            MachineState state;
+            synchronized (runtime.lock()) {
+                runtime.engine().configManual(config);
+                state = runtime.engine().machineData();
+            }
+
+            configurationEventRepository.save(new ConfigurationEventEntity(
+                    runtime.sessionId(),
+                    runtime.machineName(),
+                    ACTION_MANUAL,
+                    config.toString(),
+                    Instant.now()));
+
+            return state;
         }
-
-        configurationEventRepository.save(new ConfigurationEventEntity(
-                runtime.sessionId(),
-                runtime.machineName(),
-                ACTION_MANUAL,
-                config.toString(),
-                Instant.now()));
-
-        return state;
+        catch (Exception e) {
+            throw new IllegalArgumentException("Invalid configuration: " + e.getMessage(), e);
+        }
     }
 
     @Override
