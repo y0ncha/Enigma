@@ -35,6 +35,7 @@ public class LoaderXml implements Loader {
 
     private static final List<String> ROMAN_ORDER = List.of("I", "II", "III", "IV", "V");
     private int rotorsInUse;
+    private String machineName;
 
     /**
      * Create loader expecting specified rotor count.
@@ -49,6 +50,7 @@ public class LoaderXml implements Loader {
         BTEEnigma root = loadRoot(filePath);
 
         rotorsInUse = extractRotorsInUse(root);
+        machineName = validateMachineName(root.getName());
 
         Alphabet alphabet = extractAlphabet(root);
 
@@ -57,7 +59,7 @@ public class LoaderXml implements Loader {
         Map<String, ReflectorSpec> reflectors = extractReflectors(root, alphabet);
 
         // Build MachineSpec including rotorsInUse so callers can derive required rotor count
-        return new MachineSpec(alphabet, rotors, reflectors, rotorsInUse);
+        return new MachineSpec(alphabet, rotors, reflectors, rotorsInUse, machineName);
     }
 
     /**
@@ -108,14 +110,18 @@ public class LoaderXml implements Loader {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
             // Load schema from classpath
-            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex3.xsd");
             if (schemaStream == null) {
                 // Fallback: try loading from URL if available
-                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex3.xsd");
+                if (schemaUrl == null) {
+                    schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                }
                 if (schemaUrl != null) {
                     return schemaFactory.newSchema(schemaUrl);
                 }
-                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex2.xsd in classpath. Validation skipped.");
+                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex3.xsd in classpath. Validation skipped.");
                 return null;
             }
 
@@ -124,6 +130,23 @@ public class LoaderXml implements Loader {
             System.err.println("Warning: Unable to load XSD schema: " + e.getMessage() + ". Validation skipped.");
             return null;
         }
+    }
+
+    /**
+     * Validate and normalize machine name from XML (Exercise 3).
+     *
+     * @param rawName name as read from XML
+     * @return trimmed non-empty machine name
+     */
+    private String validateMachineName(String rawName) throws EnigmaLoadingException {
+        if (rawName == null) {
+            throw new EnigmaLoadingException("Machine name is missing (BTE-Enigma@name)");
+        }
+        String clean = rawName.trim();
+        if (clean.isEmpty()) {
+            throw new EnigmaLoadingException("Machine name is empty (BTE-Enigma@name)");
+        }
+        return clean;
     }
 
     /**

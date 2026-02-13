@@ -53,6 +53,8 @@ public class BTEEnigma {
     protected BTEReflectors bteReflectors;
     @XmlAttribute(name = "rotors-count", required = true)
     protected BigInteger rotorsCount;
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
 
     /**
      * Gets the value of the abc property.
@@ -148,6 +150,24 @@ public class BTEEnigma {
      */
     public void setRotorsCount(BigInteger value) {
         this.rotorsCount = value;
+    }
+
+    /**
+     * Gets the value of the name property.
+     *
+     * @return possible object is {@link String}
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the value of the name property.
+     *
+     * @param value allowed object is {@link String}
+     */
+    public void setName(String value) {
+        this.name = value;
     }
 
 }

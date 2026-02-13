@@ -43,7 +43,8 @@ public record MachineSpec(
         Alphabet alphabet,
         Map<Integer, RotorSpec> rotorsById,
         Map<String, ReflectorSpec> reflectorsById,
-        int rotorsInUse
+        int rotorsInUse,
+        String machineName
 ) {
 
     /**
@@ -81,6 +82,7 @@ public record MachineSpec(
 
         StringBuilder sb = new StringBuilder();
         sb.append("MachineSpec:\n");
+        sb.append("  Machine name: ").append(machineName == null ? "<none>" : machineName).append("\n");
         sb.append("  Alphabet: ").append(letters == null ? "<none>" : letters).append("\n");
         sb.append("  Alphabet size: ").append(alphaSize).append("\n");
         sb.append("  Rotors-in-use: ").append(rotorsInUse).append("\n");
@@ -144,6 +146,15 @@ public record MachineSpec(
      */
     public String getAlphabet() {
         return alphabet.letters();
+    }
+
+    /**
+     * Returns the machine name loaded from XML (Exercise 3).
+     *
+     * @return machine name
+     */
+    public String getMachineName() {
+        return machineName;
     }
 
 }
