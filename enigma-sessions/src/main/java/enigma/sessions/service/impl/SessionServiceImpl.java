@@ -12,6 +12,8 @@ import enigma.sessions.model.SessionStatus;
 import enigma.sessions.model.SessionView;
 import enigma.sessions.service.MachineCatalogService;
 import enigma.sessions.service.SessionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SessionServiceImpl implements SessionService {
 
+    private static final Logger log = LoggerFactory.getLogger(SessionServiceImpl.class);
+
     private final MachineCatalogService machineCatalogService;
     private final SessionRepository sessionRepository;
     private final Map<UUID, SessionRuntime> runtimeBySessionId;
@@ -40,6 +44,7 @@ public class SessionServiceImpl implements SessionService {
     @PostConstruct
     @Transactional
     void closeDanglingSessions() {
+        log.info("Scanning for dangling open sessions at startup");
         List<SessionEntity> allSessions = sessionRepository.findAll();
         Instant now = Instant.now();
         boolean changed = false;
@@ -54,12 +59,14 @@ public class SessionServiceImpl implements SessionService {
 
         if (changed) {
             sessionRepository.saveAll(allSessions);
+            log.info("Closed dangling sessions at startup");
         }
     }
 
     @Override
     @Transactional
     public SessionView openSession(String machineName) {
+        log.info("Opening session for machine={}", machineName);
         MachineDefinition machineDefinition = machineCatalogService.resolveMachine(machineName);
 
         EngineImpl engine = new EngineImpl();
@@ -67,6 +74,7 @@ public class SessionServiceImpl implements SessionService {
             engine.loadMachine(machineDefinition.xmlPath());
         }
         catch (Exception e) {
+            log.error("Failed to initialize session for machine={}", machineDefinition.machineName(), e);
             throw new ApiValidationException("Unable to initialize session for machine '"
                     + machineDefinition.machineName() + "': " + e.getMessage(), e);
         }
@@ -90,6 +98,7 @@ public class SessionServiceImpl implements SessionService {
                 persisted.getOpenedAt());
 
         runtimeBySessionId.put(persisted.getId(), runtime);
+        log.info("Session opened successfully sessionId={} machine={}", persisted.getId(), persisted.getMachineName());
         return toView(runtime);
     }
 
@@ -99,6 +108,7 @@ public class SessionServiceImpl implements SessionService {
         if (sessionId == null) {
             throw new ApiValidationException("sessionId must be provided");
         }
+        log.info("Closing session sessionId={}", sessionId);
 
         SessionEntity entity = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Session not found: " + sessionId));
@@ -117,6 +127,7 @@ public class SessionServiceImpl implements SessionService {
             runtime.markClosed(closedAt);
         }
 
+        log.info("Session closed sessionId={}", sessionId);
         return toView(updated);
     }
 
