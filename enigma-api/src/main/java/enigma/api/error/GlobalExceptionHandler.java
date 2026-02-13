@@ -15,6 +15,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,6 +51,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<SimpleErrorResponse> conflict(ConflictException exception) {
         return build(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<SimpleErrorResponse> unsupportedMediaType(HttpMediaTypeNotSupportedException exception) {
+        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
