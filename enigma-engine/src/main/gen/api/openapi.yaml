@@ -1,0 +1,655 @@
+openapi: 3.0.3
+info:
+  description: |
+    API for the Enigma project.
+    - Base URL: http://localhost:8080
+    - No authentication or authorization required
+    - All endpoints are prefixed with `/enigma`
+  title: Enigma API
+  version: 0.1.0
+servers:
+- description: Local development server
+  url: http://localhost:8080
+tags:
+- description: Enigma-related endpoints
+  name: Enigma
+paths:
+  /enigma/load:
+    post:
+      description: |
+        Upload an XML file representing the Enigma machine configuration.
+        The server parses and loads the machine definition.
+      operationId: loadMachineFromXml
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/loadMachineFromXml_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loadMachineFromXml_200_response'
+          description: Load result
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loadMachineFromXml_400_response'
+          description: Invalid or missing file
+      summary: Load machine configuration from an XML file
+      tags:
+      - Enigma
+      x-content-type: multipart/form-data
+      x-accepts:
+      - application/json
+  /enigma/session:
+    delete:
+      description: Deletes the session identified by the given sessionID.
+      operationId: deleteSession
+      parameters:
+      - description: The session identifier to delete.
+        explode: true
+        in: query
+        name: sessionID
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "204":
+          description: Session deleted successfully.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteSession_404_response'
+          description: Session not found.
+      summary: Delete a session
+      tags:
+      - Enigma
+      x-accepts:
+      - application/json
+    post:
+      description: |
+        Creates a new session for the given machine name.
+        The machine name must match a machine previously loaded into the system.
+      operationId: createSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createSession_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createSession_200_response'
+          description: Session was created successfully.
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createSession_409_response'
+          description: Conflict - unknown machine name
+      summary: Create a session for a machine
+      tags:
+      - Enigma
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /enigma/config:
+    get:
+      description: |
+        Returns the current status and configuration details of the loaded Enigma machine.
+
+        The optional `verbose` query parameter controls how much detail is returned:
+        - When `verbose=true`, the response includes `originalCode` and `currentRotorsPosition`.
+        - When `verbose=false` or not provided (default), these attributes are omitted.
+      operationId: getCurrentMachineStatus
+      parameters:
+      - description: The active session identifier.
+        explode: true
+        in: query
+        name: sessionID
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: |
+          If true, include detailed code structures (`originalCode` and `currentRotorsPosition`) in the response.
+          Default: false.
+        explode: true
+        in: query
+        name: verbose
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCurrentMachineStatus_200_response'
+          description: Current configuration
+      summary: Get current machine status
+      tags:
+      - Enigma
+      x-accepts:
+      - application/json
+  /enigma/config/manual:
+    put:
+      description: "Manually set the machine's secret code rotor selection and positions,\
+        \ reflector, and optional plugboard connections."
+      operationId: setManualCodeSelection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/enigmaManualConfigRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                example: Manual code set successfully
+                type: string
+          description: Operation result as a plain string
+      summary: Manual code selection
+      tags:
+      - Enigma
+      x-content-type: application/json
+      x-accepts:
+      - text/plain
+  /enigma/config/automatic:
+    put:
+      description: Automatically generates and applies a random valid Enigma code
+        setup.
+      operationId: setAutomaticCodeSetup
+      parameters:
+      - description: The active session identifier.
+        explode: true
+        in: query
+        name: sessionID
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                example: Automatic code setup completed successfully
+                type: string
+          description: Operation result as a plain string
+      summary: Automatic code setup
+      tags:
+      - Enigma
+      x-accepts:
+      - text/plain
+  /enigma/config/reset:
+    put:
+      description: Resets the current machine configuration back to the original loaded
+        code and returns it.
+      operationId: resetToOriginalCode
+      parameters:
+      - description: The active session identifier.
+        explode: true
+        in: query
+        name: sessionID
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                example: Automatic code setup completed successfully
+                type: string
+          description: Original code after reset
+      summary: Reset to original code
+      tags:
+      - Enigma
+      x-accepts:
+      - text/plain
+  /enigma/process:
+    post:
+      description: |
+        Encrypts/decrypts the provided input using the current machine state.
+        This operation advances rotor positions (stateful).
+      operationId: processInput
+      parameters:
+      - description: The text to process.
+        explode: true
+        in: query
+        name: input
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/processInput_200_response'
+          description: Process result
+      summary: Process input through the Enigma machine
+      tags:
+      - Enigma
+      x-accepts:
+      - application/json
+  /enigma/history:
+    get:
+      description: |
+        Returns processing history based on either a specific session or an entire machine.
+
+        Exactly **one** of the following query parameters must be provided:
+        - `sessionID` – returns history for a single session
+        - `machineName` – returns history across all sessions of the given machine
+
+        Providing both parameters or none at all is invalid.
+      operationId: getMachineHistory
+      parameters:
+      - description: |
+          Session identifier.
+          When provided, history is returned only for this session.
+        explode: true
+        in: query
+        name: sessionID
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |
+          Machine name.
+          When provided, history is returned across all sessions of this machine.
+        explode: true
+        in: query
+        name: machineName
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  items:
+                    $ref: '#/components/schemas/HistoryEntry'
+                  type: array
+                type: object
+          description: History grouped by code description
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getMachineHistory_400_response'
+          description: Invalid request – exactly one query parameter must be provided
+      summary: Get machine history
+      tags:
+      - Enigma
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    enigmaManualConfigRequest:
+      allOf:
+      - properties:
+          sessionID:
+            description: The active session identifier.
+            example: sess_3f2a9c1d
+            type: string
+        required:
+        - sessionID
+        type: object
+      - $ref: '#/components/schemas/enigmaCodeStructureManual'
+    enigmaCodeStructure:
+      additionalProperties: false
+      example:
+        rotors:
+        - notchDistance: 5
+          rotorNumber: 2
+          rotorPosition: A
+        - notchDistance: 5
+          rotorNumber: 2
+          rotorPosition: A
+        reflector: B
+        plugs:
+        - plug2: Z
+          plug1: A
+        - plug2: Z
+          plug1: A
+      properties:
+        rotors:
+          description: Ordered rotor selection with initial positions. Each rotor
+            includes its notch distance.
+          items:
+            $ref: '#/components/schemas/RotorSelectionWithNotch'
+          minItems: 1
+          type: array
+        reflector:
+          description: "Reflector identifier (e.g., \"A\", \"B\", \"C\")."
+          example: B
+          type: string
+        plugs:
+          description: Optional plugboard connections (each connects two single characters).
+          items:
+            $ref: '#/components/schemas/PlugConnection'
+          type: array
+      required:
+      - reflector
+      - rotors
+      type: object
+    enigmaCodeStructureManual:
+      additionalProperties: false
+      properties:
+        rotors:
+          description: Ordered rotor selection with initial positions (no notch distance
+            in manual setup).
+          items:
+            $ref: '#/components/schemas/RotorSelection'
+          minItems: 1
+          type: array
+        reflector:
+          description: "Reflector identifier (e.g., \"A\", \"B\", \"C\")."
+          example: B
+          type: string
+        plugs:
+          description: Optional plugboard connections (each connects two single characters).
+          items:
+            $ref: '#/components/schemas/PlugConnection'
+          type: array
+      required:
+      - reflector
+      - rotors
+      type: object
+    RotorSelection:
+      properties:
+        rotorNumber:
+          description: Rotor identifier/ordinal in the machine catalog.
+          example: 2
+          type: integer
+        rotorPosition:
+          description: Single-character initial position for this rotor.
+          example: A
+          maxLength: 1
+          minLength: 1
+          type: string
+      required:
+      - rotorNumber
+      - rotorPosition
+      type: object
+    RotorSelectionWithNotch:
+      allOf:
+      - $ref: '#/components/schemas/RotorSelection'
+      - properties:
+          notchDistance:
+            description: Distance (in steps) from the current rotor position to the
+              notch.
+            example: 5
+            type: number
+        required:
+        - notchDistance
+        type: object
+      example:
+        notchDistance: 5
+        rotorNumber: 2
+        rotorPosition: A
+      type: object
+    PlugConnection:
+      example:
+        plug2: Z
+        plug1: A
+      properties:
+        plug1:
+          description: First plug endpoint.
+          example: A
+          maxLength: 1
+          minLength: 1
+          type: string
+        plug2:
+          description: Second plug endpoint.
+          example: Z
+          maxLength: 1
+          minLength: 1
+          type: string
+      required:
+      - plug1
+      - plug2
+      type: object
+    HistoryEntry:
+      properties:
+        input:
+          example: HELLO
+          type: string
+        output:
+          example: XQFJM
+          type: string
+        duration:
+          example: 12
+          type: integer
+      required:
+      - duration
+      - input
+      - output
+      type: object
+    loadMachineFromXml_request:
+      properties:
+        file:
+          description: The XML file to upload
+          format: binary
+          type: string
+      required:
+      - file
+      type: object
+    loadMachineFromXml_200_response:
+      example:
+        success: true
+        name: Enigma-M1
+        error: Invalid XML structure
+      properties:
+        success:
+          example: true
+          type: boolean
+        name:
+          description: The machine name loaded from the XML.
+          example: Enigma-M1
+          type: string
+        error:
+          description: Error message (present only if success=false)
+          example: Invalid XML structure
+          nullable: true
+          type: string
+      required:
+      - name
+      - success
+      type: object
+    loadMachineFromXml_400_response:
+      example:
+        success: false
+        error: File not provided
+      properties:
+        success:
+          example: false
+          type: boolean
+        error:
+          example: File not provided
+          type: string
+      type: object
+    createSession_request:
+      properties:
+        machine:
+          description: The machine name.
+          example: Enigma-M1
+          type: string
+      required:
+      - machine
+      type: object
+    createSession_200_response:
+      example:
+        sessionID: sess_3f2a9c1d
+      properties:
+        sessionID:
+          description: The created session identifier.
+          example: sess_3f2a9c1d
+          type: string
+      required:
+      - sessionID
+      type: object
+    createSession_409_response:
+      example:
+        error: "Unknown machine name: Enigma-M1"
+      properties:
+        error:
+          example: "Unknown machine name: Enigma-M1"
+          type: string
+      required:
+      - error
+      type: object
+    deleteSession_404_response:
+      example:
+        error: "Unknown sessionID: sess_3f2a9c1d"
+      properties:
+        error:
+          example: "Unknown sessionID: sess_3f2a9c1d"
+          type: string
+      required:
+      - error
+      type: object
+    getCurrentMachineStatus_200_response_oneOf:
+      description: Verbose mode (true) – includes detailed code structures
+      example:
+        totalRotors: 5
+        totalReflectors: 3
+        currentRotorsPositionCompact: 1-B | 2-C | 3-D
+        originalCode:
+          rotors:
+          - notchDistance: 5
+            rotorNumber: 2
+            rotorPosition: A
+          - notchDistance: 5
+            rotorNumber: 2
+            rotorPosition: A
+          reflector: B
+          plugs:
+          - plug2: Z
+            plug1: A
+          - plug2: Z
+            plug1: A
+        totalProcessedMessages: 12
+        currentRotorsPosition:
+          rotors:
+          - notchDistance: 5
+            rotorNumber: 2
+            rotorPosition: A
+          - notchDistance: 5
+            rotorNumber: 2
+            rotorPosition: A
+          reflector: B
+          plugs:
+          - plug2: Z
+            plug1: A
+          - plug2: Z
+            plug1: A
+        originalCodeCompact: "1-A | 2-B | 3-C | R:B | P:A-Z,B-Y"
+      properties:
+        totalRotors:
+          example: 5
+          type: integer
+        totalReflectors:
+          example: 3
+          type: integer
+        totalProcessedMessages:
+          example: 12
+          type: integer
+        originalCode:
+          $ref: '#/components/schemas/enigmaCodeStructure'
+        currentRotorsPosition:
+          $ref: '#/components/schemas/enigmaCodeStructure'
+        originalCodeCompact:
+          description: Compact string representation of the original code.
+          example: "1-A | 2-B | 3-C | R:B | P:A-Z,B-Y"
+          type: string
+        currentRotorsPositionCompact:
+          description: Compact string representation of the current rotors position.
+          example: 1-B | 2-C | 3-D
+          type: string
+      required:
+      - currentRotorsPosition
+      - currentRotorsPositionCompact
+      - originalCode
+      - originalCodeCompact
+      - totalProcessedMessages
+      - totalReflectors
+      - totalRotors
+      type: object
+    getCurrentMachineStatus_200_response_oneOf_1:
+      description: Non-verbose mode (false or default) – compact only
+      properties:
+        totalRotors:
+          example: 5
+          type: integer
+        totalReflectors:
+          example: 3
+          type: integer
+        totalProcessedMessages:
+          example: 12
+          type: integer
+        originalCodeCompact:
+          description: Compact string representation of the original code.
+          example: "1-A | 2-B | 3-C | R:B | P:A-Z,B-Y"
+          type: string
+        currentRotorsPositionCompact:
+          description: Compact string representation of the current rotors position.
+          example: 1-B | 2-C | 3-D
+          type: string
+      required:
+      - currentRotorsPositionCompact
+      - originalCodeCompact
+      - totalProcessedMessages
+      - totalReflectors
+      - totalRotors
+      type: object
+    getCurrentMachineStatus_200_response:
+      oneOf:
+      - $ref: '#/components/schemas/getCurrentMachineStatus_200_response_oneOf'
+      - $ref: '#/components/schemas/getCurrentMachineStatus_200_response_oneOf_1'
+    processInput_200_response:
+      example:
+        output: QWERTY
+        currentRotorsPositionCompact: B2-C5-D1
+      properties:
+        output:
+          example: QWERTY
+          type: string
+        currentRotorsPositionCompact:
+          example: B2-C5-D1
+          type: string
+      required:
+      - currentRotorsPositionCompact
+      - output
+      type: object
+    getMachineHistory_400_response:
+      example:
+        error: Exactly one of sessionID or machineName must be provided
+      properties:
+        error:
+          example: Exactly one of sessionID or machineName must be provided
+          type: string
+      required:
+      - error
+      type: object
+

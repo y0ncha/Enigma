@@ -30,6 +30,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public MachineState currentState(UUID sessionId) {
+        SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
+        synchronized (runtime.lock()) {
+            return runtime.engine().machineData();
+        }
+    }
+
+    @Override
     @Transactional
     public MachineState configureManual(UUID sessionId, CodeConfig config) {
         SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
