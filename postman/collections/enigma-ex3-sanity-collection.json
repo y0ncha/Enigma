@@ -1026,6 +1026,207 @@
       "response": []
     },
     {
+      "name": "Sanity process paper session #3 (closed session)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "02d93ed8-15a2-49c7-ba44-e479cb5ffb4f",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "38140751-98f4-48d1-9dff-ff094165ce8e",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "5972d042-0763-4aae-b428-5522f3ddb2f0",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/process?input=ENIGMAMACHINEROCKS",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "process"
+          ],
+          "query": [
+            {
+              "key": "input",
+              "value": "ENIGMAMACHINEROCKS",
+              "uuid": "bfa4593f-c393-49a6-a11a-085a2c33f4d5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity configure paper session  auto #3 (closed session)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "cc5b18bb-9564-4453-80c4-3f8d2ee5f3d1",
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "8cfb4f55-9a6a-4fba-83e9-f47ed7cf72a1",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "10fa73b6-ceb7-4a01-a48e-db8700184f7b",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{sanityPaperSessionId3}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config",
+            "automatic"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanityPaperSessionId3}}",
+              "uuid": "3b44658c-aa53-4b41-8c0d-9f05cdb20f29"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity configure paper session manual #3 (closed session)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "cc5b18bb-9564-4453-80c4-3f8d2ee5f3d1",
+            "exec": [
+              "pm.test(\"Status code is 409\", function () {",
+              "    pm.response.to.have.status(409);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "8cfb4f55-9a6a-4fba-83e9-f47ed7cf72a1",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "ab2730a3-868a-4dfb-8f25-ce006fc536eb",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionID\": \"{{sanityPaperSessionId3}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"O\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"D\"\n    },\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"X\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config/manual",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config",
+            "manual"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Sanity clear storage",
       "event": [
         {
@@ -1061,92 +1262,92 @@
   ],
   "variable": [
     {
-      "id": "f92c7494-31c9-42cb-a064-95626c734b00",
+      "id": "a6c2b0bc-de6e-4e5a-8a25-e2fee2725859",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "ad6992bc-ded0-417b-8d8c-cbdcb3e16e93",
+      "id": "e37c3d2d-53a7-4260-a6aa-9924e009b9da",
       "key": "machineNamePaper",
       "value": "paper-enigma"
     },
     {
-      "id": "94f90e13-3ad8-4540-a3b6-672bcdba1634",
+      "id": "8ca7084a-b775-4be5-bc57-d8d34fae76c5",
       "key": "sanityPaperSessionId1",
       "value": ""
     },
     {
-      "id": "b028f9d8-83b3-474e-8f2d-33fe301e8907",
+      "id": "7bdbcfcd-76ed-465b-a717-0f970e5cf372",
       "key": "sanityPaperSessionId2",
       "value": ""
     },
     {
-      "id": "f6d42f56-aa97-4c29-bf67-64da794baefb",
+      "id": "413e2e8f-9d1f-4bce-b199-a283c3a6e3f8",
       "key": "sanityPaperSessionId3",
       "value": ""
     },
     {
-      "id": "42218dfc-e5a7-4846-ad69-369dba558391",
+      "id": "fdfe3065-bec2-4131-b2f5-001a4f81ce2e",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "19fe8a6d-4d6b-429a-9d76-d311a21ea71f",
+      "id": "3a47b773-1769-4ec9-b38d-e6ac6de8606b",
       "key": "machineNameSanity",
       "value": ""
     },
     {
-      "id": "34b7e576-9677-4cd2-a0be-980a4479c27c",
+      "id": "19cb84f5-9df5-4738-92ed-f280b4e94027",
       "key": "activeMachineName",
       "value": ""
     },
     {
-      "id": "ff8a4ad4-f274-43a5-aa29-f2aa3b670b7d",
+      "id": "775fc107-91f3-48b8-ab60-493a9d3af9f1",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "606918c9-4b62-4482-8284-50760a4787cb",
+      "id": "dc933018-25bb-4eef-a300-054306f57425",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "8e9c6f24-c5dd-4462-b2e6-fdf05b659c60",
+      "id": "63ace6dd-f0ee-4aba-8875-13157ad814e0",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "0b6366ec-ad6a-4aa3-a9a6-50c87ebd5988",
+      "id": "e6f16ddb-8f88-4cc5-8b67-121ce2a82ad8",
       "key": "deletedSessionId",
       "value": ""
     },
     {
-      "id": "ab2f00b6-4029-421e-94d7-d51a1712e3f8",
+      "id": "31472b79-5a4c-4ff3-a539-a46da843d4ba",
       "key": "historySessionId",
       "value": ""
     },
     {
-      "id": "768aae6a-7a13-4d21-be26-c2c10c159485",
+      "id": "a18ac602-3699-4b82-a979-13f05c263ef9",
       "key": "historyMachineName",
       "value": ""
     },
     {
-      "id": "b3803164-95a1-47df-9736-9dda776f9d73",
+      "id": "6c71d795-2667-4777-a66a-b2f8f8ce9282",
       "key": "processInput",
       "value": ""
     },
     {
-      "id": "df820fe1-4d9f-4412-80a7-6e605d824201",
+      "id": "72fd55e6-bfb6-4648-81a7-422990a6aa5a",
       "key": "lastProcessOutput",
       "value": ""
     },
     {
-      "id": "a12f9bf7-c416-4332-80fe-81f0aa6b00c8",
+      "id": "a9b8140f-5a16-46c3-821d-1eaa07833755",
       "key": "sanitySmallSessionId",
       "value": ""
     },
     {
-      "id": "53a8a061-e7e8-4ae4-94a5-85afb8fcd787",
+      "id": "d7c84d64-46c0-483d-a184-b5d602daafad",
       "key": "sanityPaperSessionId",
       "value": ""
     }
