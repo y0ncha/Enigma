@@ -10,7 +10,7 @@ public record ProcessRecordView(
         String code,
         String inputText,
         String outputText,
-        long durationNanos,
+        long durationMillis,
         Instant processedAt
 ) {
 }

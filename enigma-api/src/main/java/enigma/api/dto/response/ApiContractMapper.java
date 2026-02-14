@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public final class ApiContractMapper {
 
@@ -66,7 +65,7 @@ public final class ApiContractMapper {
                     .add(new HistoryEntryResponse(
                             record.inputText(),
                             record.outputText(),
-                            TimeUnit.NANOSECONDS.toMillis(record.durationNanos())));
+                            record.durationMillis()));
         }
 
         return grouped;

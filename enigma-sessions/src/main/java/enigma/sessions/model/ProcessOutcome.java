@@ -9,7 +9,7 @@ public record ProcessOutcome(
         String machineName,
         String input,
         String output,
-        long durationNanos,
+        long durationMillis,
         MachineState machineState
 ) {
 }

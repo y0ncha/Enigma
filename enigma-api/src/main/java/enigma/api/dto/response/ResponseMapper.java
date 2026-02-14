@@ -65,9 +65,10 @@ public final class ResponseMapper {
                 processRecordView.id(),
                 processRecordView.sessionId(),
                 processRecordView.machineName(),
+                processRecordView.code(),
                 processRecordView.inputText(),
                 processRecordView.outputText(),
-                processRecordView.durationNanos(),
+                processRecordView.durationMillis(),
                 processRecordView.processedAt()
         );
     }

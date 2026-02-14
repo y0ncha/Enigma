@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProcessingServiceImpl implements ProcessingService {
@@ -44,13 +45,17 @@ public class ProcessingServiceImpl implements ProcessingService {
         SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
 
         ProcessTrace processTrace;
-        long durationNanos;
+        long durationMillis;
         MachineState state;
+        String codeUsedForProcessing;
 
         synchronized (runtime.lock()) {
+            MachineState stateBeforeProcessing = runtime.engine().machineData();
+            codeUsedForProcessing = CodeStateCompactFormatter.originalCodeCompact(stateBeforeProcessing.curCodeState());
+
             long startedAt = System.nanoTime();
             processTrace = runtime.engine().process(normalizedInput);
-            durationNanos = System.nanoTime() - startedAt;
+            durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
             state = runtime.engine().machineData();
         }
 
@@ -60,10 +65,10 @@ public class ProcessingServiceImpl implements ProcessingService {
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Machine not found for processing runtime: " + runtime.machineId())),
                 runtime.sessionId().toString(),
-                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
+                codeUsedForProcessing,
                 normalizedInput,
                 processTrace.output(),
-                durationNanos
+                durationMillis
         ));
 
         return new ProcessOutcome(
@@ -71,7 +76,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 runtime.machineName(),
                 normalizedInput,
                 processTrace.output(),
-                durationNanos,
+                durationMillis,
                 state
         );
     }

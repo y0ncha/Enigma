@@ -6,13 +6,14 @@ current delivery target and Part 4 groundwork requirements included.
 
 ## 1) Source of truth and priority
 - Primary source: `/docs/Enigma - 3.0 V3.pdf`.
-- Contract source for API behavior and format: `/.openAPI/api/openapi.yaml`.
+- Contract source for API behavior and format: `/.openAPI/engima-api.yml`.
+- `/.openAPI/engima-api.yml` is immutable for agents; do not modify this file.
 - Working repository constraints: `/docs/INSTRUCTIONS.md`, `/README.md`,
   `/docs/ex3-api-contract.md`.
 - If sources conflict:
   1. User explicit instruction in current chat.
   2. PDF assignment requirements.
-  3. `/.openAPI/api/openapi.yaml` for all API contract decisions.
+  3. `/.openAPI/engima-api.yml` for all API contract decisions.
   4. `docs/INSTRUCTIONS.md`.
   5. Existing code style/conventions in repository.
 
@@ -43,7 +44,8 @@ current delivery target and Part 4 groundwork requirements included.
   - Invalid XML must not override current valid machine state.
 
 ## 4) API behavior rules for Part 3
-- STRICT COMPLIANCE with `/.openAPI/api/openapi.yaml` is mandatory.
+- STRICT COMPLIANCE with `/.openAPI/engima-api.yml` is mandatory.
+- Never edit `/.openAPI/engima-api.yml`; adapt implementation to this contract.
 - Treat OpenAPI as canonical for:
   - Path and method.
   - Query parameter names/casing (example: `sessionID` exact spelling).
@@ -115,7 +117,7 @@ current delivery target and Part 4 groundwork requirements included.
 - Make minimal, targeted changes; avoid unrelated refactors.
 - Do not silently change API contracts or endpoint semantics.
 - Before finishing API changes, verify endpoint signatures and payload formats
-  against `/.openAPI/api/openapi.yaml`.
+  against `/.openAPI/engima-api.yml`.
 - Document assumptions when requirements are ambiguous.
 - If blocked by environment/tooling, state exactly what is missing.
 - Keep all comments/docs/code in English.

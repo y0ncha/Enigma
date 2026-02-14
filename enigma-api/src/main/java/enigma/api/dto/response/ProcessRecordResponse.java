@@ -7,9 +7,10 @@ public record ProcessRecordResponse(
         UUID id,
         UUID sessionId,
         String machineName,
+        String code,
         String inputText,
         String outputText,
-        long durationNanos,
+        long durationMillis,
         Instant processedAt
 ) {
 }

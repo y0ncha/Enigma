@@ -40,7 +40,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     @Transactional
-    public SessionView openSession(String machineName) {
+    public SessionView openSession(String machineName) { // todo - loading service should load the machine, session should only use the loaded machine and validate its in the db
         log.info("Opening session for machine={}", machineName);
         MachineDefinition machineDefinition = machineCatalogService.resolveMachine(machineName);
 

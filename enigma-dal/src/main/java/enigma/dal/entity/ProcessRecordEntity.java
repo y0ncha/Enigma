@@ -51,7 +51,7 @@ public class ProcessRecordEntity {
     private String outputText;
 
     @Column(name = "time", nullable = false)
-    private long durationNanos;
+    private long durationMillis;
 
     public ProcessRecordEntity() {
     }
@@ -62,14 +62,14 @@ public class ProcessRecordEntity {
                                String code,
                                String inputText,
                                String outputText,
-                               long durationNanos) {
+                               long durationMillis) {
         this.id = id;
         this.machine = machine;
         this.sessionId = sessionId;
         this.code = code;
         this.inputText = inputText;
         this.outputText = outputText;
-        this.durationNanos = durationNanos;
+        this.durationMillis = durationMillis;
     }
 
     public UUID getId() {
@@ -120,11 +120,11 @@ public class ProcessRecordEntity {
         this.outputText = outputText;
     }
 
-    public long getDurationNanos() {
-        return durationNanos;
+    public long getDurationMillis() {
+        return durationMillis;
     }
 
-    public void setDurationNanos(long durationNanos) {
-        this.durationNanos = durationNanos;
+    public void setDurationMillis(long durationMillis) {
+        this.durationMillis = durationMillis;
     }
 }

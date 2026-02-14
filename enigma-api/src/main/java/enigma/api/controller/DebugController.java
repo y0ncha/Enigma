@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/enigma/debug")
+@RequestMapping("/debug")
 public class DebugController {
 
     private final MaintenanceService maintenanceService;
@@ -20,6 +20,11 @@ public class DebugController {
     @DeleteMapping("/storage")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearStorage() {
-        maintenanceService.clearStorage();
+        try {
+            maintenanceService.clearStorage();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
