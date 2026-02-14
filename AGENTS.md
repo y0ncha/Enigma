@@ -6,13 +6,15 @@ current delivery target and Part 4 groundwork requirements included.
 
 ## 1) Source of truth and priority
 - Primary source: `/docs/Enigma - 3.0 V3.pdf`.
+- Contract source for API behavior and format: `/.openAPI/api/openapi.yaml`.
 - Working repository constraints: `/docs/INSTRUCTIONS.md`, `/README.md`,
   `/docs/ex3-api-contract.md`.
 - If sources conflict:
   1. User explicit instruction in current chat.
   2. PDF assignment requirements.
-  3. `docs/INSTRUCTIONS.md`.
-  4. Existing code style/conventions in repository.
+  3. `/.openAPI/api/openapi.yaml` for all API contract decisions.
+  4. `docs/INSTRUCTIONS.md`.
+  5. Existing code style/conventions in repository.
 
 ## 2) Current target (Part 3) and scope
 - Deliver and preserve a Spring Boot REST server for Enigma under `/enigma`.
@@ -41,12 +43,20 @@ current delivery target and Part 4 groundwork requirements included.
   - Invalid XML must not override current valid machine state.
 
 ## 4) API behavior rules for Part 3
-- Preserve route groups and base path semantics from current implementation:
-  - `/load`, `/session`, `/config`, `/process`, `/history` under `/enigma`.
-- Keep DTO contracts stable unless user asks for explicit contract migration.
+- STRICT COMPLIANCE with `/.openAPI/api/openapi.yaml` is mandatory.
+- Treat OpenAPI as canonical for:
+  - Path and method.
+  - Query parameter names/casing (example: `sessionID` exact spelling).
+  - Request/response body schema fields and field casing.
+  - Content types (`application/json`, `text/plain`, `multipart/form-data`).
+  - HTTP status codes per endpoint.
+- Preserve route groups and base path semantics under `/enigma`:
+  - `/load`, `/session`, `/config`, `/process`, `/history`.
+- Keep DTO contracts stable unless user explicitly requests a contract change.
 - Ensure consistent status mapping for validation/not-found/conflict/server errors.
 - Keep timestamp/session/machine fields deterministic and serializable.
 - History and processing records must remain queryable and coherent per scope.
+- No "almost matching" payloads are allowed; response format must match OpenAPI.
 
 ## 5) Persistence and DB safety (hard constraints)
 - NO DDL is allowed.
@@ -104,6 +114,8 @@ current delivery target and Part 4 groundwork requirements included.
 ## 10) Agent execution behavior in this repo
 - Make minimal, targeted changes; avoid unrelated refactors.
 - Do not silently change API contracts or endpoint semantics.
+- Before finishing API changes, verify endpoint signatures and payload formats
+  against `/.openAPI/api/openapi.yaml`.
 - Document assumptions when requirements are ambiguous.
 - If blocked by environment/tooling, state exactly what is missing.
 - Keep all comments/docs/code in English.
