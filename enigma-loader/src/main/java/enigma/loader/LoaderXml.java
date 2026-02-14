@@ -10,6 +10,7 @@ import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
@@ -92,8 +93,68 @@ public class LoaderXml implements Loader {
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
-            throw new EnigmaLoadingException("Unable to parse file '" + filePath + "': " + e.getMessage(), e);
+            throw new EnigmaLoadingException(buildXmlParsingMessage(filePath, e), e);
         }
+    }
+
+    private String buildXmlParsingMessage(String filePath, JAXBException exception) {
+        SAXParseException saxParseException = findSaxParseException(exception);
+        if (saxParseException != null) {
+            StringBuilder message = new StringBuilder("XML does not comply with XSD schema");
+            if (saxParseException.getLineNumber() > 0 && saxParseException.getColumnNumber() > 0) {
+                message.append(" at line ")
+                        .append(saxParseException.getLineNumber())
+                        .append(", column ")
+                        .append(saxParseException.getColumnNumber());
+            }
+
+            String details = sanitizeParsingMessage(saxParseException.getMessage());
+            if (!details.isBlank()) {
+                message.append(": ").append(details);
+            }
+            return message.toString();
+        }
+
+        Throwable linked = exception.getLinkedException();
+        if (linked != null && linked.getMessage() != null && !linked.getMessage().isBlank()) {
+            return "Unable to parse file '" + filePath + "': " + sanitizeParsingMessage(linked.getMessage());
+        }
+
+        String fallback = exception.getMessage();
+        if (fallback == null || fallback.isBlank()) {
+            fallback = "Unknown XML parsing error";
+        }
+        return "Unable to parse file '" + filePath + "': " + sanitizeParsingMessage(fallback);
+    }
+
+    private SAXParseException findSaxParseException(JAXBException exception) {
+        Throwable current = exception;
+        while (current != null) {
+            if (current instanceof SAXParseException saxParseException) {
+                return saxParseException;
+            }
+            current = current.getCause();
+        }
+
+        Throwable linked = exception.getLinkedException();
+        while (linked != null) {
+            if (linked instanceof SAXParseException saxParseException) {
+                return saxParseException;
+            }
+            linked = linked.getCause();
+        }
+        return null;
+    }
+
+    private String sanitizeParsingMessage(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "";
+        }
+
+        String message = raw.trim();
+        message = message.replaceFirst("^org\\.xml\\.sax\\.SAXParseException;\\s*", "");
+        message = message.replaceFirst("^lineNumber:\\s*\\d+;\\s*columnNumber:\\s*\\d+;\\s*", "");
+        return message.trim();
     }
 
     /**
