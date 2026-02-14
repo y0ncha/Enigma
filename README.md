@@ -9,10 +9,11 @@ Multi-module Java implementation of the Enigma assignment across:
 
 ## Repository Layout
 
-This repository currently builds **9 Maven modules**:
+This repository currently builds **10 Maven modules** (including one nested aggregator):
 
 | Module | Purpose |
 |---|---|
+| `enigma-logic` | Nested aggregator for logic-oriented modules (Ex2 core + sessions + additional game modules) |
 | `enigma-shared` | Shared DTOs, specs, and machine/code state records |
 | `enigma-machine` | Core Enigma mechanics (rotors, reflector, plugboard, stepping, signal path) |
 | `enigma-loader` | XML parsing and structural validation into machine specs |
@@ -60,17 +61,10 @@ From repository root:
 mvn clean install
 ```
 
-This produces runnable artifacts at:
-- `target/enigma-machine-ex2.jar` (console)
+This produces a runnable server artifact at:
 - `target/enigma-machine-server-ex3.jar` (Spring Boot server)
 
 ## Run
-
-### Console (Exercises 1-2)
-
-```bash
-java -jar target/enigma-machine-ex2.jar
-```
 
 ### Server (Exercise 3)
 

@@ -13,13 +13,8 @@
     <name>Enigma Aggregator</name>
 
     <modules>
-        <module>enigma-shared</module>
-        <module>enigma-machine</module>
-        <module>enigma-loader</module>
-        <module>enigma-engine</module>
-        <module>enigma-console</module>
+        <module>enigma-logic</module>
         <module>enigma-dal</module>
-        <module>enigma-sessions</module>
         <module>enigma-api</module>
         <module>enigma-app</module>
     </modules>
