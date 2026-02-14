@@ -10,6 +10,7 @@ import enigma.shared.dto.config.CodeConfig;
 import enigma.engine.Engine;
 import enigma.engine.EngineValidator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -535,7 +536,7 @@ public class ConsoleImpl implements Console {
                         "Enter the text you want to process, only characters from the machine alphabet : "
                                 + enigma.getMachineSpec().getAlphabet());
                 // Normalize to upper-case to make input case-insensitive
-                String normalizedInput = originalInput.toUpperCase();
+                String normalizedInput = originalInput.trim().toUpperCase(Locale.ROOT);
                 // 2. Process input via engine and measure duration
                 // Engine will validate that characters are in the machine alphabet
                 EngineValidator.validateInputInAlphabet(enigma.getMachineSpec(), normalizedInput);
@@ -692,4 +693,3 @@ public class ConsoleImpl implements Console {
         }
     }
 }
-

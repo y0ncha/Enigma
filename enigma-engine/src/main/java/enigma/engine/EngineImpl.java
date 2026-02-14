@@ -83,6 +83,20 @@ public class EngineImpl implements Engine {
      * {@inheritDoc}
      */
     @Override
+    public void loadMachine(MachineSpec machineSpec) {
+        if (machineSpec == null) {
+            throw new EngineException("Machine specification is missing");
+        }
+        this.spec = machineSpec;
+        this.history = new MachineHistory();
+        this.ogCodeState = enigma.shared.state.CodeState.notConfigured();
+        this.stringsProcessed = 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public MachineState machineData() {
         int rotors = spec == null ? 0 : spec.rotorsById().size();
         int reflectors = spec == null ? 0 : spec.reflectorsById().size();
@@ -137,7 +151,7 @@ public class EngineImpl implements Engine {
             throw new MachineNotConfiguredException("Machine is not configured");
         }
         
-        // Validate input is not null and contains only valid characters
+        // Validate input as provided by upper-layer entry points.
         EngineValidator.validateInputInAlphabet(spec, input);
 
         List<SignalTrace> traces = new ArrayList<>();

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BTE-Enigma name="missing-abc" rotors-count="2"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="schema/Enigma-Ex3.xsd">
+    <BTE-Rotors>
+        <BTE-Rotor id="1" notch="1">
+            <BTE-Positioning right="A" left="A"/>
+        </BTE-Rotor>
+    </BTE-Rotors>
+    <BTE-Reflectors>
+        <BTE-Reflector id="I">
+            <BTE-Reflect input="1" output="1"/>
+        </BTE-Reflector>
+    </BTE-Reflectors>
+</BTE-Enigma>

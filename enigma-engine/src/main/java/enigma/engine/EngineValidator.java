@@ -270,8 +270,7 @@ public final class EngineValidator {
         specIsNull(spec);
 
         if (input == null) {
-            throw new InvalidMessageException(
-                "Input message is missing");
+            throw new InvalidMessageException("Input message is missing");
         }
 
         String alphabet = spec.alphabet().letters();
@@ -282,9 +281,7 @@ public final class EngineValidator {
             if (Character.isISOControl(c)) {
                 String controlName = getControlCharacterName(c);
                 throw new InvalidMessageException(
-                    String.format(
-                        "Control character %s detected at position %d",
-                        controlName, i));
+                    String.format("Control character %s detected at position %d", controlName, i));
             }
 
             if (!spec.alphabet().contains(c)) {
@@ -363,7 +360,7 @@ public final class EngineValidator {
             throw new InvalidConfigurationException(
                 String.format(
                     "Plugboard length must be even (pairs of characters), got length %d. " +
-                    "Plugboard: \"%s\"",
+                    "Plugboard: %s",
                     plugboard.length(), plugboard));
         }
 
@@ -378,40 +375,40 @@ public final class EngineValidator {
             if (first == second) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Plugboard letter '%c' cannot map to itself (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\"",
+                        "Plugboard letter '%c' cannot map to itself (pair %s at position %d). " +
+                        "Plugboard: %s",
                         first, pair, i, plugboard));
             }
 
             if (!seenChars.add(first)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Plugboard letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\"",
+                        "Plugboard letter '%c' appears more than once (pair %s at position %d). " +
+                        "Plugboard: %s",
                         first, pair, i, plugboard));
             }
             if (!seenChars.add(second)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Plugboard letter '%c' appears more than once (pair \"%s\" at position %d). " +
-                        "Plugboard: \"%s\"",
+                        "Plugboard letter '%c' appears more than once (pair %s at position %d). " +
+                        "Plugboard: %s",
                         second, pair, i, plugboard));
             }
 
             if (!spec.alphabet().contains(first)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Plugboard character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
+                        "Plugboard character '%c' (in pair %s at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\"",
+                        "Plugboard: %s",
                         first, pair, i, alphabet, plugboard));
             }
             if (!spec.alphabet().contains(second)) {
                 throw new InvalidConfigurationException(
                     String.format(
-                        "Plugboard character '%c' (in pair \"%s\" at position %d) is not in the machine alphabet. " +
+                        "Plugboard character '%c' (in pair %s at position %d) is not in the machine alphabet. " +
                         "Machine alphabet: %s. " +
-                        "Plugboard: \"%s\"",
+                        "Plugboard: %s",
                         second, pair, i, alphabet, plugboard));
             }
         }
