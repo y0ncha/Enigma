@@ -7,761 +7,818 @@
   },
   "item": [
     {
-      "name": "sanity",
-      "item": [
+      "name": "Sanity load small machine (ex3-sanity-small.xml)",
+      "event": [
         {
-          "name": "Sanity load small machine (ex3-sanity-small.xml)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "id": "9183f042-021b-4781-8cd7-f97cff98d812",
-                "exec": [
-                  "let jsonData = null;",
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Load response is JSON\", function () {",
-                  "    jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
-                  "});",
-                  "pm.collectionVariables.set(\"machineNameSanity\", (jsonData && jsonData.name) ? jsonData.name : (pm.collectionVariables.get(\"machineNameSanity\") || \"sanity\"));",
-                  "pm.collectionVariables.set(\"activeMachineName\", pm.collectionVariables.get(\"machineNameSanity\"));"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "id": "354e750b-4bcd-4b38-aa9f-ccb6e483220a",
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "id": "sanity-load-small",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
+          "listen": "test",
+          "script": {
+            "id": "9183f042-021b-4781-8cd7-f97cff98d812",
+            "exec": [
+              "let jsonData = null;",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Load response is JSON\", function () {",
+              "    jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an(\"object\");",
+              "});",
+              "pm.collectionVariables.set(\"machineNameSanity\", (jsonData && jsonData.name) ? jsonData.name : (pm.collectionVariables.get(\"machineNameSanity\") || \"sanity\"));",
+              "pm.collectionVariables.set(\"activeMachineName\", pm.collectionVariables.get(\"machineNameSanity\"));"
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "contentType": "",
-                  "src": [
-                    "postman-cloud:///1f108e8f-a7e9-42b0-9b83-235b0d554d85"
-                  ]
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/load",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "load"
-              ]
-            }
-          },
-          "response": []
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         },
         {
-          "name": "Sanity load paper machine (ex3-sanity-paper-enigma.xml)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "id": "ac232341-4328-44d4-867c-2c84bf17599c",
-                "exec": [
-                  "let jsonData = null;",
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Load response is JSON\", function () {",
-                  "    jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an(\"object\");",
-                  "});",
-                  "pm.collectionVariables.set(\"machineNamePaper\", (jsonData && jsonData.name) ? jsonData.name : (pm.collectionVariables.get(\"machineNamePaper\") || \"paper-enigma\"));"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "id": "3da6999c-bdce-4ff8-91df-17c5f6275d8d",
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "id": "sanity-load-paper",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
+          "listen": "prerequest",
+          "script": {
+            "id": "354e750b-4bcd-4b38-aa9f-ccb6e483220a",
+            "exec": [
+              ""
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "contentType": "",
-                  "src": [
-                    "postman-cloud:///1f108e90-3730-4db0-8a8b-77ab43cdd83c"
-                  ]
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/load",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "load"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity create session - small",
-          "event": [
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const machineName = pm.collectionVariables.get(\"machineNameSanity\") || \"sanity\";",
-                  "pm.collectionVariables.set(\"machineNameSanity\", machineName);"
-                ]
-              }
-            },
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const jsonData = pm.response.json();",
-                  "pm.test(\"Session response has sessionID\", function () {",
-                  "    pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty;",
-                  "});",
-                  "pm.collectionVariables.set(\"sanitySmallSessionId\", jsonData.sessionID);"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-create-session-small",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"machine\": \"{{machineNameSanity}}\"\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/session",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "session"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity create session - paper",
-          "event": [
-            {
-              "listen": "prerequest",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const machineName = pm.collectionVariables.get(\"machineNamePaper\") || \"paper-enigma\";",
-                  "pm.collectionVariables.set(\"machineNamePaper\", machineName);"
-                ]
-              }
-            },
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "const jsonData = pm.response.json();",
-                  "pm.test(\"Session response has sessionID\", function () {",
-                  "    pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty;",
-                  "});",
-                  "pm.collectionVariables.set(\"sanityPaperSessionId\", jsonData.sessionID);"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-create-session-paper",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"machine\": \"{{machineNamePaper}}\"\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/session",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "session"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity configure small (3,2 @ C,C)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-configure-small",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "text/plain"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionID\": \"{{sanitySmallSessionId}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"C\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"C\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/config/manual",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "config",
-                "manual"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity configure paper (1,2,3 @ O,D,X)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-configure-paper",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "text/plain"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionID\": \"{{sanityPaperSessionId}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"O\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"D\"\n    },\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"X\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/enigma/config/manual",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "config",
-                "manual"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity concurrency processing (reset before each input)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\");",
-                  "const smallSessionId = pm.collectionVariables.get(\"sanitySmallSessionId\") || \"\";",
-                  "const paperSessionId = pm.collectionVariables.get(\"sanityPaperSessionId\") || \"\";",
-                  "pm.test(\"Both sanity sessions exist\", function () {",
-                  "    pm.expect(smallSessionId).to.be.a(\"string\").and.not.empty;",
-                  "    pm.expect(paperSessionId).to.be.a(\"string\").and.not.empty;",
-                  "});",
-                  "const smallCases = [",
-                  "    { input: \"AABBCCDDEEFF\" },",
-                  "    { input: \"FEDCBADDEF\" },",
-                  "    { input: \"FACEBEEF\" },",
-                  "    { input: \"AFBFCDFEFFFF\" },",
-                  "    { input: \"AAAEEBBBDDDCCCFFF\" }",
-                  "];",
-                  "const paperCases = [",
-                  "    { input: \"THERAINISDROPPING\" },",
-                  "    { input: \"HELLOWORLD\" },",
-                  "    { input: \"ENIGMAMACHINEROCKS\" },",
-                  "    { input: \"WOWCANTBELIEVEITACTUALLYWORKS\" },",
-                  "    { input: \"JAVARULES\" }",
-                  "];",
-                  "pm.test(\"Small-case inputs use sanity-small alphabet (A-F)\", function () {",
-                  "    smallCases.forEach(function (c) {",
-                  "        pm.expect(/^[A-F]+$/.test(c.input)).to.eql(true);",
-                  "    });",
-                  "});",
-                  "const maxCases = Math.min(smallCases.length, paperCases.length);",
-                  "function requestJson(method, url, done) {",
-                  "    pm.sendRequest({ method: method, url: url, header: { Accept: \"application/json\" } }, function (err, res) {",
-                  "        done(err, res);",
-                  "    });",
-                  "}",
-                  "function requestText(method, url, done) {",
-                  "    pm.sendRequest({ method: method, url: url, header: { Accept: \"text/plain\" } }, function (err, res) {",
-                  "        done(err, res);",
-                  "    });",
-                  "}",
-                  "function runCase(index) {",
-                  "    if (index >= maxCases) {",
-                  "        return;",
-                  "    }",
-                  "    const s = smallCases[index];",
-                  "    const p = paperCases[index];",
-                  "    requestText(\"PUT\", `${baseUrl}/enigma/config/reset?sessionID=${encodeURIComponent(smallSessionId)}`, function (errResetS, resResetS) {",
-                  "        pm.test(`Small reset #${index + 1} status 200`, function () {",
-                  "            pm.expect(errResetS).to.eql(null);",
-                  "            pm.expect(resResetS.code).to.eql(200);",
-                  "        });",
-                  "        requestJson(\"POST\", `${baseUrl}/enigma/process?input=${encodeURIComponent(s.input)}&sessionID=${encodeURIComponent(smallSessionId)}`, function (errProcessS, resProcessS) {",
-                  "            pm.test(`Small process #${index + 1} status 200`, function () {",
-                  "                pm.expect(errProcessS).to.eql(null);",
-                  "                pm.expect(resProcessS.code).to.eql(200);",
-                  "            });",
-                  "            const bodyS = resProcessS.json();",
-                  "            pm.test(`Small process #${index + 1} output exists`, function () {",
-                  "                pm.expect(bodyS.output).to.be.a(\"string\").and.not.empty;",
-                  "                pm.expect(bodyS.output.length).to.eql(s.input.length);",
-                  "            });",
-                  "            requestText(\"PUT\", `${baseUrl}/enigma/config/reset?sessionID=${encodeURIComponent(paperSessionId)}`, function (errResetP, resResetP) {",
-                  "                pm.test(`Paper reset #${index + 1} status 200`, function () {",
-                  "                    pm.expect(errResetP).to.eql(null);",
-                  "                    pm.expect(resResetP.code).to.eql(200);",
-                  "                });",
-                  "                requestJson(\"POST\", `${baseUrl}/enigma/process?input=${encodeURIComponent(p.input)}&sessionID=${encodeURIComponent(paperSessionId)}`, function (errProcessP, resProcessP) {",
-                  "                    pm.test(`Paper process #${index + 1} status 200`, function () {",
-                  "                        pm.expect(errProcessP).to.eql(null);",
-                  "                        pm.expect(resProcessP.code).to.eql(200);",
-                  "                    });",
-                  "                    const bodyP = resProcessP.json();",
-                  "                    pm.test(`Paper process #${index + 1} output exists`, function () {",
-                  "                        pm.expect(bodyP.output).to.be.a(\"string\").and.not.empty;",
-                  "                        pm.expect(bodyP.output.length).to.eql(p.input.length);",
-                  "                    });",
-                  "                    runCase(index + 1);",
-                  "                });",
-                  "            });",
-                  "        });",
-                  "    });",
-                  "}",
-                  "runCase(0);"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-concurrency-validation",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/enigma/config?sessionID={{sanitySmallSessionId}}&verbose=false",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "config"
-              ],
-              "query": [
-                {
-                  "key": "sessionID",
-                  "value": "{{sanitySmallSessionId}}"
-                },
-                {
-                  "key": "verbose",
-                  "value": "false"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity history by small session",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-history-small-session",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/enigma/history?sessionID={{sanitySmallSessionId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "sessionID",
-                  "value": "{{sanitySmallSessionId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity history by paper session",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-history-paper-session",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/enigma/history?sessionID={{sanityPaperSessionId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "sessionID",
-                  "value": "{{sanityPaperSessionId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity history by small machine",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-history-small-machine",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/enigma/history?machineName={{machineNameSanity}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "machineName",
-                  "value": "{{machineNameSanity}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Sanity history by paper machine",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "id": "sanity-history-paper-machine",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/enigma/history?machineName={{machineNamePaper}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "enigma",
-                "history"
-              ],
-              "query": [
-                {
-                  "key": "machineName",
-                  "value": "{{machineNamePaper}}"
-                }
-              ]
-            }
-          },
-          "response": []
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
       ],
-      "id": "folder-sanity-concurrency"
+      "id": "sanity-load-small",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "contentType": "",
+              "src": [
+                "postman-cloud:///1f108e8f-a7e9-42b0-9b83-235b0d554d85"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/load",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "load"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity load paper machine (ex3-sanity-paper-enigma.xml)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "ac232341-4328-44d4-867c-2c84bf17599c",
+            "exec": [
+              "let jsonData = null;",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Load response is JSON\", function () {",
+              "    jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an(\"object\");",
+              "});",
+              "pm.collectionVariables.set(\"machineNamePaper\", (jsonData && jsonData.name) ? jsonData.name : (pm.collectionVariables.get(\"machineNamePaper\") || \"paper-enigma\"));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "3da6999c-bdce-4ff8-91df-17c5f6275d8d",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "sanity-load-paper",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "contentType": "",
+              "src": [
+                "postman-cloud:///1f108e90-3730-4db0-8a8b-77ab43cdd83c"
+              ]
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/load",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "load"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity create session - small",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const machineName = pm.collectionVariables.get(\"machineNameSanity\") || \"sanity\";",
+              "pm.collectionVariables.set(\"machineNameSanity\", machineName);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const jsonData = pm.response.json();",
+              "pm.test(\"Session response has sessionID\", function () {",
+              "    pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "pm.collectionVariables.set(\"sanitySmallSessionId\", jsonData.sessionID);"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-create-session-small",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"machine\": \"{{machineNameSanity}}\"\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/session",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "session"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity create session - paper",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const machineName = pm.collectionVariables.get(\"machineNamePaper\") || \"paper-enigma\";",
+              "pm.collectionVariables.set(\"machineNamePaper\", machineName);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const jsonData = pm.response.json();",
+              "pm.test(\"Session response has sessionID\", function () {",
+              "    pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "pm.collectionVariables.set(\"sanityPaperSessionId\", jsonData.sessionID);"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-create-session-paper",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"machine\": \"{{machineNamePaper}}\"\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/session",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "session"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity configure small (3,2 @ C,C)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-configure-small",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionID\": \"{{sanitySmallSessionId}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"C\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"C\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config/manual",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config",
+            "manual"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity configure paper (1,2,3 @ O,D,X)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-configure-paper",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionID\": \"{{sanityPaperSessionId}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"O\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"D\"\n    },\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"X\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config/manual",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config",
+            "manual"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity processing small session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+              "const sessionId = pm.collectionVariables.get(\"sanitySmallSessionId\") || \"\";",
+              "pm.test(\"Sanity small session exists\", function () {",
+              "    pm.expect(sessionId).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "const cases = [",
+              "    { input: \"AABBCCDDEEFF\" },",
+              "    { input: \"FEDCBADDEF\" },",
+              "    { input: \"FACEBEEF\" },",
+              "    { input: \"AFBFCDFEFFFF\" },",
+              "    { input: \"AAAEEBBBDDDCCCFFF\" }",
+              "];",
+              "pm.test(\"Small-case inputs use sanity-small alphabet (A-F)\", function () {",
+              "    cases.forEach(function (c) {",
+              "        pm.expect(/^[A-F]+$/.test(c.input)).to.eql(true);",
+              "    });",
+              "});",
+              "const requestText = function (method, url, done) {",
+              "    pm.sendRequest({ method: method, url: url, header: { Accept: \"text/plain\" } }, function (err, res) {",
+              "        done(err, res);",
+              "    });",
+              "};",
+              "const requestJson = function (method, url, done) {",
+              "    pm.sendRequest({ method: method, url: url, header: { Accept: \"application/json\" } }, function (err, res) {",
+              "        done(err, res);",
+              "    });",
+              "};",
+              "function runCase(index) {",
+              "    if (index >= cases.length) {",
+              "        return;",
+              "    }",
+              "    const current = cases[index];",
+              "    requestText(\"PUT\", `${baseUrl}/enigma/config/reset?sessionID=${encodeURIComponent(sessionId)}`, function (errReset, resReset) {",
+              "        pm.test(`Sanity small reset #${index + 1} status 200`, function () {",
+              "            pm.expect(errReset).to.eql(null);",
+              "            pm.expect(resReset.code).to.eql(200);",
+              "        });",
+              "        requestJson(\"POST\", `${baseUrl}/enigma/process?input=${encodeURIComponent(current.input)}&sessionID=${encodeURIComponent(sessionId)}`, function (errProcess, resProcess) {",
+              "            pm.test(`Sanity small process #${index + 1} status 200`, function () {",
+              "                pm.expect(errProcess).to.eql(null);",
+              "                pm.expect(resProcess.code).to.eql(200);",
+              "            });",
+              "            const body = resProcess.json();",
+              "            pm.test(`Sanity small process #${index + 1} output exists`, function () {",
+              "                pm.expect(body.output).to.be.a(\"string\").and.not.empty;",
+              "                pm.expect(body.output.length).to.eql(current.input.length);",
+              "            });",
+              "            runCase(index + 1);",
+              "        });",
+              "    });",
+              "}",
+              "runCase(0);"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-processing-small",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config?sessionID={{sanitySmallSessionId}}&verbose=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanitySmallSessionId}}"
+            },
+            {
+              "key": "verbose",
+              "value": "false"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity processing paper session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const baseUrl = pm.collectionVariables.get(\"baseUrl\");",
+              "const sessionId = pm.collectionVariables.get(\"sanityPaperSessionId\") || \"\";",
+              "pm.test(\"Sanity paper session exists\", function () {",
+              "    pm.expect(sessionId).to.be.a(\"string\").and.not.empty;",
+              "});",
+              "const cases = [",
+              "    { input: \"THERAINISDROPPING\" },",
+              "    { input: \"HELLOWORLD\" },",
+              "    { input: \"ENIGMAMACHINEROCKS\" },",
+              "    { input: \"WOWCANTBELIEVEITACTUALLYWORKS\" },",
+              "    { input: \"JAVARULES\" }",
+              "];",
+              "const requestText = function (method, url, done) {",
+              "    pm.sendRequest({ method: method, url: url, header: { Accept: \"text/plain\" } }, function (err, res) {",
+              "        done(err, res);",
+              "    });",
+              "};",
+              "const requestJson = function (method, url, done) {",
+              "    pm.sendRequest({ method: method, url: url, header: { Accept: \"application/json\" } }, function (err, res) {",
+              "        done(err, res);",
+              "    });",
+              "};",
+              "function runCase(index) {",
+              "    if (index >= cases.length) {",
+              "        return;",
+              "    }",
+              "    const current = cases[index];",
+              "    requestText(\"PUT\", `${baseUrl}/enigma/config/reset?sessionID=${encodeURIComponent(sessionId)}`, function (errReset, resReset) {",
+              "        pm.test(`Sanity paper reset #${index + 1} status 200`, function () {",
+              "            pm.expect(errReset).to.eql(null);",
+              "            pm.expect(resReset.code).to.eql(200);",
+              "        });",
+              "        requestJson(\"POST\", `${baseUrl}/enigma/process?input=${encodeURIComponent(current.input)}&sessionID=${encodeURIComponent(sessionId)}`, function (errProcess, resProcess) {",
+              "            pm.test(`Sanity paper process #${index + 1} status 200`, function () {",
+              "                pm.expect(errProcess).to.eql(null);",
+              "                pm.expect(resProcess.code).to.eql(200);",
+              "            });",
+              "            const body = resProcess.json();",
+              "            pm.test(`Sanity paper process #${index + 1} output exists`, function () {",
+              "                pm.expect(body.output).to.be.a(\"string\").and.not.empty;",
+              "                pm.expect(body.output.length).to.eql(current.input.length);",
+              "            });",
+              "            runCase(index + 1);",
+              "        });",
+              "    });",
+              "}",
+              "runCase(0);"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-processing-paper",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/config?sessionID={{sanityPaperSessionId}}&verbose=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "config"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanityPaperSessionId}}"
+            },
+            {
+              "key": "verbose",
+              "value": "false"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by small session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-history-small-session",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?sessionID={{sanitySmallSessionId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanitySmallSessionId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by paper session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-history-paper-session",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?sessionID={{sanityPaperSessionId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanityPaperSessionId}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by small machine",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-history-small-machine",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?machineName={{machineNameSanity}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "machineName",
+              "value": "{{machineNameSanity}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by paper machine",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "sanity-history-paper-machine",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?machineName={{machineNamePaper}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "machineName",
+              "value": "{{machineNamePaper}}"
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
     {
-      "id": "4ee5e582-ec67-47df-859a-0563842cdf95",
+      "id": "15d0b593-f34e-482c-9022-9b5e2e27abae",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "f5577921-71c8-4d5c-a75e-7b50739a90a1",
+      "id": "e106b121-cb86-4edb-b222-1db0675489bf",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "87525d81-3ad6-4c51-9aa2-0bb49a0ee22c",
+      "id": "413aa83e-69b0-493f-8d37-8b02d95574f0",
       "key": "machineNameSanity",
       "value": "sanity"
     },
     {
-      "id": "26180a5c-6936-4fdc-8632-054e06a5758a",
+      "id": "9435133b-208e-48a2-bf92-344a38259d55",
       "key": "activeMachineName",
       "value": "sanity"
     },
     {
-      "id": "0f8934b3-afff-4dd5-aeaf-dc992da6600a",
+      "id": "8eb3d947-9bcb-462f-8459-b45b48bd850a",
       "key": "machineNamePaper",
       "value": ""
     },
     {
-      "id": "0469ea7f-0a8a-470b-8856-014a41e3866a",
+      "id": "f6fd8d3a-f732-4b11-b75c-1477d76203b3",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "dc61d30f-5fdc-4d61-816d-5913904a9108",
+      "id": "d0c5688a-53be-4e2f-aa36-a79102ccd6c0",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "45128710-4b66-44fe-b93f-4d231eaa5c42",
+      "id": "e6122b96-73ae-437d-a235-34380f20ebfc",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "48f491ca-069a-40fa-9ac1-9a1c34306d29",
+      "id": "305292ca-c0ea-44ac-a50d-cee72ab1eadc",
       "key": "deletedSessionId",
       "value": ""
     },
     {
-      "id": "53816037-06d0-40a3-9503-a40fa10c65ad",
+      "id": "813fd85f-5d3c-4d30-9643-2587332bdf07",
       "key": "historySessionId",
       "value": ""
     },
     {
-      "id": "e8701984-7fb2-4366-af54-55bfec99404c",
+      "id": "ab48ab1f-2be8-437f-826c-d7efd14874fa",
       "key": "historyMachineName",
       "value": ""
     },
     {
-      "id": "75ae0991-2c28-4b4a-ba03-eb69435b58e4",
+      "id": "afc283f2-407a-4d3c-ab85-03dc5bef290b",
       "key": "processInput",
       "value": "",
       "type": "default"
     },
     {
-      "id": "37985ab3-0d02-4dcc-b1f2-8c2b8fa56b8d",
+      "id": "0add0b40-a863-45d2-8a52-859528e60f77",
       "key": "lastProcessOutput",
       "value": ""
     },
     {
-      "id": "ed27f105-f28b-4b79-9475-801cf0e09a7c",
+      "id": "c2d0f78b-a5c9-4ca9-8166-c9a3b9c7df69",
       "key": "sanitySmallSessionId",
       "value": ""
     },
     {
-      "id": "1c8c28df-71f5-49f2-b419-8dc03749b454",
+      "id": "c523042c-392a-4647-b257-085297183379",
       "key": "sanityPaperSessionId",
       "value": ""
     }
