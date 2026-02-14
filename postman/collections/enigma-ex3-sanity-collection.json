@@ -1061,92 +1061,92 @@
   ],
   "variable": [
     {
-      "id": "714b0804-5cdb-48e4-abec-abf191141c60",
+      "id": "f92c7494-31c9-42cb-a064-95626c734b00",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "4dd368d2-af10-4783-9c7b-47c8990cf63c",
+      "id": "ad6992bc-ded0-417b-8d8c-cbdcb3e16e93",
       "key": "machineNamePaper",
       "value": "paper-enigma"
     },
     {
-      "id": "215aeb1d-a70c-4bed-8e75-1d44d1f02930",
+      "id": "94f90e13-3ad8-4540-a3b6-672bcdba1634",
       "key": "sanityPaperSessionId1",
       "value": ""
     },
     {
-      "id": "557befc5-0a7a-41b5-9c35-875b94ee48ba",
+      "id": "b028f9d8-83b3-474e-8f2d-33fe301e8907",
       "key": "sanityPaperSessionId2",
       "value": ""
     },
     {
-      "id": "1a0a5b3d-0029-4f5c-a65d-68928d2a2df8",
+      "id": "f6d42f56-aa97-4c29-bf67-64da794baefb",
       "key": "sanityPaperSessionId3",
       "value": ""
     },
     {
-      "id": "aa56008d-48e9-4d4a-9c75-9a97a0ef9b0c",
+      "id": "42218dfc-e5a7-4846-ad69-369dba558391",
       "key": "createdSessionId",
       "value": ""
     },
     {
-      "id": "ead2be92-fa73-4d8d-8a3f-1acf81c261ae",
+      "id": "19fe8a6d-4d6b-429a-9d76-d311a21ea71f",
       "key": "machineNameSanity",
       "value": ""
     },
     {
-      "id": "1a14afc3-65f5-4003-a8cb-d1d4190f1834",
+      "id": "34b7e576-9677-4cd2-a0be-980a4479c27c",
       "key": "activeMachineName",
       "value": ""
     },
     {
-      "id": "da73b0d2-c293-422e-951d-bc2399398a59",
+      "id": "ff8a4ad4-f274-43a5-aa29-f2aa3b670b7d",
       "key": "lastLoadError",
       "value": ""
     },
     {
-      "id": "a5b0a246-a257-4de5-98b4-96514791bef6",
+      "id": "606918c9-4b62-4482-8284-50760a4787cb",
       "key": "activeSessionId",
       "value": ""
     },
     {
-      "id": "e36cfb1b-2914-4820-b745-7e7fd28d271c",
+      "id": "8e9c6f24-c5dd-4462-b2e6-fdf05b659c60",
       "key": "createdSessionIdSmall",
       "value": ""
     },
     {
-      "id": "b0184f50-bf02-4162-b31b-e7066f50292c",
+      "id": "0b6366ec-ad6a-4aa3-a9a6-50c87ebd5988",
       "key": "deletedSessionId",
       "value": ""
     },
     {
-      "id": "67a883d2-c596-449b-bb23-5cc0eeab2ea0",
+      "id": "ab2f00b6-4029-421e-94d7-d51a1712e3f8",
       "key": "historySessionId",
       "value": ""
     },
     {
-      "id": "a6bfdcb5-e447-45bb-bddc-7220e4aa9940",
+      "id": "768aae6a-7a13-4d21-be26-c2c10c159485",
       "key": "historyMachineName",
       "value": ""
     },
     {
-      "id": "69b977fa-0ddf-48cb-9f30-11bb3255d448",
+      "id": "b3803164-95a1-47df-9736-9dda776f9d73",
       "key": "processInput",
       "value": ""
     },
     {
-      "id": "e8aaa744-7078-41ac-99d4-1441dcf449ef",
+      "id": "df820fe1-4d9f-4412-80a7-6e605d824201",
       "key": "lastProcessOutput",
       "value": ""
     },
     {
-      "id": "c767c16a-4e4e-4d06-afa4-9936b8be7d06",
+      "id": "a12f9bf7-c416-4332-80fe-81f0aa6b00c8",
       "key": "sanitySmallSessionId",
       "value": ""
     },
     {
-      "id": "b9d9f48b-9065-4a0e-a0ab-d36a6918bf26",
+      "id": "53a8a061-e7e8-4ae4-94a5-85afb8fcd787",
       "key": "sanityPaperSessionId",
       "value": ""
     }

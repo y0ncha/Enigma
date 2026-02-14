@@ -10,6 +10,7 @@ import enigma.sessions.model.SessionStatus;
 import enigma.sessions.model.SessionView;
 import enigma.sessions.service.MachineCatalogService;
 import enigma.sessions.service.SessionService;
+import enigma.shared.spec.MachineSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,24 +41,13 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     @Transactional
-    public SessionView openSession(String machineName) { // todo - loading service should load the machine, session should only use the loaded machine and validate its in the db
+    public SessionView openSession(String machineName) {
         log.info("Opening session for machine={}", machineName);
         MachineDefinition machineDefinition = machineCatalogService.resolveMachine(machineName);
-
-        if (machineDefinition.xmlPath() == null || machineDefinition.xmlPath().isBlank()) {
-            throw new ConflictException("Machine source XML is unavailable for '" + machineDefinition.machineName()
-                    + "'. Reload it before opening a session.");
-        }
+        MachineSpec machineSpec = machineCatalogService.resolveMachineSpec(machineDefinition.machineName());
 
         EngineImpl engine = new EngineImpl();
-        try {
-            engine.loadMachine(machineDefinition.xmlPath());
-        }
-        catch (Exception e) {
-            log.error("Failed to initialize session for machine={}", machineDefinition.machineName(), e);
-            throw new ApiValidationException("Unable to initialize session for machine '"
-                    + machineDefinition.machineName() + "': " + e.getMessage(), e);
-        }
+        engine.loadMachine(machineSpec);
 
         UUID sessionId = UUID.randomUUID();
         Instant openedAt = Instant.now();
@@ -73,7 +63,7 @@ public class SessionServiceImpl implements SessionService {
                 sessionId,
                 machineDefinition.machineId(),
                 machineDefinition.machineName(),
-                machineDefinition.xmlPath(),
+                null,
                 engine,
                 openedAt
         );
