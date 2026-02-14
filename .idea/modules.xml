@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/enigma-aggregator.iml" filepath="$PROJECT_DIR$/enigma-aggregator.iml" />
       <module fileurl="file://$PROJECT_DIR$/enigma-engine/enigma-engine.iml" filepath="$PROJECT_DIR$/enigma-engine/enigma-engine.iml" />
     </modules>
   </component>
