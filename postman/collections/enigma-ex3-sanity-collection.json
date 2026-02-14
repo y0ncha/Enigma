@@ -826,92 +826,6 @@
       "response": []
     },
     {
-      "name": "Sanity history by paper session #1",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ]
-          }
-        }
-      ],
-      "id": "e6596d0f-2284-4d49-9b81-318896f70f8e",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/enigma/history?sessionID={{sanityPaperSessionId1}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "enigma",
-            "history"
-          ],
-          "query": [
-            {
-              "key": "sessionID",
-              "value": "{{sanityPaperSessionId1}}"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Sanity history by paper machine",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});"
-            ]
-          }
-        }
-      ],
-      "id": "1be59271-5f5c-4a0e-be06-0934651583d4",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/enigma/history?machineName={{machineNamePaper}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "enigma",
-            "history"
-          ],
-          "query": [
-            {
-              "key": "machineName",
-              "value": "{{machineNamePaper}}"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
       "name": "Sanity close paper session #1",
       "event": [
         {
@@ -1019,6 +933,92 @@
             {
               "key": "sessionID",
               "value": "{{sanityPaperSessionId3}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by paper session #1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "e6596d0f-2284-4d49-9b81-318896f70f8e",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?sessionID={{sanityPaperSessionId1}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "sessionID",
+              "value": "{{sanityPaperSessionId1}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sanity history by paper machine",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "id": "1be59271-5f5c-4a0e-be06-0934651583d4",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/enigma/history?machineName={{machineNamePaper}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "enigma",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "machineName",
+              "value": "{{machineNamePaper}}"
             }
           ]
         }
