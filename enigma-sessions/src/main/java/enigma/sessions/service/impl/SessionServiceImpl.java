@@ -167,4 +167,13 @@ public class SessionServiceImpl implements SessionService {
 
         return runtime;
     }
+
+    @Override
+    @Transactional
+    public void clearSessions() {
+        int count = sessionById.size();
+        runtimeBySessionId.clear();
+        sessionById.clear();
+        log.info("Cleared {} session records", count);
+    }
 }

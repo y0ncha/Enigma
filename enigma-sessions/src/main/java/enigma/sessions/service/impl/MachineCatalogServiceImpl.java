@@ -116,6 +116,11 @@ public class MachineCatalogServiceImpl implements MachineCatalogService {
         return toDefinition(entity);
     }
 
+    @Override
+    public void clearRuntimeMetadata() {
+        runtimeMetadataByMachineName.clear();
+    }
+
     private void saveRotors(MachineEntity machine, MachineSpec machineSpec) {
         List<MachineRotorEntity> rotors = new ArrayList<>();
         for (RotorSpec rotorSpec : machineSpec.rotorsById().values()) {

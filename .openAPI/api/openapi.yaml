@@ -303,6 +303,19 @@ paths:
       - Enigma
       x-accepts:
       - application/json
+  /enigma/debug/storage:
+    delete:
+      description: |
+        Clears in-memory session state and removes all persisted machine, rotor,
+        reflector, and processing records so the API can restart from a clean slate.
+        This endpoint is intended for debugging and integration test tooling.
+      operationId: clearStorage
+      responses:
+        "204":
+          description: Storage cleared
+      summary: Clear runtime and persistent storage
+      tags:
+      - Enigma
 components:
   schemas:
     enigmaManualConfigRequest:
@@ -652,4 +665,3 @@ components:
       required:
       - error
       type: object
-

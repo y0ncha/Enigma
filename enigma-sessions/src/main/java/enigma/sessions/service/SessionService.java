@@ -17,4 +17,6 @@ public interface SessionService {
     List<SessionView> listSessions();
 
     SessionRuntime resolveOpenRuntime(UUID sessionId);
+
+    void clearSessions();
 }

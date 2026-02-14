@@ -11,4 +11,6 @@ public interface MachineCatalogService {
     List<MachineDefinition> listMachines();
 
     MachineDefinition resolveMachine(String machineName);
+
+    void clearRuntimeMetadata();
 }
