@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<SimpleErrorResponse> unsupportedMediaType(HttpMediaTypeNotSupportedException exception) {
         log.warn("Unsupported media type: {}", exception.getMessage());
-        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, exception.getMessage());
+        return build(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)

@@ -55,7 +55,7 @@ public class SessionController {
     }
 
     @GetMapping("/{sessionId}")
-    public SessionResponse get(@PathVariable UUID sessionId) {
+    public SessionResponse get(@PathVariable("sessionId") UUID sessionId) {
         return ResponseMapper.session(sessionService.getSession(sessionId));
     }
 
