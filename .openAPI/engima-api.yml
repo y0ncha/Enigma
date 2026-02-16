@@ -204,11 +204,11 @@ paths:
                       originalCodeCompact:
                         type: string
                         description: Compact string representation of the original code.
-                        example: "1-A | 2-B | 3-C | R:B | P:A-Z,B-Y"
+                        example: "<45,27,94><A(2),O(5),!(20)><III><A|Z,D|E>"
                       currentRotorsPositionCompact:
                         type: string
                         description: Compact string representation of the current rotors position.
-                        example: "1-B | 2-C | 3-D"
+                        example: "D(12),Q(4),Z(7)"
 
                   - description: Non-verbose mode (false or default) – compact only
                     type: object
@@ -231,11 +231,11 @@ paths:
                       originalCodeCompact:
                         type: string
                         description: Compact string representation of the original code.
-                        example: "1-A | 2-B | 3-C | R:B | P:A-Z,B-Y"
+                        example: "<45,27,94><A(2),O(5),!(20)><III><A|Z,D|E>"
                       currentRotorsPositionCompact:
                         type: string
                         description: Compact string representation of the current rotors position.
-                        example: "1-B | 2-C | 3-D"
+                        example: "D(12),Q(4),Z(7)"
 
   /enigma/config/manual:
     put:
@@ -317,6 +317,12 @@ paths:
           schema:
             type: string
           description: The text to process.
+        - name: sessionID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The active session identifier.
       responses:
         '200':
           description: Process result
@@ -331,7 +337,7 @@ paths:
                     example: "QWERTY"
                   currentRotorsPositionCompact:
                     type: string
-                    example: "B2-C5-D1"
+                    example: "D(12),Q(4),Z(7)"
 
   /enigma/history:
     get:
