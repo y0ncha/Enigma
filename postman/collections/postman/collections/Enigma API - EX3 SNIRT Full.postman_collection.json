@@ -2517,52 +2517,52 @@
   ],
   "variable": [
     {
-      "id": "5433f128-30c8-4a1f-837b-1e63246d4310",
+      "id": "dc075818-489f-4de2-9dd1-62868bda136b",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "7eb3501c-fc38-4d5c-b979-925216493995",
+      "id": "31919ab0-2704-4030-bcb5-2f2a9890605b",
       "key": "smallXmlPath",
       "value": "enigma-loader/src/test/resources/ex3-sanity-small.xml"
     },
     {
-      "id": "cb4a9c54-f447-49a9-be0e-bcf3bc0265b3",
+      "id": "7da0df04-6fec-4b78-94b7-c8bafe84614e",
       "key": "paperXmlPath",
       "value": "enigma-loader/src/test/resources/ex3-sanity-paper-enigma.xml"
     },
     {
-      "id": "8b126cb2-f9c3-491f-b944-5bcb5fd5af4d",
+      "id": "9efbb5a0-1837-4efe-84fc-9dc7e8d030c6",
       "key": "machineNameSmall",
       "value": "sanity"
     },
     {
-      "id": "dff52ba8-e678-4837-b315-af751192e763",
+      "id": "623a3de9-9a82-4d67-9e06-e6603224f120",
       "key": "machineNamePaper",
       "value": "paper-enigma"
     },
     {
-      "id": "df892620-58fb-4939-82c2-55aa9a3ac6a8",
+      "id": "89ac0e86-ccc5-42c0-80e7-6b7a9b8a3741",
       "key": "snirtSmallSessionMain",
       "value": ""
     },
     {
-      "id": "fc6fb086-fdb1-4808-b975-fff273bd6ac1",
+      "id": "23266cd1-405f-49ad-9f36-84a06a619c57",
       "key": "snirtSmallSessionAux",
       "value": ""
     },
     {
-      "id": "76179a3f-1503-4de5-8ecd-928413c99621",
+      "id": "c6e2071b-825f-4b77-8ee8-bd4cecccbc05",
       "key": "snirtSmallSessionPostClose",
       "value": ""
     },
     {
-      "id": "16618967-d388-4849-8ff8-b762162e29e5",
+      "id": "3bbdb1ee-ff08-48a3-a2a0-5224a1665911",
       "key": "snirtPaperSessionMain",
       "value": ""
     },
     {
-      "id": "aba3c689-cc67-4abc-9b90-9642aa83b50a",
+      "id": "08e86261-292d-4ba4-b63a-29dd01b7ae79",
       "key": "snirtPaperSessionAux",
       "value": ""
     }

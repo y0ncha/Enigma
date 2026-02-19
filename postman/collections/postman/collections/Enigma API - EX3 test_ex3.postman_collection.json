@@ -1050,52 +1050,52 @@
   ],
   "variable": [
     {
-      "id": "0d3af791-0378-4e35-90cc-614365122c39",
+      "id": "548690db-f88c-401c-acbe-c3931916f455",
       "key": "baseUrl",
       "value": "http://localhost:8080"
     },
     {
-      "id": "0b1f87e1-c0c8-43de-8865-55795bc6745a",
+      "id": "2eef9bd9-376c-4f3e-8cef-98dd9230c07b",
       "key": "testEx3XmlPath",
       "value": "enigma-loader/src/test/resources/test_ex3.xml"
     },
     {
-      "id": "cd04d22b-ce62-496e-899a-df2b9c0a5eb6",
+      "id": "55dc41cc-4761-4172-87e6-dc772bdac7ae",
       "key": "testEx3MachineName",
       "value": "enigma_test"
     },
     {
-      "id": "e22101a0-ff29-4d3a-ae87-809b71a3953a",
+      "id": "b5fba55f-739d-4473-ba12-b56e6bff0e72",
       "key": "testEx3SessionMain",
       "value": ""
     },
     {
-      "id": "670f2952-36b4-4813-a084-7575d3049bec",
+      "id": "f72a556b-d244-4d98-8ced-9fec73de25b7",
       "key": "testEx3SessionAux",
       "value": ""
     },
     {
-      "id": "b53408a1-497c-4832-a5e6-d505b2f5b8aa",
+      "id": "e7ac3ab2-54c2-40af-84a8-976fde5e2fe8",
       "key": "testEx3InputWithSpace",
       "value": "HELLO WORLD! HOW ARE YOU?'"
     },
     {
-      "id": "01fba7d0-94c8-4976-8d40-2289b4549183",
+      "id": "11f11b60-f78d-42cc-8389-e6430b408b67",
       "key": "testEx3CipherWithSpace",
       "value": ""
     },
     {
-      "id": "4c9b8e6c-3f08-4347-b335-a1ff7a64efe0",
+      "id": "6be1580d-78f8-4d65-9603-f593318ec72b",
       "key": "testEx3CipherWithSpaceEncoded",
       "value": ""
     },
     {
-      "id": "3e43461a-f0fc-4413-a6d1-85bc8c98b6bd",
+      "id": "08fca33f-8a8b-43b2-95ae-9bc4e0e220a0",
       "key": "testEx3AllLegalChars",
       "value": "ABCDEFGHIJKLMNOPQRSTUVWXYZ !?'"
     },
     {
-      "id": "1e348e1e-2fdd-4fd9-bf5d-f9ef47d4ff5a",
+      "id": "1b291298-5891-402e-9b21-f5e9844a42ed",
       "key": "testEx3InvalidInput",
       "value": "hello world"
     }
