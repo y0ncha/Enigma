@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProcessingServiceImpl implements ProcessingService {
@@ -45,7 +44,7 @@ public class ProcessingServiceImpl implements ProcessingService {
         SessionRuntime runtime = sessionService.resolveOpenRuntime(sessionId);
 
         ProcessTrace processTrace;
-        long durationMillis;
+        long durationNanos;
         MachineState state;
         String codeUsedForProcessing;
 
@@ -55,7 +54,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
             long startedAt = System.nanoTime();
             processTrace = runtime.engine().process(normalizedInput);
-            durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+            durationNanos = System.nanoTime() - startedAt;
             state = runtime.engine().machineData();
         }
 
@@ -68,7 +67,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 codeUsedForProcessing,
                 normalizedInput,
                 processTrace.output(),
-                durationMillis
+                durationNanos
         ));
 
         return new ProcessOutcome(
@@ -76,7 +75,7 @@ public class ProcessingServiceImpl implements ProcessingService {
                 runtime.machineName(),
                 normalizedInput,
                 processTrace.output(),
-                durationMillis,
+                durationNanos,
                 state
         );
     }

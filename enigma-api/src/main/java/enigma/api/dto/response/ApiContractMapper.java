@@ -65,7 +65,7 @@ public final class ApiContractMapper {
                     .add(new HistoryEntryResponse(
                             record.inputText(),
                             record.outputText(),
-                            record.durationMillis()));
+                            record.durationNanos()));
         }
 
         return grouped;

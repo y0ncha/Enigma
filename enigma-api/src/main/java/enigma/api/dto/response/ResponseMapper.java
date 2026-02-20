@@ -68,7 +68,7 @@ public final class ResponseMapper {
                 processRecordView.code(),
                 processRecordView.inputText(),
                 processRecordView.outputText(),
-                processRecordView.durationMillis(),
+                processRecordView.durationNanos(),
                 processRecordView.processedAt()
         );
     }

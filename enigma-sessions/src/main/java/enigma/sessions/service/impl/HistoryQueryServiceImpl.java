@@ -86,7 +86,7 @@ public class HistoryQueryServiceImpl implements HistoryQueryService {
                 entity.getCode(),
                 entity.getInputText(),
                 entity.getOutputText(),
-                entity.getDurationMillis(),
+                entity.getDurationNanos(),
                 null
         );
     }
