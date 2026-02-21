@@ -7,9 +7,8 @@
 
     <groupId>patmal.course.enigma</groupId>
     <artifactId>enigma-aggregator</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>pom</packaging>
-
     <name>Enigma Aggregator</name>
 
     <modules>
