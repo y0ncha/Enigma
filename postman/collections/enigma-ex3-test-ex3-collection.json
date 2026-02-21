@@ -1,0 +1,562 @@
+{
+  "info": {
+    "name": "Enigma API - EX3 test_ex3",
+    "description": "Sanity and behavioral tests for test_ex3.xml including inputs with legal space character.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "test_ex3 full flow",
+      "item": [
+        {
+          "name": "T0 clear storage (start)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/enigma/debug/storage"
+          }
+        },
+        {
+          "name": "T1 load machine test_ex3.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"load response includes machine name\", function () {",
+                  "  pm.expect(jsonData.name).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set(\"testEx3MachineName\", jsonData.name);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{testEx3XmlPath}}" }
+              ]
+            },
+            "url": "{{baseUrl}}/enigma/load"
+          }
+        },
+        {
+          "name": "T2 create session main",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"sessionID returned\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"testEx3SessionMain\", jsonData.sessionID);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{testEx3MachineName}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/enigma/session"
+          }
+        },
+        {
+          "name": "T3 create session aux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"sessionID returned\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"testEx3SessionAux\", jsonData.sessionID);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{testEx3MachineName}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/enigma/session"
+          }
+        },
+        {
+          "name": "T4 configure main manual (5 rotors)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "text/plain" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionID\": \"{{testEx3SessionMain}}\",\n  \"rotors\": [\n    { \"rotorNumber\": 8, \"rotorPosition\": \"A\" },\n    { \"rotorNumber\": 1, \"rotorPosition\": \"B\" },\n    { \"rotorNumber\": 9, \"rotorPosition\": \"C\" },\n    { \"rotorNumber\": 4, \"rotorPosition\": \"D\" },\n    { \"rotorNumber\": 6, \"rotorPosition\": \"E\" }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/enigma/config/manual"
+          }
+        },
+        {
+          "name": "T5 configure aux automatic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "text/plain" }
+            ],
+            "url": "{{baseUrl}}/enigma/config/automatic?sessionID={{testEx3SessionAux}}"
+          }
+        },
+        {
+          "name": "T6 get config main verbose=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"verbose fields exist\", function () {",
+                  "  pm.expect(jsonData).to.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/config?sessionID={{testEx3SessionMain}}&verbose=true"
+          }
+        },
+        {
+          "name": "T7 get config main default verbose=false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"default compact fields only\", function () {",
+                  "  pm.expect(jsonData).to.not.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.not.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/config?sessionID={{testEx3SessionMain}}"
+          }
+        },
+        {
+          "name": "T8 process main with spaces and punctuation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"output exists and length preserved\", function () {",
+                  "  pm.expect(jsonData.output).to.be.a(\"string\");",
+                  "  pm.expect(jsonData.output.length).to.eql((pm.collectionVariables.get(\"testEx3InputWithSpace\") || \"\").length);",
+                  "});",
+                  "pm.collectionVariables.set(\"testEx3CipherWithSpace\", jsonData.output);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/process?sessionID={{testEx3SessionMain}}&input={{testEx3InputWithSpace}}"
+          }
+        },
+        {
+          "name": "T9 reset main before decrypt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "text/plain" }
+            ],
+            "url": "{{baseUrl}}/enigma/config/reset?sessionID={{testEx3SessionMain}}"
+          }
+        },
+        {
+          "name": "T10 decrypt cipher back to original (roundtrip)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cipher = pm.collectionVariables.get(\"testEx3CipherWithSpace\") || \"\";",
+                  "pm.collectionVariables.set(\"testEx3CipherWithSpaceEncoded\", encodeURIComponent(cipher));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "const original = pm.collectionVariables.get(\"testEx3InputWithSpace\") || \"\";",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"roundtrip decrypt returns original\", function () {",
+                  "  pm.expect(jsonData.output).to.eql(original);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/process?sessionID={{testEx3SessionMain}}&input={{testEx3CipherWithSpaceEncoded}}"
+          }
+        },
+        {
+          "name": "T11 process all legal chars",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "const input = pm.collectionVariables.get(\"testEx3AllLegalChars\") || \"\";",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"all legal chars are accepted\", function () {",
+                  "  pm.expect(jsonData.output).to.be.a(\"string\");",
+                  "  pm.expect(jsonData.output.length).to.eql(input.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/process?sessionID={{testEx3SessionAux}}&input={{testEx3AllLegalChars}}"
+          }
+        },
+        {
+          "name": "T12 process lowercase input (expect 200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"lowercase input accepted\", function () {",
+                  "  pm.expect(jsonData.output).to.be.a(\"string\").and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/process?sessionID={{testEx3SessionMain}}&input={{testEx3InvalidInput}}"
+          }
+        },
+        {
+          "name": "T13 history by main session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"history object returned\", function () { pm.expect(jsonData).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/history?sessionID={{testEx3SessionMain}}"
+          }
+        },
+        {
+          "name": "T14 history by machine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"history object returned\", function () { pm.expect(jsonData).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/history?machineName={{testEx3MachineName}}"
+          }
+        },
+        {
+          "name": "T15 history invalid (both params, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/history?sessionID={{testEx3SessionMain}}&machineName={{testEx3MachineName}}"
+          }
+        },
+        {
+          "name": "T16 history invalid (no params, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/history"
+          }
+        },
+        {
+          "name": "T17 close main session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/enigma/session?sessionID={{testEx3SessionMain}}"
+          }
+        },
+        {
+          "name": "T18 process closed main session (expect 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/process?sessionID={{testEx3SessionMain}}&input={{testEx3InputWithSpace}}"
+          }
+        },
+        {
+          "name": "T19 history still available for closed session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"history object returned\", function () { pm.expect(jsonData).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/enigma/history?sessionID={{testEx3SessionMain}}"
+          }
+        },
+        {
+          "name": "T20 close aux session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/enigma/session?sessionID={{testEx3SessionAux}}"
+          }
+        },
+        {
+          "name": "T21 clear storage (end)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/enigma/debug/storage"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "testEx3XmlPath", "value": "enigma-loader/src/test/resources/test_ex3.xml" },
+    { "key": "testEx3MachineName", "value": "enigma_test" },
+    { "key": "testEx3SessionMain", "value": "" },
+    { "key": "testEx3SessionAux", "value": "" },
+    { "key": "testEx3InputWithSpace", "value": "HELLO WORLD! HOW ARE YOU?'" },
+    { "key": "testEx3CipherWithSpace", "value": "" },
+    { "key": "testEx3CipherWithSpaceEncoded", "value": "" },
+    { "key": "testEx3AllLegalChars", "value": "ABCDEFGHIJKLMNOPQRSTUVWXYZ !?'" },
+    { "key": "testEx3InvalidInput", "value": "hello world" }
+  ]
+}

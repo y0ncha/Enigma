@@ -1,0 +1,2570 @@
+{
+  "info": {
+    "_postman_id": "7a77d1eb-078b-4c69-8cf8-7454a67493d3",
+    "name": "Enigma API - EX3 SNIRT Full",
+    "description": "SNIRT full sanity for PAPER and SMALL. Covers all endpoints with interleaved parallel-style execution and full input/output vectors.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SNIRT - Full Matrix (PAPER + SMALL + Parallel)",
+      "item": [
+        {
+          "name": "SNIRT clear storage (start)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "9ef50d72-0fb0-47c8-891a-80cd851b5392"
+              }
+            }
+          ],
+          "id": "238ded52-ef7a-407c-a701-89f72953ac17",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/debug/storage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "debug",
+                "storage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT load SMALL machine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "fdb963aa-6981-4c16-b4ac-2645f9e1a133",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Load response has machine name\", function () { pm.expect(jsonData.name).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"machineNameSmall\", jsonData.name);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "fabc2899-368f-47fc-946d-8cd001debdf5",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "4bb25504-8e2f-43bd-9f17-fce53509bc2a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1f10b486-7dd4-4020-b08d-289ce12b276b"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT load PAPER machine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3ffdd641-8944-42ae-9e78-b81f9aedd303",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Load response has machine name\", function () { pm.expect(jsonData.name).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"machineNamePaper\", jsonData.name);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "d1ee01c0-27be-4100-a3ce-9922d1a10e59",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "477dfc9b-6615-42e4-9d19-aaeb3833deeb",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1f109da7-6786-4c00-81b7-15877c010e7b"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT create session - SMALL main",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Session has sessionID\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"snirtSmallSessionMain\", jsonData.sessionID);"
+                ],
+                "id": "58973b52-544f-4391-8686-88efed0eda33"
+              }
+            }
+          ],
+          "id": "293fd3cd-9a35-406d-9734-496197e4866c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{machineNameSmall}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT create session - SMALL aux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Session has sessionID\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"snirtSmallSessionAux\", jsonData.sessionID);"
+                ],
+                "id": "f4e93f44-b018-40b4-81c8-fa31fbefd52d"
+              }
+            }
+          ],
+          "id": "5c8b4beb-63d6-4aeb-a382-36441a3611a6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{machineNameSmall}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT create session - PAPER main",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Session has sessionID\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"snirtPaperSessionMain\", jsonData.sessionID);"
+                ],
+                "id": "4fce82aa-6f00-4ec0-bdb9-e4a61deca047"
+              }
+            }
+          ],
+          "id": "6bda878a-437a-4623-9942-e0fe381c7e4f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{machineNamePaper}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT create session - PAPER aux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Session has sessionID\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"snirtPaperSessionAux\", jsonData.sessionID);"
+                ],
+                "id": "c1205dc0-d841-4408-b0d9-7d85658bb764"
+              }
+            }
+          ],
+          "id": "43c0763c-3708-4896-803c-98b7d78e06a6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{machineNamePaper}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT configure SMALL main manual (<3,2,1><CCC><I>)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "3334d5de-6137-40c0-8a65-a50d97690a98"
+              }
+            }
+          ],
+          "id": "0622510a-a117-4a6a-91ce-4facd12ed8e7",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionID\": \"{{snirtSmallSessionMain}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"C\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"C\"\n    },\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"C\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT configure SMALL aux automatic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "101680c2-766c-487b-a47c-b0fc761efdb0"
+              }
+            }
+          ],
+          "id": "8c52f7ac-9c5c-4eaf-a326-64d11e13fd2f",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{snirtSmallSessionAux}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionAux}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT configure PAPER main manual (<1,2,3><ODX><I>)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "6bdc78c4-6c1f-463b-abba-c1259c32ca26"
+              }
+            }
+          ],
+          "id": "a14c7603-d504-418c-8593-1907e676833e",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionID\": \"{{snirtPaperSessionMain}}\",\n  \"rotors\": [\n    {\n      \"rotorNumber\": 1,\n      \"rotorPosition\": \"O\"\n    },\n    {\n      \"rotorNumber\": 2,\n      \"rotorPosition\": \"D\"\n    },\n    {\n      \"rotorNumber\": 3,\n      \"rotorPosition\": \"X\"\n    }\n  ],\n  \"reflector\": \"I\",\n  \"plugs\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT configure PAPER aux automatic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "28a22dd2-065a-4a48-8f34-7f44d8c9b0db"
+              }
+            }
+          ],
+          "id": "eea95e2e-7615-4dc0-ab6c-332fbae2bae6",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{snirtPaperSessionAux}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionAux}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT get state SMALL main (verbose=true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Verbose includes detailed fields\", function () {",
+                  "  pm.expect(jsonData).to.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ],
+                "id": "9f2bbb16-9557-4117-a85a-78c258f5264a"
+              }
+            }
+          ],
+          "id": "76ad1288-357e-4b49-893f-691a4e66422d",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{snirtSmallSessionMain}}&verbose=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "verbose",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT get state SMALL main (default verbose=false)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Default omits verbose-only fields\", function () {",
+                  "  pm.expect(jsonData).to.not.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.not.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ],
+                "id": "c0990d52-4a21-443d-9842-c38a8968473f"
+              }
+            }
+          ],
+          "id": "1a223866-30b5-4afa-94fa-4892fda3faad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT get state PAPER main (verbose=true)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Verbose includes detailed fields\", function () {",
+                  "  pm.expect(jsonData).to.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ],
+                "id": "7c87c5e3-e9de-4ab8-a11d-eea9f5c4f70a"
+              }
+            }
+          ],
+          "id": "cc83dbce-d400-4ccf-8afc-108a31641356",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{snirtPaperSessionMain}}&verbose=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "verbose",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT get state PAPER main (default verbose=false)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Default omits verbose-only fields\", function () {",
+                  "  pm.expect(jsonData).to.not.have.property(\"originalCode\");",
+                  "  pm.expect(jsonData).to.not.have.property(\"currentRotorsPosition\");",
+                  "  pm.expect(jsonData).to.have.property(\"originalCodeCompact\");",
+                  "  pm.expect(jsonData).to.have.property(\"currentRotorsPositionCompact\");",
+                  "});"
+                ],
+                "id": "43503644-ea8c-4976-b379-c3bbead2701a"
+              }
+            }
+          ],
+          "id": "f5519cc5-70dd-42cf-b565-949837b774ff",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 1 reset SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "27e78baa-5cb4-4883-b946-850cfc3ac88f"
+              }
+            }
+          ],
+          "id": "8a032d4e-fc90-4488-b6d3-09aedcb5d166",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 1 reset PAPER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "71152ad7-b30a-4e2a-8aff-6f3629b9a8b5"
+              }
+            }
+          ],
+          "id": "bace11d2-75ad-43ba-a25a-2189cc0dcc48",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 1 process SMALL (AABBCCDDEEFF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"SMALL #1 output\", function () { pm.expect(jsonData.output).to.eql(\"FFCCBBEEDDAA\"); });"
+                ],
+                "id": "26b98eb5-050b-4b81-86e5-9a5cd6e522dc"
+              }
+            }
+          ],
+          "id": "9fc94417-02f5-4c50-b85c-1dcb3902a24a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=AABBCCDDEEFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "AABBCCDDEEFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 1 process PAPER (THERAINISDROPPING)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PAPER #1 output\", function () { pm.expect(jsonData.output).to.eql(\"APZTICDXRVMWQHBHU\"); });"
+                ],
+                "id": "4342fd09-957e-40e8-ad41-9d4ff0180391"
+              }
+            }
+          ],
+          "id": "1edbe80e-b2c3-4bc0-a7a7-b165be4d3568",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=THERAINISDROPPING",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "THERAINISDROPPING"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 2 reset SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "512144a8-4704-4bee-b158-d33c66aadecc"
+              }
+            }
+          ],
+          "id": "57c4434c-bd16-4975-9b80-ad242ec63133",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 2 reset PAPER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "3c6e2ac1-2154-420c-a897-9507d011cf7c"
+              }
+            }
+          ],
+          "id": "96a85fd9-d624-46ac-85b9-06623d62533e",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 2 process SMALL (FEDCBADDEF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"SMALL #2 output\", function () { pm.expect(jsonData.output).to.eql(\"ADEBCFEEDA\"); });"
+                ],
+                "id": "21a533ec-0fdf-4442-82c2-1b0c9e1eb5ac"
+              }
+            }
+          ],
+          "id": "fbc8b116-90ed-43cc-a85c-865bff88bda8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=FEDCBADDEF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "FEDCBADDEF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 2 process PAPER (HELLOWORLD)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PAPER #2 output\", function () { pm.expect(jsonData.output).to.eql(\"DLTBBQVPQV\"); });"
+                ],
+                "id": "9a0af44c-f65d-4dbd-a0cd-31bcb53f24d0"
+              }
+            }
+          ],
+          "id": "e88740b4-9d17-4dfb-ab14-355b692bf2ae",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=HELLOWORLD",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "HELLOWORLD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 3 reset SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "76b4c1ed-c80b-467d-b0a9-3c4becd68682"
+              }
+            }
+          ],
+          "id": "258e9231-770e-450e-801d-7231cf8efa05",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 3 reset PAPER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "188f5335-2cf7-4abd-82fe-a6d7ce78fc9c"
+              }
+            }
+          ],
+          "id": "44899596-4ff0-45de-9187-a2c835ca728a",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 3 process SMALL (FEDCBAABCDEF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"SMALL #3 output\", function () { pm.expect(jsonData.output).to.eql(\"ADEBCFFCBEDA\"); });"
+                ],
+                "id": "c2761806-f6cd-44b7-8ea1-d51eb5af81a2"
+              }
+            }
+          ],
+          "id": "041db5d4-3cf9-4b0c-b24e-e63aa4a284c1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=FEDCBAABCDEF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "FEDCBAABCDEF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 3 process PAPER (ENIGMAMACHINEROCKS)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PAPER #3 output\", function () { pm.expect(jsonData.output).to.eql(\"QMJIDORMMYQBJDVSBR\"); });"
+                ],
+                "id": "30aabdb8-2958-4091-a124-73b97b81a46c"
+              }
+            }
+          ],
+          "id": "4e9eec05-7a90-47f2-88cf-d196af90d3bb",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=ENIGMAMACHINEROCKS",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "ENIGMAMACHINEROCKS"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 4 reset SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "5a7a297e-8467-467f-a258-a790194db5e4"
+              }
+            }
+          ],
+          "id": "9bf708d0-4920-4d8c-855d-ebc7321a0543",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 4 reset PAPER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "18765e60-a293-4650-b32d-3fec83007a73"
+              }
+            }
+          ],
+          "id": "696eeca8-db41-4d22-bb94-407f9081a662",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 4 process SMALL (AFBFCFDFEFFF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"SMALL #4 output\", function () { pm.expect(jsonData.output).to.eql(\"FACABAEADAAA\"); });"
+                ],
+                "id": "aa0782b2-0c3a-4942-b7fb-3e3d96273fab"
+              }
+            }
+          ],
+          "id": "45b23b91-e179-457c-8d21-fbe392929605",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=AFBFCFDFEFFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "AFBFCFDFEFFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 4 process PAPER (WOWCANTBELIEVEITACTUALLYWORKS)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PAPER #4 output\", function () { pm.expect(jsonData.output).to.eql(\"CVRDIZWDAWQKUKBVHJILPKRNDXWIY\"); });"
+                ],
+                "id": "5b2a9cb6-5a83-40bc-bfad-ff7388ec33e3"
+              }
+            }
+          ],
+          "id": "9383227e-d273-4770-8a0c-5851d70390f2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=WOWCANTBELIEVEITACTUALLYWORKS",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "WOWCANTBELIEVEITACTUALLYWORKS"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 5 reset SMALL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "a657bc3c-f7b6-446b-a843-e1bfce0c3646"
+              }
+            }
+          ],
+          "id": "037057c1-8793-4e5c-b64a-e8d6dab86972",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 5 reset PAPER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "63faf109-9da7-4f28-9f2b-ddf879639a78"
+              }
+            }
+          ],
+          "id": "54ba1f4d-2d4e-49a5-8b55-1ccdcd778696",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 5 process SMALL (AAAEEEBBBDDDCCCFFF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"SMALL #5 output\", function () { pm.expect(jsonData.output).to.eql(\"FFFDDDCCCEEEAFEDCB\"); });"
+                ],
+                "id": "de7be73f-242f-4132-a478-b9d176167b6c"
+              }
+            }
+          ],
+          "id": "bcda5ec8-8cd1-4830-86cd-6f818e744769",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=AAAEEEBBBDDDCCCFFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "AAAEEEBBBDDDCCCFFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT round 5 process PAPER (JAVARULES)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PAPER #5 output\", function () { pm.expect(jsonData.output).to.eql(\"MRUHFRZZR\"); });"
+                ],
+                "id": "e95b5399-188f-4f56-9b27-fc0a8d4c1f3f"
+              }
+            }
+          ],
+          "id": "f38ef8b1-f3c8-420c-8d68-2794c65638fc",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=JAVARULES",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "JAVARULES"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by SMALL session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "974327ff-3595-49b1-8bc9-d886308c5ad6"
+              }
+            }
+          ],
+          "id": "6c5548e8-13f3-49f5-83eb-f9372af8bd34",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by PAPER session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "e9937a62-51df-44ee-8ee1-4eb8e53aeeed"
+              }
+            }
+          ],
+          "id": "2e4e4007-c0e0-4fab-841e-a428f72a89a8",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by SMALL machine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "75423960-6150-45e7-81db-738657df01bc"
+              }
+            }
+          ],
+          "id": "9d2fcb9a-be2b-4e22-883a-b8e9e0f14d15",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName={{machineNameSmall}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": "{{machineNameSmall}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by PAPER machine",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "cefedc60-0d5f-40df-960d-9499972c004f"
+              }
+            }
+          ],
+          "id": "1727d2a5-bb67-4f11-952a-27e4a12aef01",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName={{machineNamePaper}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": "{{machineNamePaper}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT close SMALL aux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "9901c7de-8dd2-4163-9c30-7315fef0111e"
+              }
+            }
+          ],
+          "id": "4f9b27ee-45f4-443f-9700-8aacf5dabcfd",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{snirtSmallSessionAux}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionAux}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT close PAPER aux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "b144d3f8-665a-4e33-a4ad-09f33fbc13d4"
+              }
+            }
+          ],
+          "id": "afa0ceea-9d87-41f8-ac42-04c751a10cc8",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{snirtPaperSessionAux}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionAux}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT close SMALL main",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "85162d32-7385-484e-ac96-ea7ce60d7096"
+              }
+            }
+          ],
+          "id": "a652afe8-e176-4a13-8ab1-6cf460e87f42",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT close PAPER main",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "53ddf848-734e-4053-b2e2-bf5cd2f36962"
+              }
+            }
+          ],
+          "id": "4db42bfe-586d-4063-94a5-a86e25bcacc9",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT process SMALL main after close (expect 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "id": "1223cd89-77cf-4f7a-a66a-3824f4f4f7f7"
+              }
+            }
+          ],
+          "id": "1f7db3c6-f241-4cf3-9ed8-32ee82c3d77f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionMain}}&input=AABBCCDDEEFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "AABBCCDDEEFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT process PAPER main after close (expect 409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "id": "d966977a-81bf-4ee8-95bb-cec52a0726be"
+              }
+            }
+          ],
+          "id": "3fcfc8f3-f25d-44a8-9a75-620b88446480",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtPaperSessionMain}}&input=THERAINISDROPPING",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                },
+                {
+                  "key": "input",
+                  "value": "THERAINISDROPPING"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by SMALL session after close",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"History payload exists\", function () { pm.expect(jsonData).to.be.an(\"object\"); });"
+                ],
+                "id": "65b034d8-17f5-4c75-9755-14f8b919ea0b"
+              }
+            }
+          ],
+          "id": "bbad4bd4-c1b1-4767-aea9-287c65278170",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{snirtSmallSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history by PAPER session after close",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"History payload exists\", function () { pm.expect(jsonData).to.be.an(\"object\"); });"
+                ],
+                "id": "b086b59f-5e9b-4d2e-ad9a-9d6da3776b92"
+              }
+            }
+          ],
+          "id": "e12a1296-9a52-4f31-ba0d-454074231a8e",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{snirtPaperSessionMain}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtPaperSessionMain}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history invalid query (both params, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "id": "2108b951-d7ad-4369-88e0-2ba3d41e0558"
+              }
+            }
+          ],
+          "id": "44252cd5-771c-4846-92a6-dd04da48d995",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{snirtSmallSessionMain}}&machineName={{machineNameSmall}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionMain}}"
+                },
+                {
+                  "key": "machineName",
+                  "value": "{{machineNameSmall}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT history invalid query (no params, expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "id": "4e487e31-7c23-48e2-acb0-2eef29841731"
+              }
+            }
+          ],
+          "id": "616701bd-6d01-4ed7-b7a5-1faa43f4d9b5",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT create session - SMALL post-close",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Session has sessionID\", function () { pm.expect(jsonData.sessionID).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"snirtSmallSessionPostClose\", jsonData.sessionID);"
+                ],
+                "id": "2054804b-4d1e-4394-890e-51c4274ee930"
+              }
+            }
+          ],
+          "id": "5981b18e-da99-4b2e-b025-9c4a6b2d6512",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machine\": \"{{machineNameSmall}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT configure SMALL post-close automatic",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "id": "5a25fbe7-4a4d-4cc4-b158-fe277e3705e3"
+              }
+            }
+          ],
+          "id": "e73cb569-1aef-4436-ad46-a01eaf0ce15a",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{snirtSmallSessionPostClose}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionPostClose}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT process SMALL post-close session (expect 200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test(\"Process output exists\", function () { pm.expect(jsonData.output).to.be.a(\"string\").and.not.empty; });"
+                ],
+                "id": "d8f6dc78-c69b-4157-9510-13635e0cea88"
+              }
+            }
+          ],
+          "id": "47e2f91f-37b9-478e-9968-b19570e320b5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{snirtSmallSessionPostClose}}&input=AABBCCDDEEFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionPostClose}}"
+                },
+                {
+                  "key": "input",
+                  "value": "AABBCCDDEEFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT process missing sessionID (expect 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "id": "51d1603c-e3a3-49d7-8cb7-4664f29ac886"
+              }
+            }
+          ],
+          "id": "72216a72-5cf7-41c2-b420-7460ec5d2310",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?input=AABBCCDDEEFF",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "AABBCCDDEEFF"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT close SMALL post-close session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "945b4b34-21b4-4abc-a4bb-58299059366a"
+              }
+            }
+          ],
+          "id": "b79d3198-5574-4298-8db2-6296ef265b5e",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{snirtSmallSessionPostClose}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{snirtSmallSessionPostClose}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SNIRT clear storage (end)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "id": "0bcbb242-afe3-4166-a013-6084266ac220"
+              }
+            }
+          ],
+          "id": "43bc66fd-73b6-4bf4-850f-9ced511b14a1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/debug/storage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "debug",
+                "storage"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "d3e972e7-d800-4ab8-8cad-caf62988c0e9"
+    }
+  ],
+  "variable": [
+    {
+      "id": "dc075818-489f-4de2-9dd1-62868bda136b",
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "id": "31919ab0-2704-4030-bcb5-2f2a9890605b",
+      "key": "smallXmlPath",
+      "value": "enigma-loader/src/test/resources/ex3-sanity-small.xml"
+    },
+    {
+      "id": "7da0df04-6fec-4b78-94b7-c8bafe84614e",
+      "key": "paperXmlPath",
+      "value": "enigma-loader/src/test/resources/ex3-sanity-paper-enigma.xml"
+    },
+    {
+      "id": "9efbb5a0-1837-4efe-84fc-9dc7e8d030c6",
+      "key": "machineNameSmall",
+      "value": "sanity"
+    },
+    {
+      "id": "623a3de9-9a82-4d67-9e06-e6603224f120",
+      "key": "machineNamePaper",
+      "value": "paper-enigma"
+    },
+    {
+      "id": "89ac0e86-ccc5-42c0-80e7-6b7a9b8a3741",
+      "key": "snirtSmallSessionMain",
+      "value": ""
+    },
+    {
+      "id": "23266cd1-405f-49ad-9f36-84a06a619c57",
+      "key": "snirtSmallSessionAux",
+      "value": ""
+    },
+    {
+      "id": "c6e2071b-825f-4b77-8ee8-bd4cecccbc05",
+      "key": "snirtSmallSessionPostClose",
+      "value": ""
+    },
+    {
+      "id": "3bbdb1ee-ff08-48a3-a2a0-5224a1665911",
+      "key": "snirtPaperSessionMain",
+      "value": ""
+    },
+    {
+      "id": "08e86261-292d-4ba4-b63a-29dd01b7ae79",
+      "key": "snirtPaperSessionAux",
+      "value": ""
+    }
+  ]
+}

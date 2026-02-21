@@ -1,0 +1,4490 @@
+{
+  "info": {
+    "_postman_id": "f50264b1-15c3-43cc-af81-0e14947be95c",
+    "name": "Enigma API - EX3 Invalid Inputs Matrix",
+    "description": "Negative and boundary tests from API/controller/service logic. 80+ checks.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "EX3 invalid inputs",
+      "item": [
+        {
+          "name": "S00 clear storage start",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "id": "5d7c6af1-c5d4-4307-b54b-35b7e149c700"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "820f8aa3-61bb-4cac-b118-f409a3030c54",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/debug/storage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "debug",
+                "storage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S01 load test_ex3 machine",
+          "event": [
+            {
+              "script": {
+                "id": "e8762c02-3973-4b72-a5db-cf26f43aff0d",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const j=pm.response.json(); pm.collectionVariables.set(\"invalidMachineName\", j.name);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              },
+              "listen": "test"
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "2c798a7b-3047-4fe5-bcba-7d07b38a2cc5",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "bf1279c7-a2de-42a9-8080-c34c6f6f8c1b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1f10b4f3-451e-4420-a1b6-cefed4b6f7ed"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S02 create configured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const j=pm.response.json(); pm.collectionVariables.set(\"invalidSessionConfigured\", j.sessionID);"
+                ],
+                "type": "text/javascript",
+                "id": "84868058-c52d-48f2-a6a8-7d22fdcb4085"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8b59ea55-4a64-4e2c-b032-76793a0eee3b",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":\"{{invalidMachineName}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S03 configure configured session valid manual",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "da64c355-1997-4c3e-a449-f3d02b50d72e"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c5c590f5-bc0b-4e95-bcb2-eef7ba6a70a8",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S04 create unconfigured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const j=pm.response.json(); pm.collectionVariables.set(\"invalidSessionUnconfigured\", j.sessionID);"
+                ],
+                "type": "text/javascript",
+                "id": "01d43f07-950f-4b54-bec3-bd0a8e38360a"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e00ec1f4-7c81-4edf-8bf0-85cbd7e631f8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":\"{{invalidMachineName}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S05 create session to close",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const j=pm.response.json(); pm.collectionVariables.set(\"invalidSessionClosed\", j.sessionID);"
+                ],
+                "type": "text/javascript",
+                "id": "af4637b8-b3c7-4fa8-8b28-22df19aa2fc2"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2c01162b-ee8b-4073-be02-7180a52dbb9e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":\"{{invalidMachineName}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S06 close prepared session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "id": "f975072d-77f1-43fc-aeed-c6abe43c373e"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3f32e738-03e0-41de-9232-de770983d50f",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "L01 load missing file part",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });",
+                  "let j={}; try{j=pm.response.json()}catch(e){}",
+                  "pm.test(\"Error contains expected text\", function(){ pm.expect((j.error||pm.response.text()||\"\").toString()).to.include(\"File not provided\"); });"
+                ],
+                "type": "text/javascript",
+                "id": "11513b88-9900-4bbb-ad89-e4d646cacd64"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "9b5ab896-097e-4546-af2f-52adee60276e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "L02 load wrong multipart key",
+          "event": [
+            {
+              "script": {
+                "id": "e70f17c3-5d76-4918-8603-83f65ad260fb",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });",
+                  "let j={}; try{j=pm.response.json()}catch(e){}",
+                  "pm.test(\"Error contains expected text\", function(){ pm.expect((j.error||pm.response.text()||\"\").toString()).to.include(\"File not provided\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              },
+              "listen": "test"
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "39f88a6e-90dc-4e78-9833-f1f0672d2636",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "b23558b2-82ae-43b9-a2f9-ecd047573660",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "xml",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1f10b4f3-451e-4420-a1b6-cefed4b6f7ed"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "L03 load duplicate machine name",
+          "event": [
+            {
+              "script": {
+                "id": "d607ac1b-8018-4927-bc0f-3a62c3e7d8c9",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });",
+                  "let j={}; try{j=pm.response.json()}catch(e){}",
+                  "pm.test(\"Error contains expected text\", function(){ pm.expect((j.error||pm.response.text()||\"\").toString()).to.include(\"Machine name already exists\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              },
+              "listen": "test"
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "c59b8760-4cd7-4a18-9c1e-aa5264c82ab4",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "df4dd63e-c2b0-43f8-9cbe-1307fd347488",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1f10b4f3-451e-4420-a1b6-cefed4b6f7ed"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE01 create session missing body",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "4f3c8475-bdf9-4499-9b23-1ba1966e254f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "37f66596-2dd6-493c-b910-7c4689225c9c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE02 create session empty body",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "5d58b148-f4b3-44fc-86fb-d70d74c22225"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "d473bfb2-5748-4de3-b857-8490b1fb4afd",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE03 create session machine blank",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "6a985c64-2a9e-4afd-9ccd-ad9089e711d9"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2e1e9470-f7c0-4ee8-9c7d-e96066a90dbb",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":\"  \"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE04 create session machine null",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "ce24c0f1-633f-44ae-b779-a49041e1c56c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "95f1d4f6-6d5a-4e2f-80bf-51edc82afcc9",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":null}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE05 create session unknown machine",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "36018346-6723-46a9-b6cd-988ae90d444a"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3ea3493c-611e-440b-88a5-ea4e854cfb45",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"machine\":\"no-such-machine\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE06 create session malformed json",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "be6f0b99-8e99-4da9-bc05-69dcc405c1d4"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8a51f33f-f421-4bcc-b833-8e21aa610c99",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE07 delete session missing sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "1d68aa32-fcc0-431a-89fa-56b6f1689f4c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "67f5eedd-d2ab-433a-82ca-74e0d162621c",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE08 delete session blank sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "b18be759-5780-4566-888b-31b443f192fa"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e79a2698-8a1e-4669-825e-23901c7e2e95",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE09 delete session invalid UUID format",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "04e93398-7775-4934-86f4-8f46daa49d16"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "22127e00-9e68-4cbc-acf6-ab70b5cb1693",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID=not-a-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "not-a-uuid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE10 delete session unknown UUID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "a7d75f6f-79d6-4361-a642-0bcc9b9d8d44"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8accf723-a7ce-4c7b-871f-c494219d5de9",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE11 delete already closed session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "4aca5552-17df-4f2d-9daa-40cde1f8379c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "9c19ff5b-6bea-4f77-a400-b4c11d98d805",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE12 get session invalid UUID path",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "02875d13-958a-44e0-96ee-4c88f4b63643"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "ed4ab9fd-a53c-43bf-af74-5b566fd937cf",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session/not-a-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session",
+                "not-a-uuid"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE13 get session unknown UUID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "724dac80-d135-479e-b57d-3cab7d926e1b"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "ab6ded2b-fa5e-4144-8888-bf24b2d18fef",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session/{{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session",
+                "{{unknownSessionId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SE14 create session wrong media type",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 415\", function () { pm.response.to.have.status(415); });"
+                ],
+                "type": "text/javascript",
+                "id": "75ea7c16-d0a9-4da1-8dbb-8f4f2a0f88db"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "868fb795-fa73-4a69-8327-08940ee6bef1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "machine=enigma_test",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM01 manual missing body",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "4f8d497e-88c4-4a8a-9d41-74ea94621f64"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "390b6469-c457-4f40-9638-712eb30df9b4",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM02 manual malformed json",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "74031062-b595-4350-898d-a223faab2af2"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "20f9b9c9-5479-49e9-ac1c-4e4244cd3e72",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM03 manual sessionID missing",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "f013f6ee-b450-4766-91da-5eefc9895b05"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e33557c8-e4f7-4138-8bc6-9074505fcaf2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"}],\"plugs\":[],\"reflector\":\"I\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM08 manual rotors missing",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "34d806b3-e202-4d03-8620-68bd783dfb90"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "16a5111d-bee4-4c5f-a80f-792c5db90e76",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM09 manual rotors null",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "44f913bd-41b5-4817-992a-ca11a6226714"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c5430a66-0788-4d7a-b890-d75c96573178",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":null,\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM10 manual rotors empty",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "ca33c91a-d091-4759-aa35-21381cde9376"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "baf1d751-82a9-4075-88cb-f092e79acc71",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM22 manual reflector missing",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "d31feb55-c718-4592-9d53-95e6fe8e813f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8626dadc-ad88-4d00-b936-17aaab0b083f",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM31 manual wrong field sessionId",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "a25fc6f7-00d4-4a23-9dfd-04fd50201e97"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a7ef4261-b09d-4f19-8d01-3eb5a2faecba",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionId\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM32 manual wrong media type",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 415\", function () { pm.response.to.have.status(415); });"
+                ],
+                "type": "text/javascript",
+                "id": "9cf47cbd-8093-4a83-b72b-f3435d90a321"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "263e87d2-8eda-4d6d-9b9f-b701094bfb8a",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "not-json",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM33 manual rotors element missing rotorNumber",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "c5208697-f2e6-4cd1-9287-4fbe967e96fa"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a172bedc-9943-4f4a-b4d0-df5b37d4a806",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM34 manual rotors element missing rotorPosition",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "2c104cc6-e3c2-4dae-92a5-5d507d42c222"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "10132872-5d78-4354-b6ca-a96001ab2455",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM35 manual plugs object missing plug2",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "fff42164-47ff-4239-9150-004926c226d8"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "e78ea10c-6bf0-439f-b0fc-7d9091929865",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[{\"plug1\":\"A\"}],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CM36 manual plugs object missing plug1",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "b1b68ca4-83f6-494b-90ea-7c57ea19c640"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7707ce20-1604-4902-ad65-418082894872",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"A\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[{\"plug2\":\"A\"}],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS01 status missing sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "a2fc8fed-f09d-40d3-9a58-a0dddf3b4ee7"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "d41a5de6-dc13-4ec4-bef7-3a536c22e6f6",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS02 status blank sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "74e360ba-ef26-4679-9531-b50d9349a3fa"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "fb586eae-e96a-4bec-a98c-6c33f707dc7a",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS03 status invalid sessionID format",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "43ef98b6-4ae5-4c11-ae78-924bc68f3082"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c85fe15f-1a38-46ed-8d65-47aa6bd29ed1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID=bad-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "bad-uuid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS04 status unknown sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "bb4816ea-1bc3-4dee-a7eb-2a271b43c932"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "838a1459-e1a9-4f8c-ab4e-6f665b11ec09",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS05 status closed sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "514762c1-371c-4f1e-a10d-89b3f7e1f52c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8f547366-abe3-42b9-81f7-9e9fa3215206",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CS06 status invalid verbose value",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "4725c199-6f27-4df7-b451-d3db6543f3ba"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "dacb1ee6-15b0-4161-ae75-3072702bba7c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config?sessionID={{invalidSessionConfigured}}&verbose=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "verbose",
+                  "value": "abc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CA01 automatic missing sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "1c5916e8-bf38-420c-9930-de6339982ec1"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "975749f5-aa9e-4a27-9f96-cb374422a44a",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CA02 automatic blank sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "58bf4b5d-7843-46ad-a47a-62abd4848aa9"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "cf7af53d-d3fc-414a-bba4-b5bbc6f34f0b",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID= ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": " "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CA03 automatic invalid sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "3c3dbf4e-4954-43a1-b4f8-bc2c48536791"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "10d2d159-54d6-4e73-b6a3-725a50a4dc0a",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID=bad-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "bad-uuid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CA04 automatic unknown sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "8f37445c-37b0-4369-82c4-126145c04147"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b6913f44-85b7-4963-9eb5-66472f4cd859",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CA05 automatic closed sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "1ece1e92-20c8-4b5f-963d-0aa3f21e6dae"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "bb1afc3a-5848-4e50-869e-7c0d6c29a1c0",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/automatic?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "automatic"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR01 reset missing sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "30207363-2b43-462c-ae06-3f945f0bf739"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3eaaa302-c026-4afe-973a-49aefbecb912",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR02 reset blank sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "407b99d2-7d08-451f-8cd9-b0af8f5bca0f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "38907afc-14f7-437c-bd5e-b412b1cb80a0",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID= ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": " "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR03 reset invalid sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "508f7180-1d73-4693-b060-4413654324e9"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "1325810f-0d80-4226-8c38-352eec4832a5",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID=bad-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "bad-uuid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR04 reset unknown sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "5ad555d4-5e1a-49c3-abb6-5dec9f64d2c9"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f0b60ac7-1010-4107-b79a-cfb45d8f9043",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR05 reset closed sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "aa7d4d8d-f39a-4fd9-bd72-305ee69e6715"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7abb67a5-f134-48f5-ba88-adc4146cb2d4",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CR06 reset unconfigured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "8d70c999-22c3-433c-86dc-cd97e155e0f4"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7640e70c-6b84-420b-aa4e-4e7a8e55e975",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/reset?sessionID={{invalidSessionUnconfigured}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "reset"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionUnconfigured}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P01 process missing input",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "38156a71-533f-4d23-8303-9ecb0542dfcb"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a27466e0-93af-400c-b0e9-3cac574a6623",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P02 process missing sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "2f2237f7-a0ce-4610-9c93-2dfab1d696a7"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "72329ce4-3db0-4a81-837e-2f65196d6d0a",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P03 process missing both params",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "b536f1aa-a131-4a61-a116-9978f2c74c02"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "23673f61-8a11-4f59-88c0-49517cef5434",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P04 process blank sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "350cacba-58b5-4133-a688-bdb96f7d0039"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "39d66621-a4c5-49b5-85c0-fbf73dbc7e27",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID=   &input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "   "
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P05 process invalid sessionID format",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "1f03b1b2-26c7-46e8-9937-f90c08cf588c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "326dae4e-3fdc-4715-846c-5bbda0ab5dae",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID=bad-uuid&input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "bad-uuid"
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P06 process unknown sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "e03d5f2f-47e0-4e98-a906-cedf1111a679"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "11f0b0a3-5b57-4445-aedd-ae16251f5288",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{unknownSessionId}}&input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P07 process closed sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "id": "fb98a27a-8c2d-4ea1-a720-0c21f3a70819"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "36cbb135-f3bf-485e-823d-196914ed4e13",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionClosed}}&input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P08 process unconfigured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "9924b50b-a74c-4e3c-b22c-8f6fcfb311b8"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f4e7da77-9799-4253-bb29-f76c24d7e19a",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionUnconfigured}}&input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionUnconfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P09 process invalid symbol @",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "f8d00474-0104-471c-8125-11cf7735c6be"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "83fd23c0-cc51-4d14-a467-4451365a95ed",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=A@C",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "A@C"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P10 process control newline",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "bd66b531-aa57-4f3b-b2d2-f99a0b463293"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "f3172e76-2c38-4226-899e-91db49c8e4dc",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=A%0AB",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "A%0AB"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P11 process control tab",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "e88dd051-cd21-4e60-a847-b63a160f246c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8cb12483-721c-44a8-bfca-6f9512839571",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=A%09B",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "A%09B"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P12 process wrong query key sessionId",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "13143bcd-8812-4b11-8833-e98d19cef2c3"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2b7569a1-32e3-43bb-9ffa-a0d0ac8b77b7",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionId={{invalidSessionConfigured}}&input=ABC",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "ABC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P13 process empty input allowed",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "const j=pm.response.json(); pm.test(\"Empty output\", function(){ pm.expect(j.output).to.eql(\"\"); });"
+                ],
+                "type": "text/javascript",
+                "id": "89b1962e-b5b9-4585-94be-b6edd64a673f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "a0b112a3-7fb9-41c9-8a86-ddb7eea036b8",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P14 process lowercase accepted",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "7e8b9f3f-5a7e-4b75-9225-1451f8df2a77"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8b84ab74-696d-49f0-b9a3-b8ac92a93ac2",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=hello",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "hello"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P15 process apostrophe and space legal",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "1122db55-e41d-4cbb-be07-9bb35bb7b9a0"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "d40361e7-b9b8-4073-aeb8-c976e88bb28b",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=I%20CAN'T",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "I%20CAN'T"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "P16 process illegal unicode char",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "eb4fe390-ef83-4845-940d-abe5d7903e82"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "56a473eb-9ced-4604-9773-491ad200b403",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/process?sessionID={{invalidSessionConfigured}}&input=A%D7%90B",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "process"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "input",
+                  "value": "A%D7%90B"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H01 history no params",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "20749f90-7aaa-4e53-ad45-a8cb602a92c6"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "cc473a94-d3df-407b-82e5-2269cafa4ef5",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H02 history both params",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "0584914a-afbb-4f97-aa2d-76583b66d47f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c262ee39-2cc6-48b9-948c-adf8743a0e54",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{invalidSessionConfigured}}&machineName={{invalidMachineName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "machineName",
+                  "value": "{{invalidMachineName}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H03 history invalid sessionID format",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "ab161d7e-19ba-42e6-ad69-608f77b1da7f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b6fc5818-9e81-47ed-b612-7ac8c7440a0a",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID=not-a-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "not-a-uuid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H04 history unknown sessionID",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "1998f697-2825-4e00-aae0-a78594e40620"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "359a4322-5a0c-4d35-bce1-7c133b5014ca",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{unknownSessionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{unknownSessionId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H05 history unknown machineName",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "id": "5dcac0a4-567c-4665-81da-f4d93848564b"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "1b6c1634-859d-4a6b-9ba4-471453438ac5",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName=no-such-machine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": "no-such-machine"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H06 history blank machineName only",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "23c6f3e7-af75-4269-95f5-4fd4be694aad"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c552cfe9-1a01-4941-9e5e-48cb916e6744",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H07 history blank sessionID only",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "0848f29c-4470-4c22-845f-dcc9fc8434c4"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "8e3e420a-09b0-417a-b6fb-9acf6606d763",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H08 history blank both",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "1cd8e0c9-318c-4647-bfa7-a93354a96f71"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "7fa1137c-7e3c-4963-9a7c-35d2d2cdf11b",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID=   &machineName=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "   "
+                },
+                {
+                  "key": "machineName",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H09 history closed session still available",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "176460c7-fc7d-4d21-8847-10005b0da806"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "2959ac57-fff5-4793-a2c3-5af53e87aeee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{invalidSessionClosed}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionClosed}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H10 history machine valid",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "3574adfc-b556-4084-bf56-c38c665eda33"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "79ffe1e9-9b46-47ea-8788-d1c11709c3d8",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName={{invalidMachineName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": "{{invalidMachineName}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H11 history missing machineName value",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "3ea7edeb-3ff2-4e3e-b107-e5baa03fbe39"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "150b29cb-19f4-4134-98b2-1896fd3c4c13",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?machineName=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "machineName",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "H12 history with session and blank machine invalid",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "id": "c2f41981-0a6f-402c-a392-8bc5f15eddbc"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "fe1206b4-a74b-4c99-bae9-8dd599257f9b",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/history?sessionID={{invalidSessionConfigured}}&machineName=   ",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                },
+                {
+                  "key": "machineName",
+                  "value": "   "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX01 manual invalid rotor position #1",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "5a28235c-978d-4c65-ada5-dc386e4965ca"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "9ac24e8d-0916-4b5d-bd50-4b1facc58286",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX02 manual invalid rotor position #2",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "61926a1b-94ad-4f3d-944e-865b4175dfe9"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "1b76ee69-2794-4240-9397-f7f9c2dd2464",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX03 manual invalid rotor position #3",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "ac31cfbb-aa28-4f54-b02b-ebf9428caadc"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "487bbee3-2449-4a4f-b54e-0e3866f9fa7a",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX04 manual invalid rotor position #4",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "df9d3e1f-4064-4d86-8926-e570615f5c91"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b18488bc-0af4-4f2e-a03b-b7b5f3464482",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX05 manual invalid rotor position #5",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "b4a0e8db-4981-424d-8aca-546d94c50f1f"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "1781f2a3-2499-4e80-90c0-d467b19ed2df",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX06 manual invalid rotor position #6",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "e69e6765-ab3e-45b3-82c8-d2062e187dfe"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c998c39e-a29d-4a22-bce3-7306b4cc6e38",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX07 manual invalid rotor position #7",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "5e759c86-354c-4ef6-bc69-9870dd96d712"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b55c4406-8bb5-470b-b21f-3a805831b260",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX08 manual invalid rotor position #8",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "1a445b32-f38c-4e42-bc16-cd97577dd220"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "3b94b097-7fa5-45b9-a0f2-779b7c4a2f41",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX09 manual invalid rotor position #9",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "0d025be2-0dc8-4f27-936b-93d1fbf8e3f6"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "289227d1-f1a0-4deb-8393-154cc3ca7e0f",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX10 manual invalid rotor position #10",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "94d0feb9-0e9b-4682-a70b-31baa2ecdd1b"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "96d6089c-542a-4622-92f3-07a91be597d9",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX11 manual invalid rotor position #11",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "d917899f-a861-4830-a2ce-9c7329faf0bd"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "5ca63f8a-cbd4-4943-8325-f44d021c242d",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX12 manual invalid rotor position #12",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "f7501cb3-2bed-416f-9d8d-90f5aa3a16da"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "54f63c9c-ceb1-4c95-9eb5-adcdd6bb8c7d",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX13 manual invalid rotor position #13",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "354ff781-7e91-4067-bd83-44ce9091539c"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b766c8b6-eb74-4589-a754-1a4a9a09976d",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX14 manual invalid rotor position #14",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "5a3c9091-adbe-46f6-a624-899767a33bcd"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6050f625-7353-4afe-ba82-b9ef31bdd9f2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX15 manual invalid rotor position #15",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "b00a497f-51d7-4173-913e-1c4634641de8"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "85e3ddf3-c2c0-4d3c-9a81-5bb355b8eeb9",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX16 manual invalid rotor position #16",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "84529a50-a085-42a1-a4ce-b10e588e5183"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "4ca4dcc6-feae-4b31-b211-eef55e5fbce4",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX17 manual invalid rotor position #17",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "3809456a-8de6-4931-b4b3-6ab5fe8e0fcc"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6f2f6b09-4a22-48cc-a58a-c05c87e5cad4",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "MX18 manual invalid rotor position #18",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "id": "f342ecf7-8cc8-4ed0-951f-b9efca6d1af7"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "0436a4c5-d5b2-4813-9dfc-96f98fd0ff0d",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rotors\":[{\"rotorNumber\":8,\"rotorPosition\":\"@\"},{\"rotorNumber\":1,\"rotorPosition\":\"B\"},{\"rotorNumber\":9,\"rotorPosition\":\"C\"},{\"rotorNumber\":4,\"rotorPosition\":\"D\"},{\"rotorNumber\":6,\"rotorPosition\":\"E\"}],\"plugs\":[],\"reflector\":\"I\",\"sessionID\":\"{{invalidSessionConfigured}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/config/manual",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "config",
+                "manual"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S98 close configured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "id": "5610d9c4-2051-4fa7-b6ce-94c8281b602b"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "af387f3e-d348-4ff2-91fa-d4ddc3f3a9cd",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{invalidSessionConfigured}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionConfigured}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S99 close unconfigured session",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "id": "f13d2998-d3d0-44ab-91b5-6a6668ce4236"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "40d0f525-fc1a-497b-9338-a3d55bf0c93e",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/session?sessionID={{invalidSessionUnconfigured}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "session"
+              ],
+              "query": [
+                {
+                  "key": "sessionID",
+                  "value": "{{invalidSessionUnconfigured}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "S100 clear storage end",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.response.to.have.status(204); });"
+                ],
+                "type": "text/javascript",
+                "id": "1173ca8a-cf43-4e15-9a67-dceabc0c68a6"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "cd0acc2b-be28-45d2-a75c-4c89c2ac35f5",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enigma/debug/storage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "debug",
+                "storage"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "17ff98c6-efb4-4444-9571-acdef7d12687"
+    }
+  ],
+  "variable": [
+    {
+      "id": "e0b54170-f674-4201-a92c-9fe050689d02",
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "id": "618fa6b0-aaf8-425d-a382-e467f35d6abb",
+      "key": "testEx3XmlPath",
+      "value": "enigma-loader/src/test/resources/test_ex3.xml"
+    },
+    {
+      "id": "3220d098-4823-40cf-ac7e-c218d3dcedbe",
+      "key": "invalidMachineName",
+      "value": "enigma_test"
+    },
+    {
+      "id": "4daa185f-f1bd-4e65-99bd-135e6a70dcd5",
+      "key": "invalidSessionConfigured",
+      "value": ""
+    },
+    {
+      "id": "9f457efb-240b-453e-aa97-8dc4a2d993af",
+      "key": "invalidSessionUnconfigured",
+      "value": ""
+    },
+    {
+      "id": "6a666a77-cc07-423b-841f-11c2d56b37ea",
+      "key": "invalidSessionClosed",
+      "value": ""
+    },
+    {
+      "id": "db1ea001-720f-4457-a7cd-5aaa256e44bc",
+      "key": "unknownSessionId",
+      "value": "00000000-0000-0000-0000-000000000999"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<BTE-Enigma name="bad-odd-abc" rotors-count="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/Enigma-Ex3.xsd">
+    <ABC>ABCDE</ABC>
+    <BTE-Rotors>
+        <BTE-Rotor id="1" notch="4">
+            <BTE-Positioning right="A" left="E"/>
+            <BTE-Positioning right="B" left="D"/>
+            <BTE-Positioning right="C" left="C"/>
+            <BTE-Positioning right="D" left="B"/>
+            <BTE-Positioning right="E" left="A"/>
+        </BTE-Rotor>
+        <BTE-Rotor id="2" notch="1">
+            <BTE-Positioning right="A" left="D"/>
+            <BTE-Positioning right="B" left="B"/>
+            <BTE-Positioning right="C" left="E"/>
+            <BTE-Positioning right="D" left="A"/>
+            <BTE-Positioning right="E" left="C"/>
+        </BTE-Rotor>
+        <BTE-Rotor id="3" notch="2">
+            <BTE-Positioning right="A" left="B"/>
+            <BTE-Positioning right="B" left="E"/>
+            <BTE-Positioning right="C" left="A"/>
+            <BTE-Positioning right="D" left="D"/>
+            <BTE-Positioning right="E" left="C"/>
+        </BTE-Rotor>
+    </BTE-Rotors>
+    <BTE-Reflectors>
+        <BTE-Reflector id="I">
+            <BTE-Reflect input="1" output="2"/>
+            <BTE-Reflect input="3" output="4"/>
+        </BTE-Reflector>
+    </BTE-Reflectors>
+</BTE-Enigma>

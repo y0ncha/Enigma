@@ -30,15 +30,15 @@ public final class ApiContractMapper {
                 state.stringsProcessed(),
                 originalCode,
                 currentCode,
-                CodeStateCompactFormatter.originalCodeCompact(state.ogCodeState()),
-                CodeStateCompactFormatter.currentRotorsPositionCompact(state.curCodeState())
+                configOriginalCodeCompact(state.ogCodeState()),
+                configCurrentRotorsPositionCompact(state.curCodeState())
         );
     }
 
     public static ProcessApiResponse process(ProcessOutcome outcome) {
         return new ProcessApiResponse(
                 outcome.output(),
-                CodeStateCompactFormatter.currentRotorsPositionCompact(outcome.machineState().curCodeState())
+                configCurrentRotorsPositionCompact(outcome.machineState().curCodeState())
         );
     }
 
@@ -65,7 +65,7 @@ public final class ApiContractMapper {
                     .add(new HistoryEntryResponse(
                             record.inputText(),
                             record.outputText(),
-                            record.durationMillis()));
+                            record.durationNanos()));
         }
 
         return grouped;
@@ -107,6 +107,26 @@ public final class ApiContractMapper {
             return configEvent.action();
         }
         return payload;
+    }
+
+    private static String configOriginalCodeCompact(CodeState codeState) {
+        if (codeState == null || codeState == CodeState.NOT_CONFIGURED) {
+            return CodeStateCompactFormatter.NOT_CONFIGURED;
+        }
+        return codeState.toString();
+    }
+
+    private static String configCurrentRotorsPositionCompact(CodeState codeState) {
+        if (codeState == null || codeState == CodeState.NOT_CONFIGURED) {
+            return CodeStateCompactFormatter.NOT_CONFIGURED;
+        }
+
+        int size = Math.min(codeState.positions().length(), codeState.notchDist().size());
+        List<String> entries = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            entries.add(codeState.positions().charAt(i) + "(" + codeState.notchDist().get(i) + ")");
+        }
+        return String.join(",", entries);
     }
 
     private static String recordCode(ProcessRecordView record) {

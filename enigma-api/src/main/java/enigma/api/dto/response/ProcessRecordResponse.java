@@ -10,7 +10,7 @@ public record ProcessRecordResponse(
         String code,
         String inputText,
         String outputText,
-        long durationMillis,
+        long durationNanos,
         Instant processedAt
 ) {
 }
