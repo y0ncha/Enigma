@@ -15,7 +15,6 @@ mvnw
 mvnw.cmd
 
 # IDE & project metadata
-.idea/
 .vscode/
 *.iws
 *.ipr

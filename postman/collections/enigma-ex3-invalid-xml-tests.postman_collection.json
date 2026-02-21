@@ -1,0 +1,1033 @@
+﻿{
+    "info":  {
+                 "_postman_id":  "657071d3-f3d2-41e9-bcab-29acdd0c13ad",
+                 "name":  "Enigma API - Invalid XML Loader Tests",
+                 "description":  "Negative test collection for Exercise 3 loader endpoint.\\nRuns POST /enigma/load with invalid XML files and verifies 400 + error payload.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+                 {
+                     "name":  "loader invalid xml",
+                     "item":  [
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-abc-odd-length.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-abc-odd-length.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-abc-odd-length.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-duplicate-rotor-id.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-duplicate-rotor-id.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-duplicate-rotor-id.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-missing-name.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-missing-name.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-missing-name.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-notch-out-of-range.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-notch-out-of-range.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-notch-out-of-range.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-duplicate-target.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-duplicate-target.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-duplicate-target.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-id-format.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-id-format.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-id-format.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-ids-not-contiguous.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-ids-not-contiguous.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-ids-not-contiguous.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-incomplete-coverage.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-incomplete-coverage.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-incomplete-coverage.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-out-of-range.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-out-of-range.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-out-of-range.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-reflector-self-mapping.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-reflector-self-mapping.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-reflector-self-mapping.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-rotor-duplicate-left-letter.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-rotor-duplicate-left-letter.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-rotor-duplicate-left-letter.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-rotor-duplicate-right-letter.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-rotor-duplicate-right-letter.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-rotor-duplicate-right-letter.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-rotor-id-gap.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-rotor-id-gap.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-rotor-id-gap.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-rotor-letter-not-in-abc.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-rotor-letter-not-in-abc.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-rotor-letter-not-in-abc.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-rotors-count-zero.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-rotors-count-zero.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-rotors-count-zero.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-too-few-rotors.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-too-few-rotors.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-too-few-rotors.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-xml-malformed.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-xml-malformed.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-xml-malformed.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "load invalid xml - ex3-invalid-xml-not-xml-content.xml",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "formdata",
+                                                                   "formdata":  [
+                                                                                    {
+                                                                                        "key":  "file",
+                                                                                        "type":  "file",
+                                                                                        "src":  "{{filesDir}}\\\\ex3-invalid-xml-not-xml-content.xml",
+                                                                                        "description":  "Invalid XML file to validate graceful failure handling"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/enigma/load",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "enigma",
+                                                                               "load"
+                                                                           ]
+                                                              },
+                                                      "description":  "Uploads invalid XML \u0027ex3-invalid-xml-not-xml-content.xml\u0027 and expects controlled validation failure."
+                                                  },
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "",
+                                                                                    "pm.test(\u0027Response is JSON with success=false and error\u0027, function () {",
+                                                                                    "    var json = pm.response.json();",
+                                                                                    "    pm.expect(json).to.have.property(\u0027success\u0027);",
+                                                                                    "    pm.expect(json.success).to.eql(false);",
+                                                                                    "    pm.expect(json).to.have.property(\u0027error\u0027);",
+                                                                                    "    pm.expect(json.error).to.be.a(\u0027string\u0027);",
+                                                                                    "    pm.expect(json.error.length).to.be.above(0);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 }
+             ],
+    "variable":  [
+                     {
+                         "key":  "baseUrl",
+                         "value":  "http://localhost:8080"
+                     },
+                     {
+                         "key":  "filesDir",
+                         "value":  "C:\\\\Enigma\\\\spring\\\\Enigma\\\\enigma-loader\\\\src\\\\test\\\\resources"
+                     }
+                 ]
+}

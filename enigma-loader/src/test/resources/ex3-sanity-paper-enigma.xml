@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BTE-Enigma name="paper-enigma" rotors-count="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema/Enigma-Ex3.xsd">
+		<ABC>
+			ABCDEFGHIJKLMNOPQRSTUVWXYZ
+		</ABC>
+		<BTE-Rotors>
+			<BTE-Rotor id="1" notch="17">
+				<BTE-Positioning right="E" left="A"/>
+				<BTE-Positioning right="K" left="B"/>
+				<BTE-Positioning right="M" left="C"/>
+				<BTE-Positioning right="F" left="D"/>
+				<BTE-Positioning right="L" left="E"/>
+				<BTE-Positioning right="G" left="F"/>
+				<BTE-Positioning right="D" left="G"/>
+				<BTE-Positioning right="Q" left="H"/>
+				<BTE-Positioning right="V" left="I"/>
+				<BTE-Positioning right="Z" left="J"/>
+				<BTE-Positioning right="N" left="K"/>
+				<BTE-Positioning right="T" left="L"/>
+				<BTE-Positioning right="O" left="M"/>
+				<BTE-Positioning right="W" left="N"/>
+				<BTE-Positioning right="Y" left="O"/>
+				<BTE-Positioning right="H" left="P"/>
+				<BTE-Positioning right="X" left="Q"/>
+				<BTE-Positioning right="U" left="R"/>
+				<BTE-Positioning right="S" left="S"/>
+				<BTE-Positioning right="P" left="T"/>
+				<BTE-Positioning right="A" left="U"/>
+				<BTE-Positioning right="I" left="V"/>
+				<BTE-Positioning right="B" left="W"/>
+				<BTE-Positioning right="R" left="X"/>
+				<BTE-Positioning right="C" left="Y"/>
+				<BTE-Positioning right="J" left="Z"/>
+			</BTE-Rotor>
+			<BTE-Rotor id="2" notch="5">
+				<BTE-Positioning right="A" left="A"/>
+				<BTE-Positioning right="J" left="B"/>
+				<BTE-Positioning right="D" left="C"/>
+				<BTE-Positioning right="K" left="D"/>
+				<BTE-Positioning right="S" left="E"/>
+				<BTE-Positioning right="I" left="F"/>
+				<BTE-Positioning right="R" left="G"/>
+				<BTE-Positioning right="U" left="H"/>
+				<BTE-Positioning right="X" left="I"/>
+				<BTE-Positioning right="B" left="J"/>
+				<BTE-Positioning right="L" left="K"/>
+				<BTE-Positioning right="H" left="L"/>
+				<BTE-Positioning right="W" left="M"/>
+				<BTE-Positioning right="T" left="N"/>
+				<BTE-Positioning right="M" left="O"/>
+				<BTE-Positioning right="C" left="P"/>
+				<BTE-Positioning right="Q" left="Q"/>
+				<BTE-Positioning right="G" left="R"/>
+				<BTE-Positioning right="Z" left="S"/>
+				<BTE-Positioning right="N" left="T"/>
+				<BTE-Positioning right="P" left="U"/>
+				<BTE-Positioning right="Y" left="V"/>
+				<BTE-Positioning right="F" left="W"/>
+				<BTE-Positioning right="V" left="X"/>
+				<BTE-Positioning right="O" left="Y"/>
+				<BTE-Positioning right="E" left="Z"/>
+			</BTE-Rotor>
+			<BTE-Rotor id="3" notch="22">
+				<BTE-Positioning right="B" left="A"/>
+				<BTE-Positioning right="D" left="B"/>
+				<BTE-Positioning right="F" left="C"/>
+				<BTE-Positioning right="H" left="D"/>
+				<BTE-Positioning right="J" left="E"/>
+				<BTE-Positioning right="L" left="F"/>
+				<BTE-Positioning right="C" left="G"/>
+				<BTE-Positioning right="P" left="H"/>
+				<BTE-Positioning right="R" left="I"/>
+				<BTE-Positioning right="T" left="J"/>
+				<BTE-Positioning right="X" left="K"/>
+				<BTE-Positioning right="V" left="L"/>
+				<BTE-Positioning right="Z" left="M"/>
+				<BTE-Positioning right="N" left="N"/>
+				<BTE-Positioning right="Y" left="O"/>
+				<BTE-Positioning right="E" left="P"/>
+				<BTE-Positioning right="I" left="Q"/>
+				<BTE-Positioning right="W" left="R"/>
+				<BTE-Positioning right="G" left="S"/>
+				<BTE-Positioning right="A" left="T"/>
+				<BTE-Positioning right="K" left="U"/>
+				<BTE-Positioning right="M" left="V"/>
+				<BTE-Positioning right="U" left="W"/>
+				<BTE-Positioning right="S" left="X"/>
+				<BTE-Positioning right="Q" left="Y"/>
+				<BTE-Positioning right="O" left="Z"/>
+			</BTE-Rotor>
+		</BTE-Rotors>
+		<BTE-Reflectors>
+			<BTE-Reflector id="I">
+				<BTE-Reflect input="1" output="25"/>
+				<BTE-Reflect input="2" output="18"/>
+				<BTE-Reflect input="3" output="21"/>
+				<BTE-Reflect input="4" output="8"/>
+				<BTE-Reflect input="5" output="17"/>
+				<BTE-Reflect input="6" output="19"/>
+				<BTE-Reflect input="7" output="12"/>
+				<BTE-Reflect input="9" output="16"/>
+				<BTE-Reflect input="10" output="24"/>
+				<BTE-Reflect input="11" output="14"/>
+				<BTE-Reflect input="13" output="15"/>
+				<BTE-Reflect input="20" output="26"/>
+				<BTE-Reflect input="22" output="23"/>
+			</BTE-Reflector>
+		</BTE-Reflectors>
+</BTE-Enigma>

@@ -1,0 +1,15 @@
+{
+  "workspace": {
+    "id": "e5d63a89-9e87-4ce8-8962-e4a3290b03f2"
+  },
+  "entities": {
+    "environments": [],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [
+      "../enigma-engine/src/main/gen/api/openapi.yaml"
+    ],
+    "collections": []
+  }
+}

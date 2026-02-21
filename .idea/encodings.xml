@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/enigma-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-console/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-console/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-dal/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-dal/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-engine/src/main/gen/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-engine/src/main/gen/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-engine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-engine/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-loader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-loader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-logic/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-logic/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-machine/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-machine/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-sessions/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-sessions/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-shared/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/enigma-shared/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

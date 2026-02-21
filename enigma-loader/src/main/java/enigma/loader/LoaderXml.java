@@ -10,6 +10,7 @@ import enigma.shared.spec.MachineSpec;
 import enigma.shared.spec.ReflectorSpec;
 import enigma.shared.spec.RotorSpec;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
@@ -49,6 +50,7 @@ public class LoaderXml implements Loader {
         BTEEnigma root = loadRoot(filePath);
 
         rotorsInUse = extractRotorsInUse(root);
+        String machineName = validateMachineName(root.getName());
 
         Alphabet alphabet = extractAlphabet(root);
 
@@ -57,7 +59,7 @@ public class LoaderXml implements Loader {
         Map<String, ReflectorSpec> reflectors = extractReflectors(root, alphabet);
 
         // Build MachineSpec including rotorsInUse so callers can derive required rotor count
-        return new MachineSpec(alphabet, rotors, reflectors, rotorsInUse);
+        return new MachineSpec(alphabet, rotors, reflectors, rotorsInUse, machineName);
     }
 
     /**
@@ -91,15 +93,75 @@ public class LoaderXml implements Loader {
             return (BTEEnigma) unmarshaller.unmarshal(new File(filePath));
         }
         catch (JAXBException e) {
-            throw new EnigmaLoadingException("Unable to parse file '" + filePath + "': " + e.getMessage(), e);
+            throw new EnigmaLoadingException(buildXmlParsingMessage(filePath, e), e);
         }
+    }
+
+    private String buildXmlParsingMessage(String filePath, JAXBException exception) {
+        SAXParseException saxParseException = findSaxParseException(exception);
+        if (saxParseException != null) {
+            StringBuilder message = new StringBuilder("XML does not comply with XSD schema");
+            if (saxParseException.getLineNumber() > 0 && saxParseException.getColumnNumber() > 0) {
+                message.append(" at line ")
+                        .append(saxParseException.getLineNumber())
+                        .append(", column ")
+                        .append(saxParseException.getColumnNumber());
+            }
+
+            String details = sanitizeParsingMessage(saxParseException.getMessage());
+            if (!details.isBlank()) {
+                message.append(": ").append(details);
+            }
+            return message.toString();
+        }
+
+        Throwable linked = exception.getLinkedException();
+        if (linked != null && linked.getMessage() != null && !linked.getMessage().isBlank()) {
+            return "Unable to parse file '" + filePath + "': " + sanitizeParsingMessage(linked.getMessage());
+        }
+
+        String fallback = exception.getMessage();
+        if (fallback == null || fallback.isBlank()) {
+            fallback = "Unknown XML parsing error";
+        }
+        return "Unable to parse file '" + filePath + "': " + sanitizeParsingMessage(fallback);
+    }
+
+    private SAXParseException findSaxParseException(JAXBException exception) {
+        Throwable current = exception;
+        while (current != null) {
+            if (current instanceof SAXParseException saxParseException) {
+                return saxParseException;
+            }
+            current = current.getCause();
+        }
+
+        Throwable linked = exception.getLinkedException();
+        while (linked != null) {
+            if (linked instanceof SAXParseException saxParseException) {
+                return saxParseException;
+            }
+            linked = linked.getCause();
+        }
+        return null;
+    }
+
+    private String sanitizeParsingMessage(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "";
+        }
+
+        String message = raw.trim();
+        message = message.replaceFirst("^org\\.xml\\.sax\\.SAXParseException;\\s*", "");
+        message = message.replaceFirst("^lineNumber:\\s*\\d+;\\s*columnNumber:\\s*\\d+;\\s*", "");
+        return message.trim();
     }
 
     /**
      * Load XSD schema from classpath resources for validation.
      *
-     * <p>The schema file is located at: {@code /schema/Enigma-Ex2.xsd} in the classpath
-     * (typically {@code src/main/resources/schema/Enigma-Ex2.xsd}).</p>
+     * <p>The schema file is located at: {@code /schema/Enigma-Ex3.xsd} in the classpath
+     * (typically {@code src/main/resources/schema/Enigma-Ex3.xsd}).</p>
      *
      * @return Schema instance for validation, or null if schema cannot be loaded
      */
@@ -108,14 +170,18 @@ public class LoaderXml implements Loader {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
             // Load schema from classpath
-            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+            InputStream schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex3.xsd");
             if (schemaStream == null) {
                 // Fallback: try loading from URL if available
-                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                // schemaStream = getClass().getResourceAsStream("/schema/Enigma-Ex2.xsd");
+                URL schemaUrl = getClass().getResource("/schema/Enigma-Ex3.xsd");
+                if (schemaUrl == null) {
+                    schemaUrl = getClass().getResource("/schema/Enigma-Ex2.xsd");
+                }
                 if (schemaUrl != null) {
                     return schemaFactory.newSchema(schemaUrl);
                 }
-                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex2.xsd in classpath. Validation skipped.");
+                System.err.println("Warning: XSD schema not found at /schema/Enigma-Ex3.xsd in classpath. Validation skipped.");
                 return null;
             }
 
@@ -124,6 +190,23 @@ public class LoaderXml implements Loader {
             System.err.println("Warning: Unable to load XSD schema: " + e.getMessage() + ". Validation skipped.");
             return null;
         }
+    }
+
+    /**
+     * Validate and normalize machine name from XML (Exercise 3).
+     *
+     * @param rawName name as read from XML
+     * @return trimmed non-empty machine name
+     */
+    private String validateMachineName(String rawName) throws EnigmaLoadingException {
+        if (rawName == null) {
+            throw new EnigmaLoadingException("Machine name is missing (BTE-Enigma@name)");
+        }
+        String clean = rawName.trim();
+        if (clean.isEmpty()) {
+            throw new EnigmaLoadingException("Machine name is empty (BTE-Enigma@name)");
+        }
+        return clean;
     }
 
     /**
@@ -333,19 +416,15 @@ public class LoaderXml implements Loader {
     /**
      * Validate and clean the raw alphabet string from the XML {@code <ABC>} element.
      *
-     * <p>This method expects the raw alphabet value as read from the XML {@code <ABC>} element.
-     * It removes all whitespace using {@code rawAbc.replaceAll("\\s+", "")} and then
-     * enforces the following constraints on the cleaned alphabet:</p>
+     * <p>This method trims only leading/trailing whitespace from the raw value and
+     * preserves inner spaces as real alphabet characters.</p>
      *
      * <ul>
      *   <li>the raw value must not be {@code null} (the XML must contain an {@code <ABC>} element)</li>
-     *   <li>the cleaned value must not be empty after whitespace removal</li>
+     *   <li>the cleaned value must not be empty after edge trimming</li>
      *   <li>the cleaned value must have an even length</li>
      *   <li>the cleaned value must not contain duplicate characters</li>
      * </ul>
-     *
-     * <p>On success the cleaned alphabet string (all whitespace removed) is returned.
-     * On failure an {@link EnigmaLoadingException} is thrown describing the problem.</p>
      *
      * @param rawAbc raw ABC value from XML
      * @return cleaned alphabet string
@@ -356,14 +435,14 @@ public class LoaderXml implements Loader {
             throw new EnigmaLoadingException("<ABC> section is missing");
         }
 
-        String cleanAbc = rawAbc.replaceAll("\\s+", "");
+        String cleanAbc = rawAbc.trim();
         if (cleanAbc.isEmpty()) {
-            throw new EnigmaLoadingException("<ABC> section is empty after removing whitespace");
+            throw new EnigmaLoadingException("<ABC> section is empty after trimming");
         }
 
         if (cleanAbc.length() % 2 != 0) {
             throw new EnigmaLoadingException(
-                String.format("Alphabet must have even length, but got %d characters (Alphabet: \"%s\")", cleanAbc.length(), cleanAbc));
+                String.format("Alphabet must have even length, but got %d characters (Alphabet: %s)", cleanAbc.length(), cleanAbc));
         }
 
         // Check for duplicate characters

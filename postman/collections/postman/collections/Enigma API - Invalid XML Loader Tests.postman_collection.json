@@ -1,0 +1,1378 @@
+{
+  "info": {
+    "_postman_id": "baafbb9b-98d8-4f7c-b6af-e5d7ec533911",
+    "name": "Enigma API - Invalid XML Loader Tests",
+    "description": "Negative test collection for Exercise 3 loader endpoint.\\nRuns POST /enigma/load with invalid XML files and verifies 400 + error payload.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "loader invalid xml",
+      "item": [
+        {
+          "name": "load invalid xml - ex3-invalid-abc-odd-length.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "4cbe2739-4cff-4fda-83c6-a1fa3df9767d",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "71323192-98a8-4d15-8fbf-d800574ee770",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "96f1103a-9ad8-460d-b0f5-180e179a54c3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ac-14a7-4390-8a59-31bf682a7211"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-abc-odd-length.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-duplicate-rotor-id.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f4f323ba-c5f3-40ff-9a90-0fd47cb4b656",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "86fe387f-a8e8-444d-8432-c831f40f7496",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "18314a20-4969-480f-b2d4-e5c4e218ef14",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ad-6bbf-4410-84c3-4b7cee35d690"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-duplicate-rotor-id.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-missing-name.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b1621811-ce4c-46d3-95a8-9e45e042ac01",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "8fe4faa6-51a7-4b17-b892-aeab4552aa5e",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "dbdb525a-19dc-461f-94eb-3f46b56ac446",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ae-1a64-4ba0-9f65-4caf1fa1ce0a"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-missing-name.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-notch-out-of-range.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "41c6e648-6e06-4f6e-8310-8222d8d83780",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "0d5a780c-7d51-4aec-aa51-b5c922ead1e9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "b26840ba-90c2-4ea9-8981-eb4d116fa99e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ae-92a1-4fa0-add8-9d719e3be14d"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-notch-out-of-range.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-duplicate-target.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "e3d3e75c-9e72-4f38-b13c-d0d921d6e99b",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "6541a0f9-b68d-47db-b8cd-01e55e12cf1b",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "64b22155-c0e9-41c0-a119-74ab6d87b2db",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b0-823f-46b0-9e2c-a1fd4f5f8d66"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-duplicate-target.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-id-format.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "79070609-11fb-47ac-9b2a-ef05e69def7d",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "be7c1f99-58fc-476c-b555-bfde797b42ae",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "24b8d743-95a7-4d3d-befa-9d42966fdec6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b1-2555-4e80-8340-b66e2917b562"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-id-format.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-ids-not-contiguous.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a52e8e7b-6269-4ae0-95d7-4b8f4970fe42",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "11436307-2c92-49c6-a2a7-bb15378bd8e4",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "ab105833-96ce-4199-bc76-5df7759ca2c2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b2-8771-4c30-960d-9c6fcf43d270"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-ids-not-contiguous.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-incomplete-coverage.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d8dffe00-c3b6-4ec4-8d6b-89d69546f0b2",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "d2064fe5-bee1-4702-a56a-f20b2a72c450",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "863947ff-6e0d-434d-a079-673f5dda4eaa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b3-a0f0-4c00-84b2-1b4057386c6b"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-incomplete-coverage.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-out-of-range.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "f82bdc6d-d546-4e8c-9bd4-0faaa9e82788",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "19f706a8-2fd2-4fbb-814a-768920631d03",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "bf184c96-50a1-4b7a-b92c-e34b556eada9",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b4-4ece-4070-8d30-17e8a5987348"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-out-of-range.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-reflector-self-mapping.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "8e8ec833-01a4-413b-aa5e-954b5dd14bf6",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "8cb40635-a2e4-4b7b-80a0-bc736f66ebd9",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "d8e9aa63-c17e-4775-8e70-b908681278f0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b4-e3ff-4630-9ffd-3ae27cac4c87"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-reflector-self-mapping.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-rotor-duplicate-left-letter.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3f9c33e3-40c0-46ee-96d0-cec25bc9b49e",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "18c40e83-04d0-447b-8f61-232a5e23af8c",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "45470143-27c8-41e5-b740-6e49428604be",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b7-3fe9-4700-9924-eb7239b77f9e"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-rotor-duplicate-left-letter.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-rotor-duplicate-right-letter.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "01f92641-3479-4a8e-9f57-7b873428d721",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "56e12549-09ca-4901-96a4-bbfcd41128e0",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "8a92c53f-7e12-4667-b50c-b5989dd75b5a",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b8-216f-4d00-9a17-f685987e6401"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-rotor-duplicate-right-letter.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-rotor-id-gap.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c8ca4373-becc-48c4-b70f-6e7e3162ccc5",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "228be2e0-ea5c-4426-a5f3-e8f14b0b6899",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "8e8de625-5478-4b37-96d4-43e868386c3d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b8-c5de-48a0-bb3d-407a4e574ab5"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-rotor-id-gap.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-rotor-letter-not-in-abc.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "1b02323e-4086-48a6-822c-ff19336b39e0",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "37cf0042-b6cf-44e2-aaa4-9de75f2eb533",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "7fac116d-66ff-4342-b42c-24a4b301b446",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3b9-7257-45f0-a4b2-7c7b20c3cdc5"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-rotor-letter-not-in-abc.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-rotors-count-zero.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "26c8a619-e46c-4e03-bf64-40df9ec3f593",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "506b1320-fcc7-455a-8bd4-8ab326f7fc64",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "6f615444-d79c-4449-b9cf-7caf9a4f979f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ba-54f6-4820-b5b9-04d35121a116"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-rotors-count-zero.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-too-few-rotors.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2235a042-90c5-49ff-a3b1-db2c0054bdc2",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "d69de70d-1fcc-471a-8e88-d3de8029cce1",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "55da48e1-2f99-4419-a82d-a3bc5820d8d6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3ba-fe05-4510-9965-dc4d74390746"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-too-few-rotors.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-xml-malformed.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "5eb65a44-09ce-4e5b-833f-e6c825d05971",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "e43b6376-481d-405e-ba54-dc35f4e02f83",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "65d2d38b-a2ba-4de8-8685-ed88cc9a1c29",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3bb-a103-4640-b57c-57c002b9160f"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-xml-malformed.xml' and expects controlled validation failure."
+          },
+          "response": []
+        },
+        {
+          "name": "load invalid xml - ex3-invalid-xml-not-xml-content.xml",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "0af503d0-bf89-4ee3-a190-391ed50d3d3a",
+                "exec": [
+                  "pm.test('Status is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON with success=false and error', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success');",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json).to.have.property('error');",
+                  "    pm.expect(json.error).to.be.a('string');",
+                  "    pm.expect(json.error.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "21df3d44-baf7-44a2-beb5-42946ab913a3",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "7cea39e2-9ccb-439f-a80d-757bdb22bf58",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "Invalid XML file to validate graceful failure handling",
+                  "src": [
+                    "postman-cloud:///1f10e3bc-3c1e-46c0-8560-2c4c44709e3a"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enigma/load",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enigma",
+                "load"
+              ]
+            },
+            "description": "Uploads invalid XML 'ex3-invalid-xml-not-xml-content.xml' and expects controlled validation failure."
+          },
+          "response": []
+        }
+      ],
+      "id": "467cf804-0239-4da9-ac73-65d827030914"
+    }
+  ],
+  "variable": [
+    {
+      "id": "546c1110-caa1-4fb0-94f2-985edf5e58a8",
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "id": "d7781865-a242-4235-9898-12f29ac301a0",
+      "key": "filesDir",
+      "value": "C:\\\\Enigma\\\\spring\\\\Enigma\\\\enigma-loader\\\\src\\\\test\\\\resources"
+    }
+  ]
+}

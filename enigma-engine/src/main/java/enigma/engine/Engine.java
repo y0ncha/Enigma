@@ -24,6 +24,13 @@ public interface Engine {
     void loadMachine(String path) throws Exception;
 
     /**
+     * Load machine specification from an already validated source.
+     *
+     * @param machineSpec machine specification to activate
+     */
+    void loadMachine(MachineSpec machineSpec);
+
+    /**
      * Return current machine configuration and wiring data.
      *
      * @return machine state information

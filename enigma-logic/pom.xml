@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>patmal.course.enigma</groupId>
+        <artifactId>enigma-aggregator</artifactId>
+        <version>1.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>enigma-logic</artifactId>
+    <packaging>pom</packaging>
+    <name>Enigma Logic Aggregator</name>
+
+    <modules>
+        <module>../enigma-shared</module>
+        <module>../enigma-machine</module>
+        <module>../enigma-loader</module>
+        <module>../enigma-engine</module>
+        <module>../enigma-sessions</module>
+        <module>../enigma-console</module>
+    </modules>
+</project>
